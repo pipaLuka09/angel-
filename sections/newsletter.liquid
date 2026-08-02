@@ -1,0 +1,35 @@
+<div class="newsletter">
+  <div class="page-width">
+    <h2 class="newsletter__heading">{{ section.settings.heading }}</h2>
+    <p class="newsletter__subtext">{{ section.settings.subtext }}</p>
+
+    {%- form 'customer', class: 'newsletter__form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input
+        type="email"
+        name="contact[email]"
+        placeholder="{{ 'newsletter.placeholder' | t }}"
+        required
+        aria-label="{{ 'newsletter.placeholder' | t }}"
+      >
+      <button type="submit" class="btn btn--accent">{{ 'newsletter.submit' | t }}</button>
+
+      {%- if form.posted_successfully? -%}
+        <p class="newsletter__success">{{ 'newsletter.success' | t }}</p>
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Encabezado", "default": "No te pierdas nuestras ofertas" },
+    { "type": "textarea", "id": "subtext", "label": "Subtítulo", "default": "Suscríbete y recibe descuentos y lanzamientos de nuevos gadgets antes que nadie." }
+  ],
+  "presets": [
+    { "name": "Newsletter" }
+  ]
+}
+{% endschema %}

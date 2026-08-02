@@ -1,0 +1,19 @@
+{
+  "current": {
+    "color_background": "#0B0F14",
+    "color_surface": "#111820",
+    "color_text": "#E7EEF6",
+    "color_text_muted": "#93A5B9",
+    "color_primary": "#2F6FEB",
+    "color_accent": "#12D6DF",
+    "color_border": "#1E2A38",
+    "font_heading": "'Space Grotesk', system-ui, sans-serif",
+    "font_body": "'Inter', system-ui, sans-serif",
+    "page_width": 1280,
+    "sticky_header": true,
+    "social_instagram": "",
+    "social_facebook": "",
+    "social_tiktok": "",
+    "social_whatsapp": ""
+  }
+}

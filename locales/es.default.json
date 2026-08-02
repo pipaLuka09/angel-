@@ -1,0 +1,72 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Buscar productos"
+    },
+    "continue_shopping": "Seguir comprando"
+  },
+  "header": {
+    "menu": "Menú",
+    "cart": "Carrito",
+    "search": "Buscar"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Agregar al carrito",
+      "sold_out": "Agotado",
+      "on_sale": "Oferta",
+      "quantity": "Cantidad",
+      "view_details": "Ver detalles",
+      "choose_options": "Elegir opciones",
+      "unavailable": "No disponible"
+    }
+  },
+  "collection": {
+    "view_all": "Ver todo",
+    "empty": "Todavía no hay productos en esta colección.",
+    "sort_by": "Ordenar por",
+    "sort": {
+      "best_selling": "Más vendidos",
+      "price_ascending": "Precio: menor a mayor",
+      "price_descending": "Precio: mayor a menor",
+      "title_ascending": "Nombre: A-Z",
+      "title_descending": "Nombre: Z-A",
+      "created_descending": "Más recientes"
+    }
+  },
+  "cart": {
+    "title": "Tu carrito",
+    "empty": "Tu carrito está vacío.",
+    "subtotal": "Subtotal",
+    "checkout": "Finalizar compra",
+    "remove": "Eliminar",
+    "update": "Actualizar",
+    "quantity": "Cantidad",
+    "product": "Producto",
+    "price": "Precio",
+    "total": "Total"
+  },
+  "newsletter": {
+    "heading": "No te pierdas nuestras ofertas",
+    "subtext": "Suscríbete y recibe descuentos y lanzamientos de nuevos gadgets antes que nadie.",
+    "placeholder": "Tu correo electrónico",
+    "submit": "Suscribirme",
+    "success": "¡Gracias por suscribirte!"
+  },
+  "footer": {
+    "about_heading": "Sobre nosotros",
+    "categories_heading": "Categorías",
+    "links_heading": "Enlaces",
+    "follow_us": "Síguenos",
+    "rights": "Todos los derechos reservados."
+  },
+  "404": {
+    "title": "Página no encontrada",
+    "subtext": "El enlace que seguiste puede estar roto o la página pudo haberse eliminado.",
+    "link": "Volver al inicio"
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Siguiente"
+  }
+}

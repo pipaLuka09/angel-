@@ -1,0 +1,112 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "ShopNow Tech",
+    "theme_author": "ShopNow",
+    "theme_version": "1.0.0",
+    "theme_documentation_url": "https://shopnow-1548641.myshopify.com",
+    "theme_support_email": "angeloppp123@gmail.com"
+  },
+  {
+    "name": "Colores",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Fondo",
+        "default": "#0B0F14"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Fondo de tarjetas / secciones",
+        "default": "#111820"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Texto",
+        "default": "#E7EEF6"
+      },
+      {
+        "type": "color",
+        "id": "color_text_muted",
+        "label": "Texto secundario",
+        "default": "#93A5B9"
+      },
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Primario (botones, links)",
+        "default": "#2F6FEB"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Acento / CTA (neón)",
+        "default": "#12D6DF"
+      },
+      {
+        "type": "color",
+        "id": "color_border",
+        "label": "Bordes",
+        "default": "#1E2A38"
+      }
+    ]
+  },
+  {
+    "name": "Tipografía",
+    "settings": [
+      {
+        "type": "select",
+        "id": "font_heading",
+        "label": "Fuente de encabezados",
+        "options": [
+          { "value": "'Space Grotesk', system-ui, sans-serif", "label": "Space Grotesk" },
+          { "value": "'Poppins', system-ui, sans-serif", "label": "Poppins" }
+        ],
+        "default": "'Space Grotesk', system-ui, sans-serif"
+      },
+      {
+        "type": "select",
+        "id": "font_body",
+        "label": "Fuente de cuerpo de texto",
+        "options": [
+          { "value": "'Inter', system-ui, sans-serif", "label": "Inter" },
+          { "value": "'Work Sans', system-ui, sans-serif", "label": "Work Sans" }
+        ],
+        "default": "'Inter', system-ui, sans-serif"
+      }
+    ]
+  },
+  {
+    "name": "Diseño",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Ancho máximo del contenido",
+        "min": 1100,
+        "max": 1600,
+        "step": 50,
+        "unit": "px",
+        "default": 1280
+      },
+      {
+        "type": "checkbox",
+        "id": "sticky_header",
+        "label": "Encabezado fijo al hacer scroll",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Redes sociales",
+    "settings": [
+      { "type": "text", "id": "social_instagram", "label": "URL de Instagram" },
+      { "type": "text", "id": "social_facebook", "label": "URL de Facebook" },
+      { "type": "text", "id": "social_tiktok", "label": "URL de TikTok" },
+      { "type": "text", "id": "social_whatsapp", "label": "Número de WhatsApp (con código de país)" }
+    ]
+  }
+]

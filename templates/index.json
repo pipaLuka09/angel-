@@ -1,0 +1,71 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Tecnología para tu día a día",
+        "heading": "Gadgets que hacen tu vida más fácil",
+        "subheading": "Carga rápida, audio, seguridad para el hogar y accesorios para auto y moto — todo en un solo lugar.",
+        "button_label": "Ver catálogo",
+        "button_link": "/collections/all",
+        "button_label_2": "Ver ofertas de carga",
+        "button_link_2": "/collections/carga-y-energia"
+      }
+    },
+    "categories": {
+      "type": "collection-list",
+      "settings": {
+        "heading": "Compra por categoría",
+        "subheading": "Todo lo que necesitas, organizado"
+      },
+      "blocks": {
+        "cat-1": { "type": "category", "settings": { "collection": "carga-y-energia" } },
+        "cat-2": { "type": "category", "settings": { "collection": "audio-y-sonido" } },
+        "cat-3": { "type": "category", "settings": { "collection": "accesorios-para-celular" } },
+        "cat-4": { "type": "category", "settings": { "collection": "accesorios-para-auto" } },
+        "cat-5": { "type": "category", "settings": { "collection": "hogar-y-cocina" } },
+        "cat-6": { "type": "category", "settings": { "collection": "privacidad-y-seguridad" } }
+      },
+      "block_order": ["cat-1", "cat-2", "cat-3", "cat-4", "cat-5", "cat-6"]
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Más vendidos en Carga y Energía",
+        "subheading": "Cargadores, cables y accesorios que nunca te dejan sin batería",
+        "collection": "carga-y-energia",
+        "products_to_show": 8
+      }
+    },
+    "why-us": {
+      "type": "why-us",
+      "settings": {
+        "heading": "Por qué comprar en ShopNow"
+      },
+      "blocks": {
+        "feature-1": { "type": "feature", "settings": { "icon": "shipping", "title": "Envío rápido", "text": "Recibe tus gadgets en la puerta de tu casa en pocos días." } },
+        "feature-2": { "type": "feature", "settings": { "icon": "shield", "title": "Garantía", "text": "Productos revisados y con garantía en cada compra." } },
+        "feature-3": { "type": "feature", "settings": { "icon": "card", "title": "Pago seguro", "text": "Paga con tu método favorito, protegido en todo momento." } },
+        "feature-4": { "type": "feature", "settings": { "icon": "support", "title": "Soporte real", "text": "Te ayudamos por WhatsApp antes y después de tu compra." } }
+      },
+      "block_order": ["feature-1", "feature-2", "feature-3", "feature-4"]
+    },
+    "tech": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Tecnología y Gadgets IA",
+        "subheading": "Lo último para simplificar tu día a día",
+        "collection": "tecnologia-y-gadgets-ia",
+        "products_to_show": 4
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "No te pierdas nuestras ofertas",
+        "subtext": "Suscríbete y recibe descuentos y lanzamientos de nuevos gadgets antes que nadie."
+      }
+    }
+  },
+  "order": ["hero", "categories", "featured", "why-us", "tech", "newsletter"]
+}

@@ -1,6 +1,6 @@
-# angel- — Tema de Shopify
+# ShopNow Tech — Tema de Shopify
 
-Flujo de trabajo para editar el tema de esta tienda usando Shopify CLI y Claude Code.
+Tema construido desde cero para **ShopNow** (shopnow-1548641.myshopify.com), usando las colecciones y productos reales de la tienda. Ver [`CLAUDE.md`](./CLAUDE.md) para la paleta, tipografía y estructura de secciones.
 
 ## Configuración inicial
 
@@ -10,31 +10,39 @@ Flujo de trabajo para editar el tema de esta tienda usando Shopify CLI y Claude 
    npm install -g @shopify/cli
    ```
 
-2. **Descarga el tema actual** desde la carpeta del proyecto:
+2. **Conecta esta carpeta con tu tienda y sube el tema como borrador:**
 
    ```bash
-   shopify theme pull
+   shopify theme push --unpublished --theme "ShopNow Tech"
    ```
 
-   Esto te pedirá autenticarte con tu tienda de Shopify y descargará los archivos (`layout/`, `templates/`, `sections/`, `snippets/`, `assets/`, `config/`, `locales/`) en esta carpeta.
+   Esto te pedirá autenticarte con tu tienda de Shopify y creará un tema nuevo (sin publicar) con estos archivos.
 
-3. **Abre la carpeta en la terminal y ejecuta:**
+3. **Previsualiza en vivo mientras editas:**
 
    ```bash
-   claude
+   shopify theme dev
    ```
 
-4. **Ten a mano antes de pedir cambios de diseño:**
-   - Paleta de colores de la marca
-   - Tipografías definidas
-   - Estructura de secciones ya definida (qué secciones va en cada plantilla)
+4. **Valida el tema antes de subir cambios:**
 
-   Consulta y completa [`CLAUDE.md`](./CLAUDE.md) con estos datos para que Claude Code los use como referencia consistente en cada sesión.
+   ```bash
+   shopify theme check
+   ```
 
-## Subir cambios a la tienda
+## Publicar
+
+Cuando estés conforme con la vista previa, publica el tema desde el admin de Shopify (Tienda online → Temas) o con:
 
 ```bash
 shopify theme push
 ```
 
-O usa `shopify theme dev` para previsualizar los cambios en un tema de desarrollo antes de publicarlos.
+## Estructura
+
+- `layout/theme.liquid` — layout base, fuentes y variables de color.
+- `sections/` — header, footer, hero, categorías, colección destacada, producto, colección, carrito, etc.
+- `templates/*.json` — arma cada plantilla a partir de esas secciones.
+- `snippets/` — `product-card` y `price`, reutilizados en home, colección y buscador.
+- `assets/base.css` / `assets/global.js` — estilos y JS (menú móvil, selector de variantes, cantidad).
+- `config/settings_schema.json` — colores, tipografía y ancho editables desde el editor de temas.

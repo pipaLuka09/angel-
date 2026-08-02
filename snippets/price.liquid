@@ -1,0 +1,16 @@
+{%- comment -%}
+  Renders a price, with a compare-at price shown struck-through when the item is on sale.
+  Usage: {% render 'price', product: product %}
+{%- endcomment -%}
+{%- liquid
+  assign target = variant | default: product.selected_or_first_available_variant
+  assign compare_at = target.compare_at_price
+-%}
+<span class="price" data-price>
+  {%- if compare_at and compare_at > target.price -%}
+    <span>{{ target.price | money }}</span>
+    <span class="price__compare">{{ compare_at | money }}</span>
+  {%- else -%}
+    <span>{{ target.price | money }}</span>
+  {%- endif -%}
+</span>

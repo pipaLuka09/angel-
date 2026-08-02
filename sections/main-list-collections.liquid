@@ -1,0 +1,22 @@
+<div class="page-width">
+  <div class="collection-header">
+    <h1>{{ 'footer.categories_heading' | t }}</h1>
+  </div>
+  <div class="collection-grid">
+    {%- for collection in collections -%}
+      <a href="{{ collection.url }}" class="collection-card">
+        {%- if collection.image -%}
+          <img src="{{ collection.image | image_url: width: 500 }}" alt="{{ collection.title }}" loading="lazy" width="500" height="375">
+        {%- endif -%}
+        <span class="collection-card__label">{{ collection.title }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Todas las colecciones",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,54 @@
+<div class="page-width">
+  <h1>{{ 'cart.title' | t }}</h1>
+
+  {%- if cart.item_count == 0 -%}
+    <div class="cart-empty">
+      <p>{{ 'cart.empty' | t }}</p>
+      <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">{{ 'general.continue_shopping' | t }}</a>
+    </div>
+  {%- else -%}
+    <form action="{{ routes.cart_url }}" method="post" class="cart">
+      <div class="cart-items">
+        {%- for item in cart.items -%}
+          <div class="cart-line">
+            <a href="{{ item.url }}">
+              {%- if item.image -%}
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.image.alt | default: item.title }}" width="90" height="90">
+              {%- endif -%}
+            </a>
+            <div>
+              <a href="{{ item.url }}" class="cart-line__title">{{ item.product.title }}</a>
+              {%- unless item.variant.title == 'Default Title' -%}
+                <div class="cart-line__variant">{{ item.variant.title }}</div>
+              {%- endunless -%}
+              <div class="cart-line__variant">{{ item.original_price | money }}</div>
+              <a href="{{ item.url_to_remove }}" class="cart-line__remove">{{ 'cart.remove' | t }}</a>
+            </div>
+            <div class="quantity-selector">
+              <button type="button" data-quantity-step="-1" aria-label="Reducir cantidad">&minus;</button>
+              <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" aria-label="{{ 'cart.quantity' | t }}">
+              <button type="button" data-quantity-step="1" aria-label="Aumentar cantidad">&plus;</button>
+            </div>
+            <div class="cart-line__total">{{ item.final_line_price | money }}</div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <div class="cart-summary">
+        <div class="cart-summary__row">
+          <span>{{ 'cart.subtotal' | t }}</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        <button type="submit" name="update" class="btn btn--outline btn--full" style="margin-bottom: 12px;">{{ 'cart.update' | t }}</button>
+        <button type="submit" name="checkout" class="btn btn--primary btn--full">{{ 'cart.checkout' | t }}</button>
+      </div>
+    </form>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Carrito",
+  "settings": []
+}
+{% endschema %}

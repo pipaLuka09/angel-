@@ -1,0 +1,91 @@
+{%- liquid
+  assign product = product
+  assign variant = product.selected_or_first_available_variant
+-%}
+<div class="page-width product-main">
+  <div class="product-gallery" data-product-gallery>
+    <div class="product-gallery__main">
+      <img
+        src="{{ variant.featured_image | default: product.featured_image | image_url: width: 900 }}"
+        alt="{{ product.featured_image.alt | default: product.title }}"
+        data-product-main-image
+        width="900"
+        height="900"
+      >
+    </div>
+    {%- if product.images.size > 1 -%}
+      <div class="product-gallery__thumbs">
+        {%- for image in product.images -%}
+          <img
+            src="{{ image | image_url: width: 150 }}"
+            alt="{{ image.alt | default: product.title }}"
+            data-gallery-thumb
+            data-full-src="{{ image | image_url: width: 900 }}"
+            class="{% if forloop.first %}is-active{% endif %}"
+            width="68"
+            height="68"
+          >
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="product-info">
+    {%- if product.vendor != blank -%}
+      <div class="product-info__vendor">{{ product.vendor }}</div>
+    {%- endif -%}
+    <h1 class="product-info__title">{{ product.title }}</h1>
+
+    {%- render 'price', product: product -%}
+
+    <p class="product-info__availability" data-availability>
+      {%- unless variant.available -%}{{ 'products.product.sold_out' | t }}{%- endunless -%}
+    </p>
+
+    <product-form>
+      <form method="post" action="{{ routes.cart_add_url }}" data-product-form>
+        <script type="application/json" data-product-json>{{ product.json }}</script>
+
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+            <div class="product-form__option">
+              <label for="Option-{{ option.position }}">{{ option.name }}</label>
+              <select id="Option-{{ option.position }}" data-option-index="{{ option.position | minus: 1 }}">
+                {%- for value in option.values -%}
+                  <option value="{{ value | escape }}" {% if value == option.selected_value %}selected{% endif %}>{{ value }}</option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endfor -%}
+        {%- endunless -%}
+
+        <div class="quantity-selector">
+          <button type="button" data-quantity-step="-1" aria-label="Reducir cantidad">&minus;</button>
+          <input type="number" name="quantity" value="1" min="1" aria-label="{{ 'cart.quantity' | t }}">
+          <button type="button" data-quantity-step="1" aria-label="Aumentar cantidad">&plus;</button>
+        </div>
+
+        <input type="hidden" name="id" value="{{ variant.id }}" data-variant-id>
+
+        <button type="submit" class="btn btn--primary btn--full" data-add-to-cart {% unless variant.available %}disabled{% endunless %}>
+          {%- if variant.available -%}
+            {{ 'products.product.add_to_cart' | t }}
+          {%- else -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- endif -%}
+        </button>
+      </form>
+    </product-form>
+
+    {%- if product.description != blank -%}
+      <div class="product-info__description">{{ product.description }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Página de producto",
+  "settings": []
+}
+{% endschema %}

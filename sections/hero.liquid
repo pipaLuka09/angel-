@@ -1,0 +1,42 @@
+<div class="hero">
+  {%- if section.settings.image -%}
+    <img class="hero__bg" src="{{ section.settings.image | image_url: width: 1800 }}" alt="" loading="eager" width="1800" height="900">
+  {%- endif -%}
+  <div class="hero__overlay"></div>
+  <div class="hero__content">
+    {%- if section.settings.eyebrow != blank -%}
+      <div class="hero__eyebrow">{{ section.settings.eyebrow }}</div>
+    {%- endif -%}
+    <h1 class="hero__heading">{{ section.settings.heading }}</h1>
+    {%- if section.settings.subheading != blank -%}
+      <p class="hero__subheading">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+    <div class="hero__actions">
+      {%- if section.settings.button_label != blank -%}
+        <a href="{{ section.settings.button_link }}" class="btn btn--primary">{{ section.settings.button_label }}</a>
+      {%- endif -%}
+      {%- if section.settings.button_label_2 != blank -%}
+        <a href="{{ section.settings.button_link_2 }}" class="btn btn--outline">{{ section.settings.button_label_2 }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Imagen de fondo" },
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño superior", "default": "Tecnología para tu día a día" },
+    { "type": "text", "id": "heading", "label": "Encabezado", "default": "Gadgets que hacen tu vida más fácil" },
+    { "type": "textarea", "id": "subheading", "label": "Subtítulo", "default": "Carga rápida, audio, seguridad para el hogar y accesorios para auto y moto — todo en un solo lugar." },
+    { "type": "text", "id": "button_label", "label": "Texto botón principal", "default": "Ver catálogo" },
+    { "type": "url", "id": "button_link", "label": "Enlace botón principal", "default": "/collections/all" },
+    { "type": "text", "id": "button_label_2", "label": "Texto botón secundario", "default": "Ofertas" },
+    { "type": "url", "id": "button_link_2", "label": "Enlace botón secundario", "default": "/collections/carga-y-energia" }
+  ],
+  "presets": [
+    { "name": "Hero" }
+  ]
+}
+{% endschema %}

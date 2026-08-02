@@ -1,0 +1,48 @@
+{%- comment -%}
+  Renders a product card with image, price and an add-to-cart form.
+  Usage: {% render 'product-card', product: product %}
+{%- endcomment -%}
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign compare_at = variant.compare_at_price
+-%}
+<div class="product-card">
+  <a href="{{ product.url }}" class="product-card__media">
+    {%- if product.featured_image -%}
+      <img
+        src="{{ product.featured_image | image_url: width: 600 }}"
+        alt="{{ product.featured_image.alt | default: product.title }}"
+        loading="lazy"
+        width="600"
+        height="600"
+      >
+    {%- endif -%}
+    {%- if compare_at and compare_at > variant.price -%}
+      <span class="product-card__badge">{{ 'products.product.on_sale' | t }}</span>
+    {%- elsif variant.available == false -%}
+      <span class="product-card__badge">{{ 'products.product.sold_out' | t }}</span>
+    {%- endif -%}
+  </a>
+  <div class="product-card__body">
+    <a href="{{ product.url }}" class="product-card__title">{{ product.title }}</a>
+    {%- render 'price', product: product -%}
+
+    {%- if product.has_only_default_variant -%}
+      <product-form class="product-card__form">
+        <form method="post" action="{{ routes.cart_add_url }}" data-product-form>
+          <input type="hidden" name="id" value="{{ variant.id }}">
+          <input type="hidden" name="quantity" value="1">
+          <button type="submit" class="btn btn--primary btn--full" {% unless variant.available %}disabled{% endunless %}>
+            {%- if variant.available -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </button>
+        </form>
+      </product-form>
+    {%- else -%}
+      <a href="{{ product.url }}" class="btn btn--outline btn--full">{{ 'products.product.choose_options' | t }}</a>
+    {%- endif -%}
+  </div>
+</div>
