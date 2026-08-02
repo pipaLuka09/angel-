@@ -1,0 +1,14 @@
+{
+  "name": "angel-theme",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Shopify theme project, edited locally with Shopify CLI and Claude Code.",
+  "scripts": {
+    "theme:pull": "shopify theme pull",
+    "theme:push": "shopify theme push",
+    "theme:dev": "shopify theme dev"
+  },
+  "devDependencies": {
+    "@shopify/cli": "latest"
+  }
+}
