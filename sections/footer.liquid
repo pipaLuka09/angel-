@@ -33,7 +33,8 @@
         <ul>
           {%- for block in section.blocks -%}
             {%- if block.type == 'category_link' -%}
-              <li><a href="{{ block.settings.collection.url }}">{{ block.settings.collection.title | default: block.settings.label }}</a></li>
+              {%- assign linked_collection = collections[block.settings.collection_handle] -%}
+              <li><a href="{{ linked_collection.url | default: routes.collections_url }}" {{ block.shopify_attributes }}>{{ linked_collection.title | default: block.settings.label }}</a></li>
             {%- endif -%}
           {%- endfor -%}
         </ul>
@@ -84,26 +85,38 @@
       "name": "Categoría",
       "settings": [
         {
-          "type": "collection",
-          "id": "collection",
-          "label": "Colección"
+          "type": "select",
+          "id": "collection_handle",
+          "label": "Colección",
+          "options": [
+            { "value": "carga-y-energia", "label": "Carga y Energía" },
+            { "value": "audio-y-sonido", "label": "Audio y Sonido" },
+            { "value": "accesorios-para-celular", "label": "Accesorios para Celular" },
+            { "value": "accesorios-para-auto", "label": "Accesorios para Auto" },
+            { "value": "hogar-y-cocina", "label": "Hogar y Cocina" },
+            { "value": "cuidado-personal", "label": "Cuidado Personal" },
+            { "value": "entretenimiento", "label": "Entretenimiento" },
+            { "value": "privacidad-y-seguridad", "label": "Privacidad y Seguridad" },
+            { "value": "tecnologia-y-gadgets-ia", "label": "Tecnología y Gadgets IA" }
+          ],
+          "default": "carga-y-energia"
         },
         {
           "type": "text",
           "id": "label",
-          "label": "Texto alternativo (si no eliges colección)"
+          "label": "Texto alternativo (si la colección no existe)"
         }
       ]
     }
   ],
   "default": {
     "blocks": [
-      { "type": "category_link", "settings": { "label": "Carga y Energía" } },
-      { "type": "category_link", "settings": { "label": "Audio y Sonido" } },
-      { "type": "category_link", "settings": { "label": "Accesorios para Celular" } },
-      { "type": "category_link", "settings": { "label": "Accesorios para Auto" } },
-      { "type": "category_link", "settings": { "label": "Privacidad y Seguridad" } },
-      { "type": "category_link", "settings": { "label": "Tecnología y Gadgets IA" } }
+      { "type": "category_link", "settings": { "collection_handle": "carga-y-energia", "label": "Carga y Energía" } },
+      { "type": "category_link", "settings": { "collection_handle": "audio-y-sonido", "label": "Audio y Sonido" } },
+      { "type": "category_link", "settings": { "collection_handle": "accesorios-para-celular", "label": "Accesorios para Celular" } },
+      { "type": "category_link", "settings": { "collection_handle": "accesorios-para-auto", "label": "Accesorios para Auto" } },
+      { "type": "category_link", "settings": { "collection_handle": "privacidad-y-seguridad", "label": "Privacidad y Seguridad" } },
+      { "type": "category_link", "settings": { "collection_handle": "tecnologia-y-gadgets-ia", "label": "Tecnología y Gadgets IA" } }
     ]
   }
 }
