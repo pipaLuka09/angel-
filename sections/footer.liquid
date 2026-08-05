@@ -62,6 +62,14 @@
       </div>
     </div>
 
+    {%- if shop.enabled_payment_types.size > 0 -%}
+      <ul class="site-footer__payments">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
     <div class="site-footer__bottom">
       &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'footer.rights' | t }}
     </div>

@@ -52,6 +52,13 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 - **Carrito AJAX**: los formularios `data-product-form` (tarjeta de producto y producto principal) se envían por `fetch` a `/cart/add.js` sin recargar la página — actualizan el contador del header (con animación), el botón muestra estado de éxito, y aparece un toast de confirmación (`[data-cart-toast]`) con link a "Ver carrito". El carrito (`/cart`) sigue siendo un formulario normal (no AJAX) por ahora.
 - Todas las cadenas usadas por el JS están en `window.themeStrings` / `window.themeRoutes`, inyectadas desde `layout/theme.liquid` con claves de `locales/es.default.json`.
 
+## Confianza y prueba social
+
+- **Badges en producto**: fila de insignias (envío, garantía, pago seguro) debajo del botón de agregar al carrito en `sections/main-product.liquid`, editables desde el theme editor.
+- **Reseñas reales**: `main-product.liquid` incluye un block `@app` — cuando instales una app de reseñas (Judge.me, Loox, etc.), se agrega ahí visualmente desde el editor de temas. No se fabricaron reseñas falsas.
+- **Testimonios**: `sections/testimonials.liquid` existe y está lista para usarse, pero **no está agregada a `templates/index.json` todavía** — a propósito, para no mostrar reseñas de ejemplo como si fueran reales. Cuando tengas 3+ reseñas reales de clientes (WhatsApp, Instagram, etc.), agrégala desde el editor de temas ("Agregar sección" en el home) y llena los bloques con las citas reales.
+- **Pago seguro**: íconos reales de los métodos de pago habilitados en la tienda (`shop.enabled_payment_types`) en el footer y en el resumen del carrito, junto a un mensaje de "pago seguro" antes del botón de checkout.
+
 ## Notas adicionales
 
 - El tema vive en la raíz de este proyecto (`layout/`, `templates/`, `sections/`, `snippets/`, `assets/`, `config/`, `locales/`) y se sube con `shopify theme push`.

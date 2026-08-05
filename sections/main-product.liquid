@@ -77,15 +77,43 @@
       </form>
     </product-form>
 
+    <ul class="trust-badges">
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><path d="M16 8h4l3 3v5h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+        <span>{{ section.settings.badge_shipping }}</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6z"></path></svg>
+        <span>{{ section.settings.badge_warranty }}</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+        <span>{{ section.settings.badge_payment }}</span>
+      </li>
+    </ul>
+
     {%- if product.description != blank -%}
       <div class="product-info__description">{{ product.description }}</div>
     {%- endif -%}
+
+    {%- for block in section.blocks -%}
+      {%- if block.type == '@app' -%}
+        {%- render block -%}
+      {%- endif -%}
+    {%- endfor -%}
   </div>
 </div>
 
 {% schema %}
 {
   "name": "Página de producto",
-  "settings": []
+  "settings": [
+    { "type": "text", "id": "badge_shipping", "label": "Texto insignia de envío", "default": "Envío a todo Ecuador" },
+    { "type": "text", "id": "badge_warranty", "label": "Texto insignia de garantía", "default": "Garantía de fábrica" },
+    { "type": "text", "id": "badge_payment", "label": "Texto insignia de pago", "default": "Pago 100% seguro" }
+  ],
+  "blocks": [
+    { "type": "@app" }
+  ]
 }
 {% endschema %}

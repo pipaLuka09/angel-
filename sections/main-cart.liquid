@@ -41,6 +41,19 @@
         </div>
         <button type="submit" name="update" class="btn btn--outline btn--full" style="margin-bottom: 12px;">{{ 'cart.update' | t }}</button>
         <button type="submit" name="checkout" class="btn btn--primary btn--full">{{ 'cart.checkout' | t }}</button>
+
+        <p class="cart-summary__secure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6z"></path></svg>
+          {{ 'cart.secure_checkout' | t }}
+        </p>
+
+        {%- if shop.enabled_payment_types.size > 0 -%}
+          <ul class="cart-summary__payments">
+            {%- for type in shop.enabled_payment_types -%}
+              <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
       </div>
     </form>
   {%- endif -%}

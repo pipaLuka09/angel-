@@ -47,7 +47,8 @@
     "price": "Precio",
     "total": "Total",
     "added_to_cart": "Se agregó al carrito.",
-    "view_cart": "Ver carrito"
+    "view_cart": "Ver carrito",
+    "secure_checkout": "Pago 100% seguro y encriptado"
   },
   "newsletter": {
     "heading": "No te pierdas nuestras ofertas",
