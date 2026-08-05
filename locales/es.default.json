@@ -18,7 +18,8 @@
       "quantity": "Cantidad",
       "view_details": "Ver detalles",
       "choose_options": "Elegir opciones",
-      "unavailable": "No disponible"
+      "unavailable": "No disponible",
+      "added": "¡Agregado!"
     }
   },
   "collection": {
@@ -44,7 +45,9 @@
     "quantity": "Cantidad",
     "product": "Producto",
     "price": "Precio",
-    "total": "Total"
+    "total": "Total",
+    "added_to_cart": "Se agregó al carrito.",
+    "view_cart": "Ver carrito"
   },
   "newsletter": {
     "heading": "No te pierdas nuestras ofertas",

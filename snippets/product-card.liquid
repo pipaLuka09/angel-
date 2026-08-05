@@ -6,7 +6,7 @@
   assign variant = product.selected_or_first_available_variant
   assign compare_at = variant.compare_at_price
 -%}
-<div class="product-card">
+<div class="product-card reveal" data-tilt>
   <a href="{{ product.url }}" class="product-card__media">
     {%- if product.featured_image -%}
       <img
@@ -32,7 +32,7 @@
         <form method="post" action="{{ routes.cart_add_url }}" data-product-form>
           <input type="hidden" name="id" value="{{ variant.id }}">
           <input type="hidden" name="quantity" value="1">
-          <button type="submit" class="btn btn--primary btn--full" {% unless variant.available %}disabled{% endunless %}>
+          <button type="submit" class="btn btn--primary btn--full" data-add-to-cart {% unless variant.available %}disabled{% endunless %}>
             {%- if variant.available -%}
               {{ 'products.product.add_to_cart' | t }}
             {%- else -%}

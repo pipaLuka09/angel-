@@ -2,6 +2,7 @@
   {%- if section.settings.image -%}
     <img class="hero__bg" src="{{ section.settings.image | image_url: width: 1800 }}" alt="" loading="eager" width="1800" height="900">
   {%- endif -%}
+  <canvas class="hero__canvas" data-hero-canvas aria-hidden="true"></canvas>
   <div class="hero__overlay"></div>
   <div class="hero__content">
     {%- if section.settings.eyebrow != blank -%}

@@ -1,13 +1,13 @@
 <div class="section section--tight">
   <div class="page-width">
-    <div class="section__header">
+    <div class="section__header reveal">
       <div>
         <h2 class="section__heading">{{ section.settings.heading }}</h2>
       </div>
     </div>
     <div class="why-us-grid">
       {%- for block in section.blocks -%}
-        <div class="why-us-item" {{ block.shopify_attributes }}>
+        <div class="why-us-item reveal" {{ block.shopify_attributes }}>
           <div class="why-us-item__icon">
             {%- case block.settings.icon -%}
               {%- when 'shipping' -%}

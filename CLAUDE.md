@@ -44,6 +44,14 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 - **404 (`templates/404.json`)**: `main-404`.
 - **Todas las colecciones (`templates/list-collections.json`)**: `main-list-collections`.
 
+## Interacciones dinámicas
+
+- **Hero**: canvas de partículas tipo constelación (`data-hero-canvas` en `sections/hero.liquid`, animado en `assets/global.js`) + animación de entrada escalonada del texto. Se desactiva si el usuario tiene `prefers-reduced-motion`.
+- **Scroll reveal**: cualquier elemento con clase `reveal` aparece con fade/slide al entrar en pantalla (IntersectionObserver en `assets/global.js`). Ya aplicado a encabezados de sección, tarjetas de producto/colección, beneficios y newsletter.
+- **Tilt 3D**: elementos con `data-tilt` (tarjetas de producto y de colección) se inclinan siguiendo el cursor en dispositivos con mouse; se desactiva en touch.
+- **Carrito AJAX**: los formularios `data-product-form` (tarjeta de producto y producto principal) se envían por `fetch` a `/cart/add.js` sin recargar la página — actualizan el contador del header (con animación), el botón muestra estado de éxito, y aparece un toast de confirmación (`[data-cart-toast]`) con link a "Ver carrito". El carrito (`/cart`) sigue siendo un formulario normal (no AJAX) por ahora.
+- Todas las cadenas usadas por el JS están en `window.themeStrings` / `window.themeRoutes`, inyectadas desde `layout/theme.liquid` con claves de `locales/es.default.json`.
+
 ## Notas adicionales
 
 - El tema vive en la raíz de este proyecto (`layout/`, `templates/`, `sections/`, `snippets/`, `assets/`, `config/`, `locales/`) y se sube con `shopify theme push`.

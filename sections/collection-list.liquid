@@ -1,6 +1,6 @@
 <div class="section{% if section.settings.tight %} section--tight{% endif %}">
   <div class="page-width">
-    <div class="section__header">
+    <div class="section__header reveal">
       <div>
         <h2 class="section__heading">{{ section.settings.heading }}</h2>
         {%- if section.settings.subheading != blank -%}
@@ -14,7 +14,7 @@
       {%- for block in section.blocks -%}
         {%- assign collection = block.settings.collection -%}
         {%- if collection != blank -%}
-          <a href="{{ collection.url }}" class="collection-card" {{ block.shopify_attributes }}>
+          <a href="{{ collection.url }}" class="collection-card reveal" data-tilt {{ block.shopify_attributes }}>
             {%- if collection.image -%}
               <img src="{{ collection.image | image_url: width: 500 }}" alt="{{ collection.title }}" loading="lazy" width="500" height="375">
             {%- endif -%}

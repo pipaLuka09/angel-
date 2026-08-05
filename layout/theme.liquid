@@ -55,12 +55,20 @@
 
   {% section 'footer' %}
 
+  <div class="cart-toast" data-cart-toast role="status" aria-live="polite"></div>
+
   <script>
     window.themeStrings = {
       addToCart: {{ 'products.product.add_to_cart' | t | json }},
       soldOut: {{ 'products.product.sold_out' | t | json }},
       unavailable: {{ 'products.product.unavailable' | t | json }},
+      added: {{ 'products.product.added' | t | json }},
+      addedToCart: {{ 'cart.added_to_cart' | t | json }},
+      viewCart: {{ 'cart.view_cart' | t | json }},
       currency: {{ cart.currency.iso_code | json }}
+    };
+    window.themeRoutes = {
+      cartUrl: {{ routes.cart_url | json }}
     };
   </script>
   <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>

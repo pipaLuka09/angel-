@@ -104,6 +104,47 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .btn--full { width: 100%; }
 .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
 
+.btn.is-success {
+  background: var(--color-accent);
+  color: #051014;
+  border-color: var(--color-accent);
+}
+
+/* ==========================================================================
+   Cart toast
+   ========================================================================== */
+
+.cart-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  left: auto;
+  max-width: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  color: var(--color-text);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 0.9rem;
+  box-shadow: 0 20px 45px -20px rgba(18, 214, 223, 0.5);
+  transform: translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  z-index: 200;
+}
+.cart-toast.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.cart-toast--error { border-color: #e5484d; }
+.cart-toast a { color: var(--color-accent); font-weight: 600; }
+
+@media (max-width: 599px) {
+  .cart-toast { left: 16px; right: 16px; max-width: none; }
+}
+
 /* ==========================================================================
    Header
    ========================================================================== */
@@ -177,6 +218,14 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   justify-content: center;
   padding: 0 4px;
 }
+.cart-count.is-hidden { display: none; }
+
+@keyframes cart-count-bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+.cart-count.is-bumping { animation: cart-count-bump 0.4s ease; }
 
 .mobile-nav-toggle {
   display: none;
@@ -222,14 +271,22 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   height: 100%;
   opacity: 0.35;
 }
+.hero__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
 .hero__overlay {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: linear-gradient(180deg, rgba(11,15,20,0.2) 0%, rgba(11,15,20,0.9) 100%);
 }
 .hero__content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   padding: 110px 20px;
   text-align: center;
   max-width: 720px;
@@ -242,6 +299,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   font-weight: 600;
   font-size: 0.8rem;
   margin-bottom: 14px;
+  text-shadow: 0 0 16px rgba(18, 214, 223, 0.5);
 }
 .hero__heading {
   font-size: clamp(2rem, 5vw, 3.4rem);
@@ -253,6 +311,27 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   margin-bottom: 32px;
 }
 .hero__actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+.hero__eyebrow, .hero__heading, .hero__subheading, .hero__actions {
+  opacity: 0;
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero__eyebrow { animation-delay: 0.05s; }
+.hero__heading { animation-delay: 0.15s; }
+.hero__subheading { animation-delay: 0.28s; }
+.hero__actions { animation-delay: 0.42s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__eyebrow, .hero__heading, .hero__subheading, .hero__actions {
+    opacity: 1;
+    animation: none;
+  }
+}
 
 /* ==========================================================================
    Section heading
@@ -272,6 +351,21 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .section__subheading { color: var(--color-text-muted); margin-top: 8px; }
 
 /* ==========================================================================
+   Scroll reveal
+   ========================================================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ==========================================================================
    Collection list (category grid)
    ========================================================================== */
 
@@ -289,9 +383,13 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   aspect-ratio: 4 / 3;
   display: flex;
   align-items: flex-end;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
-.collection-card:hover { border-color: var(--color-accent); transform: translateY(-3px); }
+.collection-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 45px -25px rgba(18, 214, 223, 0.55);
+}
 .collection-card img {
   position: absolute;
   inset: 0;
@@ -327,9 +425,16 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
-.product-card:hover { border-color: var(--color-primary); transform: translateY(-3px); }
+.product-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 45px -25px rgba(47, 111, 235, 0.55);
+}
+
+[data-tilt] { transform-style: preserve-3d; will-change: transform; }
+[data-tilt] [data-tilt-layer] { transform: translateZ(20px); }
 
 .product-card__media {
   position: relative;
