@@ -27,6 +27,11 @@
     "view_all": "Ver todo",
     "empty": "Todavía no hay productos en esta colección.",
     "sort_by": "Ordenar por",
+    "filters": "Filtros",
+    "apply": "Aplicar",
+    "clear_filters": "Limpiar filtros",
+    "price_min": "Mín",
+    "price_max": "Máx",
     "sort": {
       "best_selling": "Más vendidos",
       "price_ascending": "Precio: menor a mayor",

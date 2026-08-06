@@ -37,7 +37,7 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
   1. `main-product` — galería con miniaturas, selector de variantes (JS en `assets/global.js`), cantidad, agregar al carrito, descripción.
 
 - **Colección (`templates/collection.json`)**:
-  1. `main-collection` — encabezado, orden (`sort_by`), grid de productos paginado.
+  1. `main-collection` — encabezado, filtros por precio y disponibilidad (`collection.filters`, requiere la app gratuita "Search & Discovery" de Shopify), orden (`sort_by`), grid de productos paginado.
 
 - **Carrito (`templates/cart.json`)**: `main-cart` — líneas editables, subtotal, checkout.
 - **Página (`templates/page.json`)**: `main-page`.
