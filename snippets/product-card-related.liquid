@@ -21,6 +21,12 @@
       <img
         class="related-card__image related-card__image--primary"
         src="{{ product.featured_image | image_url: width: 600 }}"
+        srcset="
+          {{ product.featured_image | image_url: width: 300 }} 300w,
+          {{ product.featured_image | image_url: width: 450 }} 450w,
+          {{ product.featured_image | image_url: width: 600 }} 600w
+        "
+        sizes="(max-width: 699px) 72vw, (min-width: 700px) 25vw, 50vw"
         alt="{{ product.featured_image.alt | default: product.title }}"
         loading="lazy"
         width="600"

@@ -11,6 +11,12 @@
     {%- if product.featured_image -%}
       <img
         src="{{ product.featured_image | image_url: width: 600 }}"
+        srcset="
+          {{ product.featured_image | image_url: width: 300 }} 300w,
+          {{ product.featured_image | image_url: width: 450 }} 450w,
+          {{ product.featured_image | image_url: width: 600 }} 600w
+        "
+        sizes="(min-width: 700px) 25vw, 50vw"
         alt="{{ product.featured_image.alt | default: product.title }}"
         loading="lazy"
         width="600"

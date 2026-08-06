@@ -13,7 +13,7 @@
           <div class="cart-line">
             <a href="{{ item.url }}">
               {%- if item.image -%}
-                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.image.alt | default: item.title }}" width="90" height="90">
+                <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.image.alt | default: item.title }}" width="90" height="90" loading="lazy">
               {%- endif -%}
             </a>
             <div>

@@ -77,6 +77,14 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 - **Sitemap**: `/sitemap.xml` lo genera y sirve Shopify automáticamente a nivel de plataforma — no es editable desde el tema, por eso no se creó ningún archivo para esto.
 - **URLs**: la estructura (`/products/`, `/collections/`, etc.) la controla Shopify; no es configurable desde el tema.
 
+## Rendimiento
+
+- **Fuentes auto-hospedadas**: Space Grotesk (500/700) e Inter (400/500/600), en `.woff2` (subset `latin`, cubre acentos en español), copiadas desde `@fontsource` a `assets/*.woff2` y declaradas con `@font-face` en `assets/base.css` (con `font-display: swap`). Ya no se carga nada desde `fonts.googleapis.com` — se eliminaron esa conexión externa y las 3 advertencias de `RemoteAsset` que salían en `shopify theme check`. Los dos pesos más usados (Inter 400, Space Grotesk 700) se precargan con `preload_tag` en `layout/theme.liquid`.
+- **Imágenes**: `srcset`/`sizes` en las imágenes de mayor tráfico (hero, galería de producto, tarjetas de producto/colección/relacionados) para que el navegador pida el tamaño real que necesita en cada pantalla, no siempre la versión más grande. `loading="lazy"` en todo lo que no es visible de inmediato; `loading="eager"` + `fetchpriority="high"` solo en la imagen principal del hero y la imagen principal de producto (los candidatos más probables a LCP).
+- **Accesibilidad**: estilo `:focus-visible` consistente (contorno color acento) en todo el tema — antes solo existía en el link de "saltar al contenido". Contraste de texto verificado con cálculo WCAG real (todas las combinaciones texto/fondo pasan AA).
+- **CSS/JS**: se auditó en busca de clases sin usar — no se encontró ninguna (el tema se construyó incrementalmente sin dejar código muerto acumulado).
+- No pude correr un Lighthouse real desde este entorno (sin acceso de navegador a la tienda en vivo); corre la auditoría tú desde Chrome DevTools o PageSpeed Insights sobre el tema publicado y pásame los resultados si algo queda por debajo del objetivo.
+
 ## Confianza y prueba social
 
 - **Badges en producto**: fila de insignias (envío, garantía, pago seguro) debajo del botón de agregar al carrito en `sections/main-product.liquid`, editables desde el theme editor.

@@ -6,7 +6,19 @@
     {%- for collection in collections -%}
       <a href="{{ collection.url }}" class="collection-card">
         {%- if collection.image -%}
-          <img src="{{ collection.image | image_url: width: 500 }}" alt="{{ collection.title }}" loading="lazy" width="500" height="375">
+          <img
+            src="{{ collection.image | image_url: width: 500 }}"
+            srcset="
+              {{ collection.image | image_url: width: 300 }} 300w,
+              {{ collection.image | image_url: width: 500 }} 500w,
+              {{ collection.image | image_url: width: 700 }} 700w
+            "
+            sizes="(min-width: 700px) 25vw, 50vw"
+            alt="{{ collection.title }}"
+            loading="lazy"
+            width="500"
+            height="375"
+          >
         {%- endif -%}
         <span class="collection-card__label">{{ collection.title }}</span>
       </a>
