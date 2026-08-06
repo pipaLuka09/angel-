@@ -3,7 +3,8 @@
     "search": {
       "placeholder": "Buscar productos"
     },
-    "continue_shopping": "Seguir comprando"
+    "continue_shopping": "Seguir comprando",
+    "close": "Cerrar"
   },
   "header": {
     "menu": "Menú",
@@ -47,8 +48,8 @@
     "price": "Precio",
     "total": "Total",
     "added_to_cart": "Se agregó al carrito.",
-    "view_cart": "Ver carrito",
-    "secure_checkout": "Pago 100% seguro y encriptado"
+    "secure_checkout": "Pago 100% seguro y encriptado",
+    "view_full_cart": "Ver carrito completo"
   },
   "newsletter": {
     "heading": "No te pierdas nuestras ofertas",

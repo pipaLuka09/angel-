@@ -56,6 +56,7 @@
   {% section 'footer' %}
 
   <div class="cart-toast" data-cart-toast role="status" aria-live="polite"></div>
+  {% render 'cart-drawer' %}
 
   <script>
     window.themeStrings = {
@@ -64,11 +65,17 @@
       unavailable: {{ 'products.product.unavailable' | t | json }},
       added: {{ 'products.product.added' | t | json }},
       addedToCart: {{ 'cart.added_to_cart' | t | json }},
-      viewCart: {{ 'cart.view_cart' | t | json }},
+      remove: {{ 'cart.remove' | t | json }},
+      subtotal: {{ 'cart.subtotal' | t | json }},
+      checkout: {{ 'cart.checkout' | t | json }},
+      cartEmpty: {{ 'cart.empty' | t | json }},
+      continueShopping: {{ 'general.continue_shopping' | t | json }},
+      viewFullCart: {{ 'cart.view_full_cart' | t | json }},
       currency: {{ cart.currency.iso_code | json }}
     };
     window.themeRoutes = {
-      cartUrl: {{ routes.cart_url | json }}
+      cartUrl: {{ routes.cart_url | json }},
+      cartChangeUrl: {{ routes.cart_change_url | json }}
     };
   </script>
   <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
