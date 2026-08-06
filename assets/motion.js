@@ -93,7 +93,7 @@
      Grid items (product/collection cards, why-us) batch together so
      whatever enters the viewport at once staggers in as one wave.
      --------------------------------------------------------------------- */
-  var gridSelector = '.product-card.reveal, .collection-card.reveal, .why-us-item.reveal';
+  var gridSelector = '.product-card.reveal, .collection-card.reveal, .why-us-item.reveal, .related-card.reveal';
 
   if (window.ScrollTrigger.batch) {
     ScrollTrigger.batch(gridSelector, {

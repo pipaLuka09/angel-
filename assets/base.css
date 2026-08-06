@@ -734,6 +734,108 @@ html.js .reveal { opacity: 0; }
 }
 
 /* ==========================================================================
+   Related products (glassmorphism)
+   ========================================================================== */
+
+.related-products__heading { text-align: left; }
+
+.related-products__scroller {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 22px;
+}
+
+.related-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  flex-direction: column;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.related-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 30px 60px -30px rgba(18, 214, 223, 0.45);
+}
+
+.related-card__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #0e141b;
+  display: block;
+}
+.related-card__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.related-card__image--secondary { opacity: 0; }
+.related-card:hover .related-card__image--primary { opacity: 0; transform: scale(1.04); }
+.related-card:hover .related-card__image--secondary { opacity: 1; transform: scale(1.04); }
+
+.related-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+.related-card__badge--sale { background: rgba(18, 214, 223, 0.9); color: #051014; }
+.related-card__badge--new { background: rgba(47, 111, 235, 0.9); color: #fff; }
+
+.related-card__body {
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.related-card__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.related-card__title:hover { color: var(--color-accent); }
+.related-card__form { margin-top: auto; }
+
+@media (max-width: 699px) {
+  .related-products__scroller {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 10px;
+    margin: 0 -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .related-products__scroller .related-card {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+  }
+}
+
+/* ==========================================================================
    Collection page
    ========================================================================== */
 

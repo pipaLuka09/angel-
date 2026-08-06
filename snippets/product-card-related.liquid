@@ -1,0 +1,69 @@
+{%- comment -%}
+  Premium related-product card: glassmorphism, 3D tilt, hover image swap,
+  Nuevo/Oferta badges, animated add-to-cart.
+  Usage: {% render 'product-card-related', product: product %}
+{%- endcomment -%}
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign compare_at = variant.compare_at_price
+  assign second_image = product.images[1]
+  assign now_ts = 'now' | date: '%s'
+  assign created_ts = product.created_at | date: '%s'
+  assign days_since_created = now_ts | minus: created_ts | divided_by: 86400
+  assign is_new = false
+  if days_since_created <= 30
+    assign is_new = true
+  endif
+-%}
+<div class="related-card reveal" data-tilt>
+  <a href="{{ product.url }}" class="related-card__media">
+    {%- if product.featured_image -%}
+      <img
+        class="related-card__image related-card__image--primary"
+        src="{{ product.featured_image | image_url: width: 600 }}"
+        alt="{{ product.featured_image.alt | default: product.title }}"
+        loading="lazy"
+        width="600"
+        height="600"
+      >
+    {%- endif -%}
+    {%- if second_image -%}
+      <img
+        class="related-card__image related-card__image--secondary"
+        src="{{ second_image | image_url: width: 600 }}"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        width="600"
+        height="600"
+      >
+    {%- endif -%}
+    {%- if compare_at and compare_at > variant.price -%}
+      <span class="related-card__badge related-card__badge--sale">{{ 'products.product.on_sale' | t }}</span>
+    {%- elsif is_new -%}
+      <span class="related-card__badge related-card__badge--new">{{ 'products.product.new' | t }}</span>
+    {%- endif -%}
+  </a>
+  <div class="related-card__body">
+    <a href="{{ product.url }}" class="related-card__title">{{ product.title }}</a>
+    {%- render 'price', product: product -%}
+
+    {%- if product.has_only_default_variant -%}
+      <product-form class="related-card__form">
+        <form method="post" action="{{ routes.cart_add_url }}" data-product-form>
+          <input type="hidden" name="id" value="{{ variant.id }}">
+          <input type="hidden" name="quantity" value="1">
+          <button type="submit" class="btn btn--primary btn--full" data-add-to-cart {% unless variant.available %}disabled{% endunless %}>
+            {%- if variant.available -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </button>
+        </form>
+      </product-form>
+    {%- else -%}
+      <a href="{{ product.url }}" class="btn btn--outline btn--full">{{ 'products.product.choose_options' | t }}</a>
+    {%- endif -%}
+  </div>
+</div>

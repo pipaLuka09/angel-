@@ -34,7 +34,7 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
   6. `newsletter` — suscripción de correo (formulario `customer` de Shopify).
 
 - **Producto (`templates/product.json`)**:
-  1. `main-product` — galería con miniaturas, selector de variantes (JS en `assets/global.js`), cantidad, agregar al carrito, descripción.
+  1. `main-product` — galería con miniaturas, selector de variantes (JS en `assets/global.js`), cantidad, agregar al carrito, descripción, insignias de confianza, y una sección de **productos relacionados** (misma colección, hasta `related_limit` productos) con tarjetas premium (`snippets/product-card-related.liquid`): glassmorphism, tilt 3D, cambio de imagen al hover, badges Nuevo/Oferta (Nuevo = creado hace ≤30 días, dato real, no inventado), agregar al carrito animado, y scroll horizontal tipo carrusel en móvil. Se integra al mismo sistema de reveal en oleada (`ScrollTrigger.batch`) de `assets/motion.js`.
 
 - **Colección (`templates/collection.json`)**:
   1. `main-collection` — encabezado, filtros por precio y disponibilidad (`collection.filters`, requiere la app gratuita "Search & Discovery" de Shopify), orden (`sort_by`), grid de productos paginado.

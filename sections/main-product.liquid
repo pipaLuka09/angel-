@@ -104,13 +104,40 @@
   </div>
 </div>
 
+{%- if section.settings.show_related -%}
+  {%- liquid
+    assign related_collection = product.collections.first
+  -%}
+  {%- if related_collection -%}
+    <div class="section related-products">
+      <div class="page-width">
+        <div class="section__header reveal">
+          <h2 class="section__heading related-products__heading">{{ section.settings.related_heading }}</h2>
+        </div>
+        <div class="related-products__scroller">
+          {%- assign shown = 0 -%}
+          {%- for related in related_collection.products -%}
+            {%- if related.id != product.id and shown < section.settings.related_limit -%}
+              {%- render 'product-card-related', product: related -%}
+              {%- assign shown = shown | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
 {% schema %}
 {
   "name": "Página de producto",
   "settings": [
     { "type": "text", "id": "badge_shipping", "label": "Texto insignia de envío", "default": "Envío a todo Ecuador" },
     { "type": "text", "id": "badge_warranty", "label": "Texto insignia de garantía", "default": "Garantía de fábrica" },
-    { "type": "text", "id": "badge_payment", "label": "Texto insignia de pago", "default": "Pago 100% seguro" }
+    { "type": "text", "id": "badge_payment", "label": "Texto insignia de pago", "default": "Pago 100% seguro" },
+    { "type": "checkbox", "id": "show_related", "label": "Mostrar productos relacionados", "default": true },
+    { "type": "text", "id": "related_heading", "label": "Encabezado de relacionados", "default": "También te puede interesar" },
+    { "type": "range", "id": "related_limit", "label": "Máximo de productos relacionados", "min": 4, "max": 12, "step": 1, "default": 8 }
   ],
   "blocks": [
     { "type": "@app" }
