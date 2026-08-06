@@ -1,10 +1,11 @@
 {%- liquid
   assign product = product
   assign variant = product.selected_or_first_available_variant
+  assign specs_raw = product.metafields.custom.specifications.value
 -%}
 <div class="page-width product-main">
   <div class="product-gallery" data-product-gallery>
-    <div class="product-gallery__main">
+    <div class="product-gallery__main" data-zoom>
       <img
         src="{{ variant.featured_image | default: product.featured_image | image_url: width: 900 }}"
         alt="{{ product.featured_image.alt | default: product.title }}"
@@ -12,6 +13,9 @@
         width="900"
         height="900"
       >
+      <span class="zoom-hint" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+      </span>
     </div>
     {%- if product.images.size > 1 -%}
       <div class="product-gallery__thumbs">
@@ -38,6 +42,18 @@
 
     {%- render 'price', product: product -%}
 
+    {%- if section.settings.warranty_title != blank -%}
+      <div class="warranty-callout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
+        <div>
+          <strong>{{ section.settings.warranty_title }}</strong>
+          {%- if section.settings.warranty_text != blank -%}
+            <p>{{ section.settings.warranty_text }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+
     <p class="product-info__availability" data-availability>
       {%- unless variant.available -%}{{ 'products.product.sold_out' | t }}{%- endunless -%}
     </p>
@@ -48,13 +64,21 @@
 
         {%- unless product.has_only_default_variant -%}
           {%- for option in product.options_with_values -%}
-            <div class="product-form__option">
-              <label for="Option-{{ option.position }}">{{ option.name }}</label>
-              <select id="Option-{{ option.position }}" data-option-index="{{ option.position | minus: 1 }}">
+            <div class="option-selector" data-option-index="{{ option.position | minus: 1 }}">
+              <span class="option-selector__label">
+                {{ option.name }}: <strong data-option-selected-value>{{ option.selected_value }}</strong>
+              </span>
+              <div class="option-selector__values">
+                {%- assign option_key = option.name | strip | downcase -%}
                 {%- for value in option.values -%}
-                  <option value="{{ value | escape }}" {% if value == option.selected_value %}selected{% endif %}>{{ value }}</option>
+                  <button
+                    type="button"
+                    class="option-pill{% if value == option.selected_value %} is-selected{% endif %}"
+                    data-option-value="{{ value | escape }}"
+                    {% if option_key == 'color' or option_key == 'colour' %}data-swatch-name="{{ value | escape }}"{% endif %}
+                  >{{ value }}</button>
                 {%- endfor -%}
-              </select>
+              </div>
             </div>
           {%- endfor -%}
         {%- endunless -%}
@@ -83,14 +107,18 @@
         <span>{{ section.settings.badge_shipping }}</span>
       </li>
       <li>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6z"></path></svg>
-        <span>{{ section.settings.badge_warranty }}</span>
-      </li>
-      <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
         <span>{{ section.settings.badge_payment }}</span>
       </li>
     </ul>
+
+    {%- if shop.enabled_payment_types.size > 0 -%}
+      <ul class="product-info__payments">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
 
     {%- if product.description != blank -%}
       <div class="product-info__description">{{ product.description }}</div>
@@ -103,6 +131,80 @@
     {%- endfor -%}
   </div>
 </div>
+
+{%- assign benefit_blocks = section.blocks | where: 'type', 'benefit' -%}
+{%- if benefit_blocks.size > 0 -%}
+  <div class="section section--tight">
+    <div class="page-width">
+      <div class="section__header reveal">
+        <h2 class="section__heading">{{ section.settings.benefits_heading }}</h2>
+      </div>
+      <div class="why-us-grid">
+        {%- for block in benefit_blocks -%}
+          <div class="why-us-item reveal" {{ block.shopify_attributes }}>
+            <div class="why-us-item__icon">
+              {%- case block.settings.icon -%}
+                {%- when 'shipping' -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><path d="M16 8h4l3 3v5h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                {%- when 'shield' -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6z"></path></svg>
+                {%- when 'card' -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                {%- when 'support' -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 18 0v6a2 2 0 0 1-2 2h-2v-8h4"></path><path d="M3 18v-6a9 9 0 0 1 1-4"></path></svg>
+                {%- else -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle></svg>
+              {%- endcase -%}
+            </div>
+            <h3>{{ block.settings.title }}</h3>
+            <p>{{ block.settings.text }}</p>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{%- if section.settings.show_specifications and specs_raw != blank -%}
+  <div class="section section--tight">
+    <div class="page-width">
+      <div class="section__header reveal">
+        <h2 class="section__heading">{{ section.settings.specifications_heading }}</h2>
+      </div>
+      <dl class="specs-list reveal">
+        {%- assign spec_lines = specs_raw | newline_to_br | split: '<br />' -%}
+        {%- for line in spec_lines -%}
+          {%- assign parts = line | split: ':' -%}
+          {%- if parts.size >= 2 -%}
+            <div class="specs-list__row">
+              <dt>{{ parts[0] | strip }}</dt>
+              <dd>{{ line | remove_first: parts[0] | remove_first: ':' | strip }}</dd>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </dl>
+    </div>
+  </div>
+{%- endif -%}
+
+{%- assign faq_blocks = section.blocks | where: 'type', 'faq_item' -%}
+{%- if faq_blocks.size > 0 -%}
+  <div class="section section--tight">
+    <div class="page-width">
+      <div class="section__header reveal">
+        <h2 class="section__heading">{{ section.settings.faq_heading }}</h2>
+      </div>
+      <div class="faq-list reveal">
+        {%- for block in faq_blocks -%}
+          <details class="faq-item" {{ block.shopify_attributes }}>
+            <summary>{{ block.settings.question }}</summary>
+            <div class="faq-item__answer">{{ block.settings.answer }}</div>
+          </details>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
 
 {%- if section.settings.show_related -%}
   {%- liquid
@@ -128,19 +230,84 @@
   {%- endif -%}
 {%- endif -%}
 
+<div class="sticky-cart" data-sticky-cart>
+  <div class="page-width sticky-cart__inner">
+    <div class="sticky-cart__product">
+      {%- if product.featured_image -%}
+        <img src="{{ product.featured_image | image_url: width: 100 }}" alt="" width="48" height="48">
+      {%- endif -%}
+      <div>
+        <p class="sticky-cart__title">{{ product.title }}</p>
+        {%- render 'price', product: product -%}
+      </div>
+    </div>
+    <form method="post" action="{{ routes.cart_add_url }}" data-product-form class="sticky-cart__form">
+      <input type="hidden" name="id" value="{{ variant.id }}" data-variant-id>
+      <input type="hidden" name="quantity" value="1">
+      <button type="submit" class="btn btn--primary" data-add-to-cart {% unless variant.available %}disabled{% endunless %}>
+        {%- if variant.available -%}
+          {{ 'products.product.add_to_cart' | t }}
+        {%- else -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- endif -%}
+      </button>
+    </form>
+  </div>
+</div>
+
 {% schema %}
 {
   "name": "Página de producto",
   "settings": [
     { "type": "text", "id": "badge_shipping", "label": "Texto insignia de envío", "default": "Envío a todo Ecuador" },
-    { "type": "text", "id": "badge_warranty", "label": "Texto insignia de garantía", "default": "Garantía de fábrica" },
     { "type": "text", "id": "badge_payment", "label": "Texto insignia de pago", "default": "Pago 100% seguro" },
+    { "type": "text", "id": "warranty_title", "label": "Título de garantía", "default": "Garantía de 30 días" },
+    { "type": "textarea", "id": "warranty_text", "label": "Texto de garantía", "default": "Si no te convence, te devolvemos tu dinero. Sin complicaciones." },
+    { "type": "text", "id": "benefits_heading", "label": "Encabezado de beneficios", "default": "Por qué comprar con nosotros" },
+    { "type": "checkbox", "id": "show_specifications", "label": "Mostrar especificaciones", "default": true },
+    { "type": "text", "id": "specifications_heading", "label": "Encabezado de especificaciones", "default": "Especificaciones" },
+    { "type": "text", "id": "faq_heading", "label": "Encabezado de preguntas frecuentes", "default": "Preguntas frecuentes" },
     { "type": "checkbox", "id": "show_related", "label": "Mostrar productos relacionados", "default": true },
     { "type": "text", "id": "related_heading", "label": "Encabezado de relacionados", "default": "También te puede interesar" },
     { "type": "range", "id": "related_limit", "label": "Máximo de productos relacionados", "min": 4, "max": 12, "step": 1, "default": 8 }
   ],
   "blocks": [
+    {
+      "type": "benefit",
+      "name": "Beneficio",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Ícono",
+          "options": [
+            { "value": "shipping", "label": "Envío" },
+            { "value": "shield", "label": "Garantía" },
+            { "value": "card", "label": "Pago" },
+            { "value": "support", "label": "Soporte" }
+          ],
+          "default": "shipping"
+        },
+        { "type": "text", "id": "title", "label": "Título", "default": "Envío rápido" },
+        { "type": "textarea", "id": "text", "label": "Texto", "default": "Recibe tu pedido en pocos días." }
+      ]
+    },
+    {
+      "type": "faq_item",
+      "name": "Pregunta frecuente",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Pregunta", "default": "Escribe aquí la pregunta" },
+        { "type": "textarea", "id": "answer", "label": "Respuesta", "default": "Escribe aquí la respuesta real." }
+      ]
+    },
     { "type": "@app" }
-  ]
+  ],
+  "default": {
+    "blocks": [
+      { "type": "benefit", "settings": { "icon": "shipping", "title": "Envío rápido", "text": "Recibe tu pedido en la puerta de tu casa en pocos días." } },
+      { "type": "benefit", "settings": { "icon": "card", "title": "Pago 100% seguro", "text": "Paga con tu método favorito, protegido en todo momento." } },
+      { "type": "benefit", "settings": { "icon": "support", "title": "Soporte real", "text": "Te ayudamos por WhatsApp antes y después de tu compra." } }
+    ]
+  }
 }
 {% endschema %}

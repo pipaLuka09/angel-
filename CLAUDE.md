@@ -33,8 +33,16 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
   5. `tech` (`featured-collection`) — productos de "Tecnología y Gadgets IA".
   6. `newsletter` — suscripción de correo (formulario `customer` de Shopify).
 
-- **Producto (`templates/product.json`)**:
-  1. `main-product` — galería con miniaturas, selector de variantes (JS en `assets/global.js`), cantidad, agregar al carrito, descripción, insignias de confianza, y una sección de **productos relacionados** (misma colección, hasta `related_limit` productos) con tarjetas premium (`snippets/product-card-related.liquid`): glassmorphism, tilt 3D, cambio de imagen al hover, badges Nuevo/Oferta (Nuevo = creado hace ≤30 días, dato real, no inventado), agregar al carrito animado, y scroll horizontal tipo carrusel en móvil. Se integra al mismo sistema de reveal en oleada (`ScrollTrigger.batch`) de `assets/motion.js`.
+- **Producto (`templates/product.json`)**: `main-product`, rediseñada como landing premium:
+  1. Galería con miniaturas + **zoom con el mouse** (`data-zoom`, `gsap.quickTo` en `assets/motion.js`, solo puntero fino).
+  2. Info: vendor, título, precio, **callout de garantía** (`warranty_title`/`warranty_text`), disponibilidad.
+  3. **Variantes premium**: pills en vez de `<select>`; si la opción se llama "Color"/"Colour" intenta mostrar un swatch de color real (mapa de nombres comunes ES/EN en `assets/global.js` — si no reconoce el nombre, cae de vuelta a pill de texto normal, nunca inventa un color).
+  4. Cantidad, agregar al carrito (AJAX), íconos reales de métodos de pago (`shop.enabled_payment_types`).
+  5. Bloques `benefit` (ícono + título + texto) — 3 por defecto en `templates/product.json`.
+  6. **Especificaciones**: solo se muestra si el producto tiene el metafield `product.metafields.custom.specifications` (texto multilínea, formato `Clave: Valor` por línea) — si no existe, la sección no aparece. No se inventan specs.
+  7. Bloques `faq_item` (pregunta/respuesta) en acordeón nativo (`<details>`) — vacío por defecto, agrégalos desde el editor con preguntas reales.
+  8. **Productos relacionados** (misma colección, hasta `related_limit`) con tarjetas premium (`snippets/product-card-related.liquid`): glassmorphism, tilt 3D, cambio de imagen al hover, badges Nuevo/Oferta (Nuevo = creado hace ≤30 días, dato real), agregar al carrito animado, scroll horizontal en móvil. Se integra al `ScrollTrigger.batch` de `assets/motion.js`.
+  9. **Barra sticky de agregar al carrito** (`data-sticky-cart`): aparece al hacer scroll pasado el botón principal; su variante/precio se mantienen sincronizados con el selector de arriba (`assets/global.js` actualiza todos los `[data-variant-id]`/`[data-price]`/`[data-add-to-cart]` del documento, no solo los del formulario principal).
 
 - **Colección (`templates/collection.json`)**:
   1. `main-collection` — encabezado, filtros por precio y disponibilidad (`collection.filters`, requiere la app gratuita "Search & Discovery" de Shopify), orden (`sort_by`), grid de productos paginado.

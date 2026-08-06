@@ -177,5 +177,27 @@
         yTo(0);
       });
     });
+
+    document.querySelectorAll('[data-zoom]').forEach(function (zoomEl) {
+      var img = zoomEl.querySelector('img');
+      if (!img) return;
+      var scaleTo = gsap.quickTo(img, 'scale', { duration: 0.35, ease: 'power2.out' });
+      var xTo = gsap.quickTo(img, 'xPercent', { duration: 0.35, ease: 'power2.out' });
+      var yTo = gsap.quickTo(img, 'yPercent', { duration: 0.35, ease: 'power2.out' });
+
+      zoomEl.addEventListener('mousemove', function (event) {
+        var rect = zoomEl.getBoundingClientRect();
+        var px = (event.clientX - rect.left) / rect.width - 0.5;
+        var py = (event.clientY - rect.top) / rect.height - 0.5;
+        scaleTo(1.8);
+        xTo(px * -30);
+        yTo(py * -30);
+      });
+      zoomEl.addEventListener('mouseleave', function () {
+        scaleTo(1);
+        xTo(0);
+        yTo(0);
+      });
+    });
   }
 })();

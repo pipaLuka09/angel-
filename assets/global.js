@@ -23,8 +23,25 @@ document.addEventListener('click', function (event) {
   input.dispatchEvent(new Event('change', { bubbles: true }));
 });
 
-/* Product variant picker */
+/* Product variant picker (pill / color-swatch buttons) */
 (function () {
+  var SWATCH_COLORS = {
+    negro: '#111111', black: '#111111',
+    blanco: '#f5f5f5', white: '#f5f5f5',
+    azul: '#2F6FEB', blue: '#2F6FEB',
+    rojo: '#e5484d', red: '#e5484d',
+    verde: '#2f9e44', green: '#2f9e44',
+    amarillo: '#f5c518', yellow: '#f5c518',
+    rosa: '#ec4899', pink: '#ec4899',
+    'rose gold': '#e0a899', oro: '#d4af37', gold: '#d4af37',
+    plata: '#c0c0c0', plateado: '#c0c0c0', silver: '#c0c0c0',
+    gris: '#8a8f98', grey: '#8a8f98', gray: '#8a8f98',
+    morado: '#8b5cf6', purple: '#8b5cf6', violeta: '#8b5cf6',
+    cafe: '#6b4423', marron: '#6b4423', brown: '#6b4423',
+    naranja: '#f76707', orange: '#f76707',
+    dorado: '#d4af37', beige: '#e8dcc8'
+  };
+
   var forms = document.querySelectorAll('[data-product-form]');
   forms.forEach(function (form) {
     var dataEl = form.querySelector('[data-product-json]');
@@ -37,19 +54,26 @@ document.addEventListener('click', function (event) {
       return;
     }
 
-    var optionSelects = form.querySelectorAll('[data-option-index]');
-    var variantIdInput = form.querySelector('[data-variant-id]');
-    var priceEl = form.closest('.product-info, .product-card__body')
-      ? form.parentElement.querySelector('[data-price]') || document.querySelector('[data-price]')
-      : null;
-    var addButton = form.querySelector('[data-add-to-cart]');
+    var optionGroups = form.querySelectorAll('[data-option-index]');
     var availabilityEl = document.querySelector('[data-availability]');
     var mainImage = document.querySelector('[data-product-main-image]');
 
+    optionGroups.forEach(function (group) {
+      group.querySelectorAll('[data-swatch-name]').forEach(function (pill) {
+        var key = pill.getAttribute('data-swatch-name').trim().toLowerCase();
+        if (SWATCH_COLORS[key]) {
+          pill.style.setProperty('--swatch-color', SWATCH_COLORS[key]);
+          pill.classList.add('has-swatch');
+        }
+      });
+    });
+
     function getSelectedOptions() {
       var selected = [];
-      optionSelects.forEach(function (select) {
-        selected[parseInt(select.getAttribute('data-option-index'), 10)] = select.value;
+      optionGroups.forEach(function (group) {
+        var index = parseInt(group.getAttribute('data-option-index'), 10);
+        var selectedPill = group.querySelector('.option-pill.is-selected');
+        selected[index] = selectedPill ? selectedPill.getAttribute('data-option-value') : null;
       });
       return selected;
     }
@@ -62,28 +86,38 @@ document.addEventListener('click', function (event) {
       });
     }
 
+    function formatMoney(cents) {
+      return (cents / 100).toLocaleString(undefined, { style: 'currency', currency: window.themeStrings.currency || 'USD' });
+    }
+
     function updateForVariant(variant) {
+      var addButtons = document.querySelectorAll('[data-add-to-cart]');
+      var variantInputs = document.querySelectorAll('[data-variant-id]');
+      var priceEls = document.querySelectorAll('[data-price]');
+
       if (!variant) {
-        if (addButton) {
-          addButton.disabled = true;
-          addButton.textContent = window.themeStrings.unavailable;
-        }
+        addButtons.forEach(function (btn) {
+          btn.disabled = true;
+          btn.textContent = window.themeStrings.unavailable;
+        });
         if (availabilityEl) availabilityEl.textContent = window.themeStrings.unavailable;
         return;
       }
 
-      if (variantIdInput) variantIdInput.value = variant.id;
+      variantInputs.forEach(function (input) {
+        input.value = variant.id;
+      });
 
-      if (priceEl) {
+      priceEls.forEach(function (priceEl) {
         priceEl.innerHTML = variant.compare_at_price && variant.compare_at_price > variant.price
           ? '<span data-money>' + formatMoney(variant.price) + '</span> <span class="price__compare">' + formatMoney(variant.compare_at_price) + '</span>'
           : '<span data-money>' + formatMoney(variant.price) + '</span>';
-      }
+      });
 
-      if (addButton) {
-        addButton.disabled = !variant.available;
-        addButton.textContent = variant.available ? window.themeStrings.addToCart : window.themeStrings.soldOut;
-      }
+      addButtons.forEach(function (btn) {
+        btn.disabled = !variant.available;
+        btn.textContent = variant.available ? window.themeStrings.addToCart : window.themeStrings.soldOut;
+      });
 
       if (availabilityEl) {
         availabilityEl.textContent = variant.available ? '' : window.themeStrings.soldOut;
@@ -94,17 +128,39 @@ document.addEventListener('click', function (event) {
       }
     }
 
-    function formatMoney(cents) {
-      return (cents / 100).toLocaleString(undefined, { style: 'currency', currency: window.themeStrings.currency || 'USD' });
-    }
+    optionGroups.forEach(function (group) {
+      var pills = group.querySelectorAll('.option-pill');
+      var selectedLabel = group.querySelector('[data-option-selected-value]');
 
-    optionSelects.forEach(function (select) {
-      select.addEventListener('change', function () {
-        var variant = findVariant(getSelectedOptions());
-        updateForVariant(variant);
+      pills.forEach(function (pill) {
+        pill.addEventListener('click', function () {
+          pills.forEach(function (p) { p.classList.remove('is-selected'); });
+          pill.classList.add('is-selected');
+          if (selectedLabel) selectedLabel.textContent = pill.getAttribute('data-option-value');
+          var variant = findVariant(getSelectedOptions());
+          updateForVariant(variant);
+        });
       });
     });
   });
+})();
+
+/* Sticky add-to-cart bar */
+(function () {
+  var bar = document.querySelector('[data-sticky-cart]');
+  var sentinel = document.querySelector('[data-product-form] [data-add-to-cart]');
+  if (!bar || !sentinel || !('IntersectionObserver' in window)) return;
+
+  var observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        var scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        bar.classList.toggle('is-visible', scrolledPast);
+      });
+    },
+    { threshold: 0 }
+  );
+  observer.observe(sentinel);
 })();
 
 /* Product gallery thumbnails */

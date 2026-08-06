@@ -1,7 +1,13 @@
 {
   "sections": {
     "main": {
-      "type": "main-product"
+      "type": "main-product",
+      "blocks": {
+        "benefit-1": { "type": "benefit", "settings": { "icon": "shipping", "title": "Envío rápido", "text": "Recibe tu pedido en la puerta de tu casa en pocos días." } },
+        "benefit-2": { "type": "benefit", "settings": { "icon": "card", "title": "Pago 100% seguro", "text": "Paga con tu método favorito, protegido en todo momento." } },
+        "benefit-3": { "type": "benefit", "settings": { "icon": "support", "title": "Soporte real", "text": "Te ayudamos por WhatsApp antes y después de tu compra." } }
+      },
+      "block_order": ["benefit-1", "benefit-2", "benefit-3"]
     }
   },
   "order": ["main"]

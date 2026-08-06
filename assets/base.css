@@ -631,12 +631,36 @@ html.js .reveal { opacity: 0; }
 }
 
 .product-gallery__main {
+  position: relative;
   border-radius: 12px;
   overflow: hidden;
   background: var(--color-surface);
   aspect-ratio: 1 / 1;
+  cursor: zoom-in;
 }
 .product-gallery__main img { width: 100%; height: 100%; object-fit: cover; }
+
+.zoom-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(11, 15, 20, 0.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.zoom-hint svg { width: 16px; height: 16px; }
+@media (hover: none) and (pointer: coarse) {
+  .zoom-hint { display: none; }
+  .product-gallery__main { cursor: default; }
+}
 
 .product-gallery__thumbs {
   display: flex;
@@ -664,22 +688,74 @@ html.js .reveal { opacity: 0; }
 .product-info__title { font-size: clamp(1.5rem, 3vw, 2.1rem); margin-bottom: 12px; }
 .product-info .price { font-size: 1.3rem; margin-bottom: 24px; }
 
-.product-form__option { margin-bottom: 20px; }
-.product-form__option label {
+.warranty-callout {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.warranty-callout svg { width: 26px; height: 26px; color: var(--color-accent); flex-shrink: 0; }
+.warranty-callout strong { display: block; font-size: 0.92rem; margin-bottom: 2px; }
+.warranty-callout p { margin: 0; font-size: 0.82rem; color: var(--color-text-muted); }
+
+.product-info__payments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+}
+.product-info__payments .payment-icon { width: 36px; height: auto; border-radius: 4px; }
+
+/* Premium option pills / color swatches */
+.option-selector { margin-bottom: 20px; }
+.option-selector__label {
   display: block;
   font-weight: 600;
   font-size: 0.85rem;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--color-text-muted);
 }
-.product-form__option select {
-  width: 100%;
-  padding: 0.75em 1em;
+.option-selector__label strong { color: var(--color-text); font-weight: 700; }
+.option-selector__values { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.option-pill {
+  padding: 0.6em 1.1em;
   border-radius: 8px;
   border: 1px solid var(--color-border);
-  background: var(--color-background);
+  background: var(--color-surface);
   color: var(--color-text);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
+.option-pill:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.option-pill.is-selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.option-pill.has-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 0.7em;
+}
+.option-pill.has-swatch::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--swatch-color, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+.option-pill.has-swatch.is-selected { background: var(--color-surface); color: var(--color-text); border-color: var(--color-accent); }
+.option-pill.has-swatch.is-selected::before { box-shadow: 0 0 0 2px var(--color-accent); }
 
 .quantity-selector {
   display: inline-flex;
@@ -833,6 +909,107 @@ html.js .reveal { opacity: 0; }
     flex: 0 0 72%;
     scroll-snap-align: start;
   }
+}
+
+/* ==========================================================================
+   Specifications
+   ========================================================================== */
+
+.specs-list {
+  border-top: 1px solid var(--color-border);
+  max-width: 720px;
+}
+.specs-list__row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.specs-list__row dt { color: var(--color-text-muted); font-weight: 600; font-size: 0.9rem; }
+.specs-list__row dd { margin: 0; font-size: 0.9rem; }
+@media (max-width: 599px) {
+  .specs-list__row { grid-template-columns: 1fr; gap: 4px; }
+}
+
+/* ==========================================================================
+   FAQ
+   ========================================================================== */
+
+.faq-list { max-width: 780px; }
+.faq-item {
+  border-bottom: 1px solid var(--color-border);
+  padding: 18px 0;
+}
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  font-size: 1.3rem;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item__answer {
+  color: var(--color-text-muted);
+  margin-top: 12px;
+  line-height: 1.7;
+}
+
+/* ==========================================================================
+   Sticky add-to-cart bar
+   ========================================================================== */
+
+.sticky-cart {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 150;
+  background: rgba(11, 15, 20, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--color-border);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sticky-cart.is-visible { transform: translateY(0); }
+
+.sticky-cart__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+}
+.sticky-cart__product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.sticky-cart__product img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+.sticky-cart__title {
+  margin: 0 0 2px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+.sticky-cart__form .btn { padding: 0.7em 1.4em; white-space: nowrap; }
+
+@media (max-width: 599px) {
+  .sticky-cart__title { max-width: 130px; }
 }
 
 /* ==========================================================================
