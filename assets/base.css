@@ -1016,6 +1016,20 @@ html.js .reveal { opacity: 0; }
    Collection page
    ========================================================================== */
 
+.breadcrumbs { padding: 20px 0 0; }
+.breadcrumbs ol { display: flex; flex-wrap: wrap; gap: 6px; }
+.breadcrumbs li {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumbs li:not(:last-child)::after { content: '/'; color: var(--color-border); }
+.breadcrumbs a { color: var(--color-text-muted); }
+.breadcrumbs a:hover { color: var(--color-accent); }
+.breadcrumbs li[aria-current="page"] { color: var(--color-text); }
+
 .collection-header {
   padding: 48px 0 24px;
   text-align: center;

@@ -2,7 +2,57 @@
   assign product = product
   assign variant = product.selected_or_first_available_variant
   assign specs_raw = product.metafields.custom.specifications.value
+  assign crumb_collection = product.collections.first
 -%}
+
+<nav class="breadcrumbs page-width" aria-label="breadcrumb">
+  <ol>
+    <li><a href="{{ routes.root_url }}">{{ 'general.breadcrumbs.home' | t }}</a></li>
+    {%- if crumb_collection -%}
+      <li><a href="{{ crumb_collection.url }}">{{ crumb_collection.title }}</a></li>
+    {%- endif -%}
+    <li aria-current="page">{{ product.title }}</li>
+  </ol>
+</nav>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": {{ shop.name | json }}, "item": {{ shop.url | json }} }
+      {%- if crumb_collection -%},
+      { "@type": "ListItem", "position": 2, "name": {{ crumb_collection.title | json }}, "item": {{ shop.url | append: crumb_collection.url | json }} }
+      {%- endif -%},
+      { "@type": "ListItem", "position": {% if crumb_collection %}3{% else %}2{% endif %}, "name": {{ product.title | json }}, "item": {{ shop.url | append: product.url | json }} }
+    ]
+  }
+</script>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    "description": {{ product.description | strip_html | json }},
+    {%- if variant.sku != blank -%}
+    "sku": {{ variant.sku | json }},
+    {%- endif -%}
+    {%- if product.vendor != blank -%}
+    "brand": { "@type": "Brand", "name": {{ product.vendor | json }} },
+    {%- endif -%}
+    "image": [{{ product.featured_image | image_url: width: 1200 | json }}],
+    "offers": {
+      "@type": "Offer",
+      "url": {{ shop.url | append: product.url | json }},
+      "priceCurrency": {{ cart.currency.iso_code | json }},
+      "price": {{ variant.price | json }},
+      "availability": "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+      "itemCondition": "https://schema.org/NewCondition"
+    }
+  }
+</script>
+
 <div class="page-width product-main">
   <div class="product-gallery" data-product-gallery>
     <div class="product-gallery__main" data-zoom>

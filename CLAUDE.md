@@ -68,6 +68,15 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 - **Carrito AJAX + drawer**: los formularios `data-product-form` se envían por `fetch` a `/cart/add.js`; al agregar un producto se abre el **drawer del carrito** (`snippets/cart-drawer.liquid`, lógica en `assets/global.js`) en vez de recargar o ir a `/cart`. El drawer se llena con `fetch` a `/cart.js` y actualiza cantidades/elimina líneas con `/cart/change.js` (`routes.cart_change_url`), todo sin recargar. El ícono del carrito en el header (`data-cart-drawer-toggle`) abre el drawer; `/cart` (`main-cart.liquid`) sigue existiendo como fallback si JS está desactivado o se navega directo. El toast (`[data-cart-toast]`) ahora solo se usa para errores (ej. producto agotado).
 - Todas las cadenas usadas por el JS están en `window.themeStrings` / `window.themeRoutes`, inyectadas desde `layout/theme.liquid` con claves de `locales/es.default.json`.
 
+## SEO
+
+- **`layout/theme.liquid`**: meta description con fallback automático (usa `page_description`; si está vacío, cae a la descripción del producto/colección/tienda), Open Graph, Twitter Cards, y JSON-LD de `Organization` + `WebSite` (con `SearchAction` para el buscador). El `canonical` de una colección con filtros activos apunta a la URL base de la colección (evita contenido duplicado por combinaciones de filtros).
+- **Producto (`main-product.liquid`)**: JSON-LD `Product` (precio, disponibilidad, marca, SKU) + breadcrumbs visibles y `BreadcrumbList` (Inicio → Colección → Producto).
+- **Colección (`main-collection.liquid`)**: breadcrumbs visibles y `BreadcrumbList` (Inicio → Colección).
+- **Logo/Favicon**: se agregaron como settings reales (`settings.logo`, `settings.favicon` en `config/settings_schema.json`) — antes se referenciaban en el código pero no existían como opción editable, así que nunca se mostraban. El logo también se usa como imagen de respaldo para Open Graph si una página no tiene imagen propia.
+- **Sitemap**: `/sitemap.xml` lo genera y sirve Shopify automáticamente a nivel de plataforma — no es editable desde el tema, por eso no se creó ningún archivo para esto.
+- **URLs**: la estructura (`/products/`, `/collections/`, etc.) la controla Shopify; no es configurable desde el tema.
+
 ## Confianza y prueba social
 
 - **Badges en producto**: fila de insignias (envío, garantía, pago seguro) debajo del botón de agregar al carrito en `sections/main-product.liquid`, editables desde el theme editor.

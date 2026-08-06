@@ -4,7 +4,10 @@
       "placeholder": "Buscar productos"
     },
     "continue_shopping": "Seguir comprando",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "breadcrumbs": {
+      "home": "Inicio"
+    }
   },
   "header": {
     "menu": "Menú",
