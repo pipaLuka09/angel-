@@ -312,25 +312,13 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .hero__actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(22px); }
-  to { opacity: 1; transform: none; }
-}
-
-.hero__eyebrow, .hero__heading, .hero__subheading, .hero__actions {
+/* Hero entrance is animated by assets/motion.js (SplitType + GSAP timeline).
+   Hidden only when JS is enabled; reduced-motion is handled in motion.js. */
+html.js .hero__eyebrow,
+html.js .hero__heading,
+html.js .hero__subheading,
+html.js .hero__actions {
   opacity: 0;
-  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-.hero__eyebrow { animation-delay: 0.05s; }
-.hero__heading { animation-delay: 0.15s; }
-.hero__subheading { animation-delay: 0.28s; }
-.hero__actions { animation-delay: 0.42s; }
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__eyebrow, .hero__heading, .hero__subheading, .hero__actions {
-    opacity: 1;
-    animation: none;
-  }
 }
 
 /* ==========================================================================
@@ -351,19 +339,15 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .section__subheading { color: var(--color-text-muted); margin-top: 8px; }
 
 /* ==========================================================================
-   Scroll reveal
+   Scroll reveal — animated by assets/motion.js (GSAP + ScrollTrigger).
+   Hidden only when JS is enabled, so no-JS visitors always see full content;
+   reduced-motion visitors are handled in motion.js (revealed instantly).
    ========================================================================== */
 
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.reveal.is-visible { opacity: 1; transform: none; }
+html.js .reveal { opacity: 0; }
 
-@media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
-}
+.split-heading { display: block; }
+.split-heading .word { display: inline-block; will-change: transform, filter; }
 
 /* ==========================================================================
    Collection list (category grid)
@@ -434,7 +418,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 
 [data-tilt] { transform-style: preserve-3d; will-change: transform; }
-[data-tilt] [data-tilt-layer] { transform: translateZ(20px); }
 
 .product-card__media {
   position: relative;

@@ -1,5 +1,3 @@
-document.documentElement.classList.remove('no-js');
-
 /* Mobile navigation toggle */
 document.addEventListener('click', function (event) {
   var toggle = event.target.closest('[data-mobile-nav-toggle]');
@@ -123,49 +121,7 @@ document.addEventListener('click', function (event) {
   thumb.classList.add('is-active');
 });
 
-/* Scroll reveal */
-(function () {
-  var targets = document.querySelectorAll('.reveal');
-  if (!targets.length) return;
-
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion || !('IntersectionObserver' in window)) {
-    targets.forEach(function (el) { el.classList.add('is-visible'); });
-    return;
-  }
-
-  var observer = new IntersectionObserver(
-    function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-  );
-
-  targets.forEach(function (el) { observer.observe(el); });
-})();
-
-/* 3D tilt on cards (pointer devices only) */
-(function () {
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-  document.querySelectorAll('[data-tilt]').forEach(function (card) {
-    card.addEventListener('mousemove', function (event) {
-      var rect = card.getBoundingClientRect();
-      var x = (event.clientX - rect.left) / rect.width - 0.5;
-      var y = (event.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform =
-        'perspective(700px) rotateX(' + (y * -8).toFixed(2) + 'deg) rotateY(' + (x * 8).toFixed(2) + 'deg) translateZ(4px)';
-    });
-    card.addEventListener('mouseleave', function () {
-      card.style.transform = '';
-    });
-  });
-})();
+/* Scroll reveal and 3D tilt now live in assets/motion.js (GSAP + ScrollTrigger). */
 
 /* Hero constellation canvas */
 (function () {

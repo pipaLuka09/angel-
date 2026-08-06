@@ -46,9 +46,17 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 
 ## Interacciones dinámicas
 
-- **Hero**: canvas de partículas tipo constelación (`data-hero-canvas` en `sections/hero.liquid`, animado en `assets/global.js`) + animación de entrada escalonada del texto. Se desactiva si el usuario tiene `prefers-reduced-motion`.
-- **Scroll reveal**: cualquier elemento con clase `reveal` aparece con fade/slide al entrar en pantalla (IntersectionObserver en `assets/global.js`). Ya aplicado a encabezados de sección, tarjetas de producto/colección, beneficios y newsletter.
-- **Tilt 3D**: elementos con `data-tilt` (tarjetas de producto y de colección) se inclinan siguiendo el cursor en dispositivos con mouse; se desactiva en touch.
+- **Motion layer premium (`assets/motion.js`)**: GSAP + ScrollTrigger + Lenis + SplitType, vendorizadas (auto-hospedadas) en `assets/gsap.min.js`, `assets/scroll-trigger.min.js`, `assets/lenis.min.js`, `assets/split-type.min.js` — cargadas con `defer` desde `layout/theme.liquid`, en ese orden. No usan CDN externo (evita una conexión extra y problemas de CSP).
+  - **Lenis**: smooth scroll solo en dispositivos con mouse/trackpad (`hover:hover and pointer:fine`); en touch se deja el scroll nativo (mejor rendimiento y sensación en móvil).
+  - **SplitType**: separa en palabras el `hero__heading` y los títulos de sección (`.section__heading`, `.newsletter__heading`, `.collection-header h1`, `.product-info__title`), animados palabra por palabra con GSAP.
+  - **ScrollTrigger reveals**: reemplazan el IntersectionObserver anterior. Cualquier elemento con clase `reveal` anima fade + subida + escala + blur al entrar en pantalla. Las tarjetas de grid (`.product-card`, `.collection-card`, `.why-us-item`) usan `ScrollTrigger.batch` para revelarse en oleada según lo que entra a la vez en pantalla.
+  - **Tilt 3D**: `[data-tilt]` (tarjetas) ahora usa `gsap.quickTo` para una inclinación 3D con inercia suave, en vez del cálculo manual anterior.
+  - **Botones magnéticos**: cualquier `.btn` seguido el cursor dentro de su área (`gsap.quickTo` sobre x/y) en dispositivos con mouse.
+  - **Parallax**: la imagen de fondo del hero (`[data-hero-parallax]`) se mueve más lento que el scroll (`ScrollTrigger` con `scrub`).
+  - **Fallback de seguridad**: si GSAP/ScrollTrigger no cargan (bloqueo de red, etc.) o el usuario tiene `prefers-reduced-motion`, todo el contenido se muestra instantáneamente — nunca queda oculto por error. El CSS solo oculta estos elementos cuando `<html>` tiene la clase `js` (agregada por un script inline en el `<head>`, antes de que se pinte la página, para evitar parpadeos); sin JS, el contenido siempre es visible.
+  - Se evaluó **VanillaTilt** y **Three.js/Spline** y se descartaron a propósito: el tilt custom con GSAP ya cubre lo mismo sin una librería extra, y no se pidió ningún objeto 3D real que justifique el peso de Three.js/Spline.
+  - Tamaño agregado (gzip aprox.): GSAP ~28 KB, ScrollTrigger ~18 KB, Lenis ~5 KB, SplitType ~4 KB — cargados con `defer`, sin bloquear el render.
+- **Canvas de partículas del hero**: se mantiene igual que antes (`data-hero-canvas`, lógica en `assets/global.js`), independiente del motion layer.
 - **Carrito AJAX + drawer**: los formularios `data-product-form` se envían por `fetch` a `/cart/add.js`; al agregar un producto se abre el **drawer del carrito** (`snippets/cart-drawer.liquid`, lógica en `assets/global.js`) en vez de recargar o ir a `/cart`. El drawer se llena con `fetch` a `/cart.js` y actualiza cantidades/elimina líneas con `/cart/change.js` (`routes.cart_change_url`), todo sin recargar. El ícono del carrito en el header (`data-cart-drawer-toggle`) abre el drawer; `/cart` (`main-cart.liquid`) sigue existiendo como fallback si JS está desactivado o se navega directo. El toast (`[data-cart-toast]`) ahora solo se usa para errores (ej. producto agotado).
 - Todas las cadenas usadas por el JS están en `window.themeStrings` / `window.themeRoutes`, inyectadas desde `layout/theme.liquid` con claves de `locales/es.default.json`.
 

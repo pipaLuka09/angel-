@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="{{ request.locale.iso_code }}" class="no-js">
 <head>
+  <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -42,6 +43,11 @@
   {% endstyle %}
 
   <link rel="stylesheet" href="{{ 'base.css' | asset_url }}">
+
+  <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'scroll-trigger.min.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'lenis.min.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'split-type.min.js' | asset_url }}" defer="defer"></script>
 </head>
 
 <body>
@@ -79,5 +85,6 @@
     };
   </script>
   <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'motion.js' | asset_url }}" defer="defer"></script>
 </body>
 </html>
