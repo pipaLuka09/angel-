@@ -20,6 +20,6 @@ jobs:
         env:
           SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
         run: |
-          shopify theme push --unpublished --theme "ShopNow Tech" \
+          shopify theme push --theme=147850330165 \
             --store=hs0gwb-u1.myshopify.com \
             --path=. --no-color
