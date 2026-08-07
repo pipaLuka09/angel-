@@ -5,11 +5,8 @@
   in both cases we do not want elements pre-hidden by CSS to stay hidden.
 */
 (function () {
-  var revealSelector =
-    '.reveal, .hero__eyebrow, .hero__heading, .hero__subheading, .hero__actions';
-
   function revealEverythingInstantly() {
-    document.querySelectorAll(revealSelector).forEach(function (el) {
+    document.querySelectorAll('.reveal').forEach(function (el) {
       el.style.opacity = '1';
       el.style.transform = 'none';
       el.style.filter = 'none';
@@ -53,23 +50,23 @@
     return split;
   }
 
+  /* Hero text is visible from first paint (no CSS pre-hide, protects LCP).
+     Only the heading gets a subtle word-by-word reveal; eyebrow/subheading/
+     actions stay static since motion.js now loads after window.load and a
+     delayed positional jump would look broken rather than premium. */
   var heroHeading = document.querySelector('.hero__heading');
   var heroSplit = heroHeading ? splitWords(heroHeading) : null;
 
-  var heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-  gsap.set(['.hero__eyebrow', '.hero__subheading', '.hero__actions'], { y: 20 });
-
   if (heroSplit) {
-    heroTl.to(
-      heroSplit.words,
-      { opacity: 1, y: '0%', filter: 'blur(0px)', duration: 0.9, stagger: 0.055 },
-      0.15
-    );
+    gsap.to(heroSplit.words, {
+      opacity: 1,
+      y: '0%',
+      filter: 'blur(0px)',
+      duration: 0.9,
+      stagger: 0.055,
+      ease: 'power3.out'
+    });
   }
-  heroTl
-    .to('.hero__eyebrow', { opacity: 1, y: 0, duration: 0.6 }, 0)
-    .to('.hero__subheading', { opacity: 1, y: 0, duration: 0.7 }, 0.55)
-    .to('.hero__actions', { opacity: 1, y: 0, duration: 0.7 }, 0.7);
 
   document
     .querySelectorAll('.section__heading, .newsletter__heading, .collection-header h1, .product-info__title')

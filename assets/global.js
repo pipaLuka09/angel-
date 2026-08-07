@@ -473,3 +473,17 @@ document.addEventListener('click', function (event) {
 
   window.themeCartDrawer = { open: open, close: close, refresh: refresh };
 })();
+
+/* Safety net: motion.js (GSAP) now loads after window.load, so if it fails
+   to load or takes unusually long, make sure .reveal elements (hidden by
+   base.css until animated in) don't stay invisible forever. */
+(function () {
+  window.setTimeout(function () {
+    if (window.gsap) return;
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      el.style.filter = 'none';
+    });
+  }, 4000);
+})();

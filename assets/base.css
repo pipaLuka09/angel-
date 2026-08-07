@@ -355,14 +355,11 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .hero__actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
-/* Hero entrance is animated by assets/motion.js (SplitType + GSAP timeline).
-   Hidden only when JS is enabled; reduced-motion is handled in motion.js. */
-html.js .hero__eyebrow,
-html.js .hero__heading,
-html.js .hero__subheading,
-html.js .hero__actions {
-  opacity: 0;
-}
+/* Hero text is visible immediately (it's almost always the LCP element —
+   hiding it behind opacity:0 until GSAP/SplitType load badly hurts LCP).
+   assets/motion.js only enhances it progressively once it loads: it splits
+   the heading into words and animates those, without ever hiding the
+   already-painted text. */
 
 /* ==========================================================================
    Section heading

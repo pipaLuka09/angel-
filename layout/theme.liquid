@@ -136,11 +136,6 @@
   {% endstyle %}
 
   <link rel="stylesheet" href="{{ 'base.css' | asset_url }}">
-
-  <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
-  <script src="{{ 'scroll-trigger.min.js' | asset_url }}" defer="defer"></script>
-  <script src="{{ 'lenis.min.js' | asset_url }}" defer="defer"></script>
-  <script src="{{ 'split-type.min.js' | asset_url }}" defer="defer"></script>
 </head>
 
 <body>
@@ -178,6 +173,33 @@
     };
   </script>
   <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
-  <script src="{{ 'motion.js' | asset_url }}" defer="defer"></script>
+
+  {%- comment -%}
+    Premium motion layer (GSAP + ScrollTrigger + Lenis + SplitType + motion.js)
+    is not needed for first paint or the LCP element, so it's kept off the
+    critical path entirely: only requested after window.load, one file at a
+    time, in dependency order. global.js (cart/nav/variants) still loads
+    normally above and is unaffected.
+  {%- endcomment -%}
+  <script>
+    window.addEventListener('load', function () {
+      var motionScripts = [
+        {{ 'gsap.min.js' | asset_url | json }},
+        {{ 'scroll-trigger.min.js' | asset_url | json }},
+        {{ 'lenis.min.js' | asset_url | json }},
+        {{ 'split-type.min.js' | asset_url | json }},
+        {{ 'motion.js' | asset_url | json }}
+      ];
+      function loadNext(index) {
+        if (index >= motionScripts.length) return;
+        var script = document.createElement('script');
+        script.src = motionScripts[index];
+        script.onload = function () { loadNext(index + 1); };
+        script.onerror = function () { loadNext(index + 1); };
+        document.body.appendChild(script);
+      }
+      loadNext(0);
+    });
+  </script>
 </body>
 </html>
