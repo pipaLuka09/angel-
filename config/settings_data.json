@@ -11,6 +11,8 @@
     "font_body": "'Inter', system-ui, sans-serif",
     "page_width": 1300,
     "sticky_header": true,
+    "free_shipping_bar_enabled": true,
+    "free_shipping_threshold": 50,
     "social_instagram": "",
     "social_facebook": "",
     "social_tiktok": "",

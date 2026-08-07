@@ -320,10 +320,34 @@ document.addEventListener('click', function (event) {
 
   var body = drawer.querySelector('[data-cart-drawer-body]');
   var footer = drawer.querySelector('[data-cart-drawer-footer]');
+  var freeShippingEl = drawer.querySelector('[data-cart-drawer-free-shipping]');
   var lastFocused = null;
 
   function formatMoney(cents) {
     return (cents / 100).toLocaleString(undefined, { style: 'currency', currency: window.themeStrings.currency || 'USD' });
+  }
+
+  function freeShippingBarHtml(totalPrice) {
+    var settings = window.themeSettings || {};
+    if (!settings.freeShippingEnabled || !settings.freeShippingThresholdCents) return '';
+    var threshold = settings.freeShippingThresholdCents;
+    if (totalPrice >= threshold) {
+      return (
+        '<div class="free-shipping-bar free-shipping-bar--reached">' +
+        '<p class="free-shipping-bar__message">' + window.themeStrings.freeShippingReached + '</p>' +
+        '<div class="free-shipping-bar__track"><div class="free-shipping-bar__fill" style="width: 100%;"></div></div>' +
+        '</div>'
+      );
+    }
+    var remaining = formatMoney(threshold - totalPrice);
+    var percent = (totalPrice / threshold) * 100;
+    var message = window.themeStrings.freeShippingProgressTemplate.replace('{{ amount }}', remaining);
+    return (
+      '<div class="free-shipping-bar">' +
+      '<p class="free-shipping-bar__message">' + message + '</p>' +
+      '<div class="free-shipping-bar__track"><div class="free-shipping-bar__fill" style="width: ' + percent + '%;"></div></div>' +
+      '</div>'
+    );
   }
 
   function escapeHtml(value) {
@@ -368,6 +392,7 @@ document.addEventListener('click', function (event) {
 
   function render(cart) {
     if (cart.item_count === 0) {
+      if (freeShippingEl) freeShippingEl.innerHTML = '';
       body.innerHTML =
         '<div class="cart-drawer__empty"><p>' + window.themeStrings.cartEmpty + '</p>' +
         '<button type="button" class="btn btn--primary" data-cart-drawer-close>' + window.themeStrings.continueShopping + '</button></div>';
@@ -375,6 +400,7 @@ document.addEventListener('click', function (event) {
       return;
     }
 
+    if (freeShippingEl) freeShippingEl.innerHTML = freeShippingBarHtml(cart.total_price);
     body.innerHTML = cart.items.map(lineItemHtml).join('');
     footer.innerHTML =
       '<div class="cart-drawer__subtotal"><span>' + window.themeStrings.subtotal + '</span><span>' + formatMoney(cart.total_price) + '</span></div>' +

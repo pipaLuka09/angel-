@@ -165,11 +165,17 @@
       cartEmpty: {{ 'cart.empty' | t | json }},
       continueShopping: {{ 'general.continue_shopping' | t | json }},
       viewFullCart: {{ 'cart.view_full_cart' | t | json }},
+      freeShippingReached: {{ 'cart.free_shipping.reached' | t | json }},
+      freeShippingProgressTemplate: {{ 'cart.free_shipping.progress' | t | json }},
       currency: {{ cart.currency.iso_code | json }}
     };
     window.themeRoutes = {
       cartUrl: {{ routes.cart_url | json }},
       cartChangeUrl: {{ routes.cart_change_url | json }}
+    };
+    window.themeSettings = {
+      freeShippingEnabled: {{ settings.free_shipping_bar_enabled | json }},
+      freeShippingThresholdCents: {{ settings.free_shipping_threshold | times: 100 | json }}
     };
   </script>
   <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>

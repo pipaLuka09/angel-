@@ -7,6 +7,7 @@
       <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">{{ 'general.continue_shopping' | t }}</a>
     </div>
   {%- else -%}
+    {%- render 'free-shipping-bar' -%}
     <form action="{{ routes.cart_url }}" method="post" class="cart">
       <div class="cart-items">
         {%- for item in cart.items -%}

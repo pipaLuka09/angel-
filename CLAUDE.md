@@ -47,7 +47,7 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 - **Colección (`templates/collection.json`)**:
   1. `main-collection` — encabezado, filtros por precio y disponibilidad (`collection.filters`, requiere la app gratuita "Search & Discovery" de Shopify), orden (`sort_by`), grid de productos paginado.
 
-- **Carrito (`templates/cart.json`)**: `main-cart` — líneas editables, subtotal, checkout.
+- **Carrito (`templates/cart.json`)**: `main-cart` — líneas editables, subtotal, checkout, barra de envío gratis.
 - **Página (`templates/page.json`)**: `main-page`.
 - **404 (`templates/404.json`)**: `main-404`.
 - **Todas las colecciones (`templates/list-collections.json`)**: `main-list-collections`.
@@ -67,6 +67,7 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 - **Canvas de partículas del hero**: se mantiene igual que antes (`data-hero-canvas`, lógica en `assets/global.js`), independiente del motion layer.
 - **Carrito AJAX + drawer**: los formularios `data-product-form` se envían por `fetch` a `/cart/add.js`; al agregar un producto se abre el **drawer del carrito** (`snippets/cart-drawer.liquid`, lógica en `assets/global.js`) en vez de recargar o ir a `/cart`. El drawer se llena con `fetch` a `/cart.js` y actualiza cantidades/elimina líneas con `/cart/change.js` (`routes.cart_change_url`), todo sin recargar. El ícono del carrito en el header (`data-cart-drawer-toggle`) abre el drawer; `/cart` (`main-cart.liquid`) sigue existiendo como fallback si JS está desactivado o se navega directo. El toast (`[data-cart-toast]`) ahora solo se usa para errores (ej. producto agotado).
 - Todas las cadenas usadas por el JS están en `window.themeStrings` / `window.themeRoutes`, inyectadas desde `layout/theme.liquid` con claves de `locales/es.default.json`.
+- **Barra de envío gratis** (`snippets/free-shipping-bar.liquid`): muestra cuánto falta para el envío gratis o el mensaje de "envío gratis desbloqueado", según `settings.free_shipping_threshold` (editable en el theme editor, sección "Carrito"; en 0 se oculta). En la página `/cart` se renderiza server-side con Liquid (`cart.total_price`); en el drawer se recalcula client-side en `assets/global.js` (`freeShippingBarHtml`, usando `window.themeSettings.freeShippingThresholdCents`) cada vez que el carrito cambia, sin recargar.
 
 ## SEO
 

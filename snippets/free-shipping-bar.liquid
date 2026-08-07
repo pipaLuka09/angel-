@@ -1,0 +1,23 @@
+{%- comment -%}
+  Free shipping progress bar, server-rendered from the live `cart` object.
+  Used on the standalone cart page (main-cart.liquid). The AJAX cart drawer
+  renders the same markup/classes client-side (assets/global.js) since its
+  contents update without a page reload.
+{%- endcomment -%}
+{%- if settings.free_shipping_bar_enabled and settings.free_shipping_threshold > 0 -%}
+  {%- assign threshold_cents = settings.free_shipping_threshold | times: 100 -%}
+  {%- if cart.total_price >= threshold_cents -%}
+    <div class="free-shipping-bar free-shipping-bar--reached">
+      <p class="free-shipping-bar__message">{{ 'cart.free_shipping.reached' | t }}</p>
+      <div class="free-shipping-bar__track"><div class="free-shipping-bar__fill" style="width: 100%;"></div></div>
+    </div>
+  {%- else -%}
+    {%- assign remaining_cents = threshold_cents | minus: cart.total_price -%}
+    {%- assign remaining_money = remaining_cents | money -%}
+    {%- assign percent = cart.total_price | times: 100.0 | divided_by: threshold_cents -%}
+    <div class="free-shipping-bar">
+      <p class="free-shipping-bar__message">{{ 'cart.free_shipping.progress' | t: amount: remaining_money }}</p>
+      <div class="free-shipping-bar__track"><div class="free-shipping-bar__fill" style="width: {{ percent }}%;"></div></div>
+    </div>
+  {%- endif -%}
+{%- endif -%}

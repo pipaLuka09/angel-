@@ -58,7 +58,11 @@
     "total": "Total",
     "added_to_cart": "Se agregó al carrito.",
     "secure_checkout": "Pago 100% seguro y encriptado",
-    "view_full_cart": "Ver carrito completo"
+    "view_full_cart": "Ver carrito completo",
+    "free_shipping": {
+      "progress": "Te faltan {{ amount }} para tu envío gratis",
+      "reached": "¡Tu pedido tiene envío gratis!"
+    }
   },
   "newsletter": {
     "heading": "No te pierdas nuestras ofertas",

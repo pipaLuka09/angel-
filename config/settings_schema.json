@@ -108,6 +108,24 @@
     ]
   },
   {
+    "name": "Carrito",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "free_shipping_bar_enabled",
+        "label": "Mostrar barra de envío gratis",
+        "default": true
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "label": "Monto mínimo para envío gratis",
+        "info": "En la moneda de la tienda. Déjalo en 0 para ocultar la barra.",
+        "default": 50
+      }
+    ]
+  },
+  {
     "name": "Redes sociales",
     "settings": [
       { "type": "text", "id": "social_instagram", "label": "URL de Instagram" },
