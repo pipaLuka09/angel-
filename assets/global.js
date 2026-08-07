@@ -156,6 +156,7 @@ document.addEventListener('click', function (event) {
       entries.forEach(function (entry) {
         var scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0;
         bar.classList.toggle('is-visible', scrolledPast);
+        document.body.classList.toggle('has-sticky-cart', scrolledPast);
       });
     },
     { threshold: 0 }

@@ -16,6 +16,8 @@
     "social_instagram": "",
     "social_facebook": "",
     "social_tiktok": "",
-    "social_whatsapp": ""
+    "social_whatsapp": "",
+    "whatsapp_floating_button_enabled": true,
+    "whatsapp_button_message": "Hola, tengo una pregunta sobre un producto."
   }
 }

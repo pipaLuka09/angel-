@@ -1006,6 +1006,33 @@ html.js .reveal { opacity: 0; }
 }
 
 /* ==========================================================================
+   Floating WhatsApp button
+   ========================================================================== */
+
+.whatsapp-float {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 140;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.whatsapp-float:hover { transform: scale(1.08); }
+body.has-sticky-cart .whatsapp-float { bottom: 92px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-float { transition: none; }
+}
+
+/* ==========================================================================
    Sticky add-to-cart bar
    ========================================================================== */
 

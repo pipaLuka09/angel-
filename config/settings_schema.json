@@ -131,7 +131,20 @@
       { "type": "text", "id": "social_instagram", "label": "URL de Instagram" },
       { "type": "text", "id": "social_facebook", "label": "URL de Facebook" },
       { "type": "text", "id": "social_tiktok", "label": "URL de TikTok" },
-      { "type": "text", "id": "social_whatsapp", "label": "Número de WhatsApp (con código de país)" }
+      { "type": "text", "id": "social_whatsapp", "label": "Número de WhatsApp (con código de país)" },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_floating_button_enabled",
+        "label": "Mostrar botón flotante de WhatsApp",
+        "info": "Requiere el número de WhatsApp de arriba.",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_button_message",
+        "label": "Mensaje predefinido del botón flotante",
+        "default": "Hola, tengo una pregunta sobre un producto."
+      }
     ]
   }
 ]
