@@ -54,6 +54,29 @@ Cargadas vía Google Fonts en `layout/theme.liquid`. Configurables en `config/se
 
 ## Interacciones dinámicas
 
+### Tabla de coreografía (referencia obligatoria)
+
+Antes de escribir la animación de cualquier sección nueva, usar esta tabla — no inventar timings/easings distintos para el mismo tipo de elemento. Si un elemento nuevo no encaja en ninguna fila, se agrega una fila nueva aquí antes de programarlo, no se decide ad-hoc dentro de `motion.js`.
+
+| Elemento | Selector | Animación | Propiedades | Duración / easing | Trigger | Función en `motion.js` |
+|---|---|---|---|---|---|---|
+| Título del hero | `.hero__heading` | Palabra por palabra, blur → nítido | `opacity`, `y: 55%→0%`, `filter: blur(5px)→0` | 0.9s, stagger 0.055, `power3.out` | Al cargar (post `window.load`), sin scroll trigger | `initHeroSplit` |
+| Título de sección | `.section__heading`, `.newsletter__heading`, `.collection-header h1`, `.product-info__title` | Palabra por palabra, blur → nítido | igual que el hero | 0.8s, stagger 0.05, `power3.out` | `ScrollTrigger` top 88%, `toggleActions: play none none reverse` | `initSectionSplits` |
+| Tarjetas de grid | `.product-card.reveal`, `.collection-card.reveal`, `.why-us-item.reveal`, `.related-card.reveal` | Fade + rise + scale + blur, en oleada | `opacity`, `y: 36→0`, `scale: 0.95→1`, `filter: blur(6px)→0` | 0.8s, stagger 0.08, `power3.out` | `ScrollTrigger.batch` top 90% (agrupa lo que entra a la vez) | `initScrollReveals` |
+| Elemento genérico `.reveal` (no grid) | `.reveal` | Fade + rise + scale + blur | `opacity`, `y: 40→0`, `scale: 0.97→1`, `filter: blur(6px)→0` | 1s, `power3.out` | `ScrollTrigger` top 85%, `toggleActions: play none none reverse` | `initScrollReveals` |
+| Parallax del hero | `[data-hero-parallax]` | Desplazamiento vertical más lento que el scroll | `yPercent: 0→18` | Lineal (`ease: none`), `scrub: true` | `ScrollTrigger` desde `top top` hasta `bottom top` de `.hero` | `initParallax` |
+| Tilt 3D | `[data-tilt]` | Rotación 3D con inercia, solo puntero fino | `rotationX: ±8`, `rotationY: ±8` | 0.5s por eje, `power3.out`, vía `gsap.quickTo` | `mousemove` / `mouseleave` sobre la tarjeta | `initTilt` |
+| Botón magnético | `.btn` | Sigue el cursor dentro de su área, solo puntero fino | `x`, `y` (relativo al centro del botón, factor 0.35) | 0.4s, `power3.out`, vía `gsap.quickTo` | `mousemove` / `mouseleave` sobre el botón | `initMagneticButtons` |
+| Zoom de galería | `[data-zoom]` | Zoom + paneo con el mouse, solo puntero fino | `scale: 1→1.8`, `xPercent`/`yPercent: ±30` | 0.35s, `power2.out`, vía `gsap.quickTo` | `mousemove` / `mouseleave` sobre la imagen | `initZoom` |
+| Smooth scroll | `document` (global) | Momentum suave en vez de scroll nativo, solo puntero fino | — (Lenis `lerp: 0.1`) | continuo, sincronizado con `gsap.ticker` | Siempre activo en dispositivos con mouse/trackpad | `initLenis` |
+
+Reglas fijas que aplican a toda la tabla (no son negociables por sección):
+
+- Todo lo que anima parte de un estado visible por CSS por defecto (nunca `opacity: 0` estático fuera de `html.js .reveal`) — el fallback sin JS y el timeout de seguridad de `global.js` dependen de eso.
+- Nada de lo anterior corre antes de `window.load`; cada función se programa con `requestIdleCallback` (fallback `setTimeout`) para no generar tareas largas.
+- Los efectos de puntero (tilt, magnético, zoom) solo se inicializan si `(hover: hover) and (pointer: fine)` — nunca en touch.
+- Si `prefers-reduced-motion: reduce` está activo, o GSAP/ScrollTrigger no cargan, todo el contenido `.reveal` se muestra instantáneamente sin animar (`revealEverythingInstantly`) — no hay excepción a esta regla para ningún elemento nuevo.
+
 - **Motion layer premium (`assets/motion.js`)**: GSAP + ScrollTrigger + Lenis + SplitType, vendorizadas (auto-hospedadas) en `assets/gsap.min.js`, `assets/scroll-trigger.min.js`, `assets/lenis.min.js`, `assets/split-type.min.js` — cargadas con `defer` desde `layout/theme.liquid`, en ese orden. No usan CDN externo (evita una conexión extra y problemas de CSP).
   - **Lenis**: smooth scroll solo en dispositivos con mouse/trackpad (`hover:hover and pointer:fine`); en touch se deja el scroll nativo (mejor rendimiento y sensación en móvil).
   - **SplitType**: separa en palabras el `hero__heading` y los títulos de sección (`.section__heading`, `.newsletter__heading`, `.collection-header h1`, `.product-info__title`), animados palabra por palabra con GSAP.
