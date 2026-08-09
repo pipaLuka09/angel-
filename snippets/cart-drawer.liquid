@@ -5,7 +5,7 @@
 {%- endcomment -%}
 <div class="cart-drawer" data-cart-drawer aria-hidden="true">
   <div class="cart-drawer__overlay" data-cart-drawer-close></div>
-  <aside class="cart-drawer__panel" role="dialog" aria-modal="true" aria-label="{{ 'cart.title' | t }}">
+  <div class="cart-drawer__panel" role="dialog" aria-modal="true" aria-label="{{ 'cart.title' | t }}">
     <div class="cart-drawer__header">
       <h2>{{ 'cart.title' | t }}</h2>
       <button type="button" class="cart-drawer__close" data-cart-drawer-close aria-label="{{ 'general.close' | t }}">
@@ -18,5 +18,5 @@
     <div data-cart-drawer-free-shipping></div>
     <div class="cart-drawer__body" data-cart-drawer-body></div>
     <div class="cart-drawer__footer" data-cart-drawer-footer></div>
-  </aside>
+  </div>
 </div>
