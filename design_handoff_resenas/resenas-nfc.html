@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Simulación — tarjeta NFC de reseñas</title>
+<link rel="stylesheet" href="_ds/modernist-4e39d72f-67e8-4c3c-a4f8-011aa3009942/styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+  html,body{margin:0;height:100%;background:var(--color-bg);font-family:var(--font-body)}
+  three-d-stage:not(:defined){visibility:hidden}
+  #hud{position:fixed;left:0;top:0;z-index:10;padding:20px 24px;pointer-events:none;max-width:340px}
+  #hud .kicker{font-family:var(--font-heading);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin:0 0 6px}
+  #hud h1{font-family:var(--font-heading);font-size:22px;line-height:1.1;margin:0 0 12px;color:var(--color-text)}
+  #hud .rule{height:2px;background:var(--color-divider);margin:0 0 12px}
+  #hud dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:13px;color:var(--color-text)}
+  #hud dt{font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.08em;font-size:11px;opacity:.6}
+  #hud dd{margin:0;font-variant-numeric:tabular-nums}
+  #hud .state{font-family:var(--font-heading);font-weight:700}
+</style>
+</head>
+<body>
+<div id="hud">
+  <p class="kicker">Tarjeta NFC · Reseñas</p>
+  <h1>Acerca tu celular</h1>
+  <div class="rule"></div>
+  <dl>
+    <dt>Estado</dt><dd class="state" id="hud-state">En espera</dd>
+    <dt>Enlace</dt><dd id="hud-link">—</dd>
+    <dt>Hora</dt><dd id="hud-clock">--:--:--</dd>
+  </dl>
+</div>
+<three-d-stage name="tarjeta-nfc-resenas" background="#f3f2f2"></three-d-stage>
+<script src="three-d-stage.js"></script>
+<script type="module">
+import * as THREE_NS from 'three';
+const stage = document.querySelector('three-d-stage');
+const { THREE } = await stage.ready;
+
+const two = n => String(n).padStart(2, '0');
+const hhmm = d => two(d.getHours()) + ':' + two(d.getMinutes());
+const hhmmss = d => hhmm(d) + ':' + two(d.getSeconds());
+const G = { blue:'#4285f4', red:'#ea4335', yellow:'#fbbc05', green:'#34a853' };
+
+function roundedRect(w, h, r) {
+  const s = new THREE.Shape(), x = -w/2, y = -h/2;
+  s.moveTo(x + r, y);
+  s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+  s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  return s;
+}
+function plate(w, h, r, d, mat, name, bevel) {
+  const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+    ? { depth:d, bevelEnabled:true, bevelThickness:bevel, bevelSize:bevel, bevelSegments:4, curveSegments:24 }
+    : { depth:d, bevelEnabled:false, curveSegments:24 });
+  g.center();
+  const m = new THREE.Mesh(g, mat); m.name = name; return m;
+}
+function screenCanvas(w, h) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  return { c, ctx: c.getContext('2d'), tex };
+}
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function star(ctx, cx, cy, R, fill) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI/2 + i * Math.PI/5, r = i % 2 ? R * 0.46 : R;
+    ctx[i ? 'lineTo' : 'moveTo'](cx + Math.cos(a)*r, cy + Math.sin(a)*r);
+  }
+  ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
+}
+
+const MAT = {
+  cardEdge: new THREE.MeshStandardMaterial({ name:'card_edge', color:0xf4f3f1, roughness:0.35, metalness:0.05 }),
+  standDark: new THREE.MeshStandardMaterial({ name:'stand_dark', color:0x2a2827, roughness:0.55, metalness:0.15 }),
+  counter: new THREE.MeshStandardMaterial({ name:'counter_top', color:0xc9c6c2, roughness:0.6, metalness:0.1 }),
+  accent: new THREE.MeshStandardMaterial({ name:'accent_red', color:0xec3013, roughness:0.4, metalness:0.05 }),
+  phoneBody: new THREE.MeshStandardMaterial({ name:'phone_body', color:0x1c1b1a, roughness:0.4, metalness:0.3 }),
+  glass: new THREE.MeshStandardMaterial({ name:'phone_back_glass', color:0x24221f, roughness:0.25, metalness:0.4 }),
+  pulse: new THREE.MeshStandardMaterial({ name:'nfc_pulse', color:0x4285f4, emissive:0x4285f4, emissiveIntensity:1.2, transparent:true, opacity:0.0, roughness:0.3 }),
+};
+
+const scene = new THREE.Group();
+scene.name = 'nfc_review_scene';
+
+// ---- counter ----
+const counter = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.020, 0.24), MAT.counter);
+counter.name = 'counter_top'; counter.position.set(0.0, 0.010, 0.02); scene.add(counter);
+const edge = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.004, 0.001), MAT.accent);
+edge.name = 'counter_edge'; edge.position.set(0.0, 0.018, 0.1405); scene.add(edge);
+
+// ---- acrylic stand holding the NFC card ----
+const standBase = new THREE.Mesh(new THREE.BoxGeometry(0.105, 0.012, 0.062), MAT.standDark);
+standBase.name = 'stand_base'; standBase.position.set(-0.05, 0.026, -0.03); scene.add(standBase);
+const standSpine = new THREE.Mesh(new THREE.BoxGeometry(0.095, 0.052, 0.010), MAT.standDark);
+standSpine.name = 'stand_spine';
+standSpine.position.set(-0.05, 0.052, -0.046); standSpine.rotation.x = -0.22; scene.add(standSpine);
+
+// ---- NFC review card ----
+const CW = 0.086, CH = 0.116, CT = 0.0032;
+const cardRig = new THREE.Group(); cardRig.name = 'card_rig';
+cardRig.position.set(-0.05, 0.093, -0.032); cardRig.rotation.x = -0.22;
+scene.add(cardRig);
+
+const cardBody = plate(CW, CH, 0.008, CT, MAT.cardEdge, 'card_body', 0.0006);
+cardRig.add(cardBody);
+
+const cs = screenCanvas(688, 928);
+const cardFaceMat = new THREE.MeshStandardMaterial({
+  name:'card_print', map: cs.tex, roughness:0.32, metalness:0.02
+});
+const cardFace = new THREE.Mesh(new THREE.PlaneGeometry(CW - 0.001, CH - 0.001), cardFaceMat);
+cardFace.name = 'card_face'; cardFace.position.z = CT/2 + 0.0008; cardRig.add(cardFace);
+
+// NFC pulse ring on the card
+const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.020, 0.0016, 10, 56), MAT.pulse);
+pulse.name = 'nfc_pulse_ring';
+pulse.position.set(0, 0.004, CT/2 + 0.004); cardRig.add(pulse);
+
+// ---- phone (animated) ----
+const phoneRig = new THREE.Group(); phoneRig.name = 'phone_rig';
+scene.add(phoneRig);
+const phone = new THREE.Group(); phone.name = 'phone';
+phoneRig.add(phone);
+
+const phoneBody = plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, 'phone_body', 0.0012);
+phone.add(phoneBody);
+const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+phoneBack.name = 'phone_back'; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, 'camera_bump', 0.0006);
+camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+const ps = screenCanvas(560, 1150);
+const phoneScreenMat = new THREE.MeshStandardMaterial({
+  name:'phone_screen', map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+  emissiveIntensity: 0.95, roughness: 0.2, metalness: 0.0
+});
+const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), phoneScreenMat);
+phoneScreen.name = 'phone_screen_glass'; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+stage.setObject(scene);
+
+// ---------- card artwork ----------
+function paintCard() {
+  const { ctx, c, tex } = cs;
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+  const band = ctx.createLinearGradient(0, 0, c.width, 0);
+  band.addColorStop(0, G.blue); band.addColorStop(0.3, G.red);
+  band.addColorStop(0.62, G.yellow); band.addColorStop(1, G.green);
+  ctx.save();
+  ctx.globalAlpha = 0.95; ctx.fillStyle = band; ctx.fillRect(0, 0, c.width, 210);
+  const fade = ctx.createLinearGradient(0, 120, 0, 230);
+  fade.addColorStop(0, 'rgba(255,255,255,0)'); fade.addColorStop(1, '#ffffff');
+  ctx.fillStyle = fade; ctx.fillRect(0, 120, c.width, 115);
+  ctx.restore();
+
+  for (let i = 0; i < 5; i++) star(ctx, 172 + i * 86, 46, 27, '#f5a623');
+
+  ctx.textAlign = 'center'; ctx.fillStyle = '#ffffff';
+  ctx.font = '800 44px Archivo, sans-serif';
+  ctx.fillText('¡COMPARTE TU', c.width/2, 118);
+  ctx.fillText('EXPERIENCIA EN GOOGLE!', c.width/2, 166);
+
+  // G mark
+  const gx = c.width/2, gy = 300, R = 62;
+  ctx.lineWidth = 26; ctx.lineCap = 'butt';
+  const arcs = [[G.red, -0.55, 0.62], [G.yellow, 0.62, 1.9], [G.green, 1.9, 3.25], [G.blue, 3.25, 5.05]];
+  for (const [col, a0, a1] of arcs) {
+    ctx.strokeStyle = col; ctx.beginPath(); ctx.arc(gx, gy, R, a0, a1); ctx.stroke();
+  }
+  ctx.fillStyle = G.blue; ctx.fillRect(gx, gy - 13, R + 6, 26);
+  ctx.fillStyle = '#ffffff'; ctx.font = '800 96px Archivo, sans-serif';
+  ctx.fillText('G', gx - 2, gy + 36);
+
+  // NFC glyph: wave field + phone in hand outline
+  ctx.strokeStyle = '#141c2b'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.ellipse(c.width/2 - 20, 520, 200, 108, 0, 0, Math.PI*2); ctx.stroke();
+  for (let i = 0; i < 4; i++) {
+    ctx.lineWidth = 15 - i * 1.5;
+    ctx.beginPath(); ctx.arc(230, 520, 22 + i * 30, -0.95, 0.95); ctx.stroke();
+  }
+  ctx.lineWidth = 7;
+  rr(ctx, 372, 462, 74, 118, 12); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(372, 552); ctx.quadraticCurveTo(345, 600, 392, 616);
+  ctx.lineTo(470, 616); ctx.quadraticCurveTo(500, 610, 486, 578);
+  ctx.lineTo(452, 540); ctx.stroke();
+
+  ctx.textAlign = 'center'; ctx.fillStyle = '#141c2b';
+  ctx.font = '800 40px Archivo, sans-serif';
+  ctx.fillText('ACERCA TU CELULAR', c.width/2, 700);
+  ctx.font = '700 32px Archivo, sans-serif';
+  ctx.fillText('(NFC)', c.width/2, 744);
+
+  ctx.fillStyle = '#3b5bd9'; ctx.font = '800 27px Archivo, sans-serif';
+  ctx.fillText('¡TU RESEÑA NOS AYUDA A CRECER!', c.width/2, 872);
+  tex.needsUpdate = true;
+}
+
+// ---------- phone screens ----------
+function paintPhone(state, now, k) {
+  const { ctx, c, tex } = ps;
+  if (state === 'review') {
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+    // status bar
+    ctx.fillStyle = '#5f6368'; ctx.font = '600 22px Archivo, sans-serif';
+    ctx.textAlign = 'left'; ctx.fillText(hhmm(now), 28, 40);
+    ctx.textAlign = 'right'; ctx.fillText('NFC', c.width - 28, 40);
+    // map strip
+    ctx.fillStyle = '#e8eee6'; ctx.fillRect(0, 58, c.width, 200);
+    ctx.strokeStyle = '#cfd8cd'; ctx.lineWidth = 10;
+    ctx.beginPath(); ctx.moveTo(-10, 150); ctx.lineTo(c.width + 10, 118); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-10, 216); ctx.lineTo(c.width + 10, 240); ctx.stroke();
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 14;
+    ctx.beginPath(); ctx.moveTo(120, 58); ctx.lineTo(180, 258); ctx.stroke();
+    ctx.fillStyle = G.red;
+    ctx.beginPath(); ctx.arc(300, 150, 22, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(280, 162); ctx.lineTo(320, 162); ctx.lineTo(300, 196); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(300, 150, 8, 0, Math.PI*2); ctx.fill();
+    // place card
+    ctx.textAlign = 'left'; ctx.fillStyle = '#202124';
+    ctx.font = '800 34px Archivo, sans-serif';
+    ctx.fillText('Xprint Soluciones', 28, 320);
+    ctx.fillText('Digitales', 28, 360);
+    ctx.fillStyle = '#5f6368'; ctx.font = '600 22px Archivo, sans-serif';
+    ctx.fillText('Rotulación digital · Abierto ahora', 28, 400);
+    ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(28, 436); ctx.lineTo(c.width - 28, 436); ctx.stroke();
+    ctx.fillStyle = '#202124'; ctx.font = '700 26px Archivo, sans-serif';
+    ctx.fillText('Califica tu experiencia', 28, 490);
+    const filled = Math.min(5, Math.max(1, Math.round((k || 1) * 5)));
+    for (let i = 0; i < 5; i++) star(ctx, 60 + i * 92, 570, 38, i < filled ? '#f5a623' : '#dadce0');
+    // review field
+    ctx.strokeStyle = '#dadce0'; ctx.lineWidth = 3;
+    rr(ctx, 28, 640, c.width - 56, 190, 16); ctx.stroke();
+    ctx.fillStyle = '#80868b'; ctx.font = '600 24px Archivo, sans-serif';
+    ctx.fillText('Comparte los detalles de tu', 52, 690);
+    ctx.fillText('experiencia en este lugar', 52, 726);
+    // button
+    ctx.fillStyle = G.blue; rr(ctx, 28, 872, c.width - 56, 82, 14); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.font = '800 28px Archivo, sans-serif';
+    ctx.fillText('PUBLICAR RESEÑA', 56, 922);
+    ctx.fillStyle = '#5f6368'; ctx.font = '600 22px Archivo, sans-serif';
+    ctx.fillText('Se abrió desde una etiqueta NFC', 28, 1010);
+    ctx.fillStyle = '#dadce0'; rr(ctx, c.width/2 - 90, 1100, 180, 8, 4); ctx.fill();
+  } else if (state === 'reading') {
+    ctx.fillStyle = '#0d0f14'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.textAlign = 'center'; ctx.fillStyle = '#ffffff';
+    ctx.font = '700 30px Archivo, sans-serif';
+    ctx.fillText('NFC', c.width/2, 460);
+    ctx.font = '600 24px Archivo, sans-serif';
+    ctx.fillStyle = '#9aa0a6';
+    ctx.fillText('Leyendo etiqueta…', c.width/2, 620);
+    ctx.strokeStyle = G.blue; ctx.lineWidth = 8;
+    const r = 90 + Math.sin((k || 0) * Math.PI * 4) * 14;
+    ctx.beginPath(); ctx.arc(c.width/2, 540, r, 0, Math.PI*2); ctx.stroke();
+  } else {
+    ctx.fillStyle = '#0d0f14'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.textAlign = 'center'; ctx.fillStyle = '#f3f2f2';
+    ctx.font = '700 132px Archivo, sans-serif';
+    ctx.fillText(hhmm(now), c.width/2, 300);
+    ctx.fillStyle = '#8b8785'; ctx.font = '600 26px Archivo, sans-serif';
+    ctx.fillText(now.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }).toUpperCase(), c.width/2, 350);
+    ctx.fillStyle = '#2a2827'; rr(ctx, 40, 940, c.width - 80, 120, 16); ctx.fill();
+    ctx.fillStyle = '#9aa0a6'; ctx.font = '600 24px Archivo, sans-serif';
+    ctx.fillText('NFC activado', c.width/2, 1010);
+    ctx.fillStyle = '#dadce0'; rr(ctx, c.width/2 - 90, 1100, 180, 8, 4); ctx.fill();
+  }
+  tex.needsUpdate = true;
+}
+
+// ---------- animation ----------
+const hudState = document.getElementById('hud-state');
+const hudLink = document.getElementById('hud-link');
+const hudClock = document.getElementById('hud-clock');
+const CYCLE = 9.0, T_NEAR = 2.2, T_READ = 3.0, T_SHOW = 6.6, T_BACK = 7.8;
+const ease = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+const FAR = new THREE.Vector3(0.115, 0.135, 0.185);
+const NEAR = new THREE.Vector3(-0.048, 0.100, 0.028);
+let last = '';
+
+function frame(ms) {
+  const t = (ms / 1000) % CYCLE;
+  const now = new Date();
+  let p, tiltX, tiltY, state, sub = 0;
+
+  if (t < T_NEAR) {
+    const k = ease(t / T_NEAR);
+    p = FAR.clone().lerp(NEAR, k);
+    tiltX = -0.55 + 0.33 * k; tiltY = 0.45 - 0.42 * k;
+    state = 'idle';
+  } else if (t < T_READ) {
+    const k = (t - T_NEAR) / (T_READ - T_NEAR);
+    p = NEAR.clone(); p.z += Math.sin(k * Math.PI) * 0.004;
+    tiltX = -0.22; tiltY = 0.03; state = 'reading'; sub = k;
+  } else if (t < T_SHOW) {
+    const k = (t - T_READ) / (T_SHOW - T_READ);
+    p = NEAR.clone().lerp(new THREE.Vector3(0.055, 0.145, 0.115), ease(Math.min(1, k * 1.6)));
+    tiltX = -0.22 - 0.20 * Math.min(1, k * 1.6); tiltY = 0.10 * Math.min(1, k * 1.6);
+    state = 'review'; sub = Math.min(1, 0.4 + k * 1.4);
+  } else if (t < T_BACK) {
+    const k = ease((t - T_SHOW) / (T_BACK - T_SHOW));
+    p = new THREE.Vector3(0.055, 0.145, 0.115).lerp(FAR, k);
+    tiltX = -0.42 - 0.13 * k; tiltY = 0.10 + 0.35 * k;
+    state = 'review'; sub = 1;
+  } else {
+    p = FAR.clone(); tiltX = -0.55; tiltY = 0.45; state = 'idle';
+  }
+
+  phoneRig.position.copy(p);
+  phone.rotation.set(tiltX, tiltY, Math.sin(ms / 1300) * 0.02);
+
+  const glow = state === 'reading' ? 0.55 + 0.45 * Math.sin(sub * Math.PI * 4) : 0;
+  MAT.pulse.opacity = glow;
+  pulse.scale.setScalar(1 + (state === 'reading' ? sub * 0.5 : 0));
+
+  paintPhone(state, now, sub);
+  if (state !== last) {
+    last = state;
+    hudState.textContent = state === 'review' ? 'Reseña abierta' : state === 'reading' ? 'Leyendo NFC' : 'En espera';
+    hudState.style.color = state === 'review' ? 'var(--color-accent-700)' : 'var(--color-text)';
+    hudLink.textContent = state === 'review' ? 'Xprint · Google Maps' : '—';
+  }
+  hudClock.textContent = hhmmss(now);
+}
+phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) { console.error(e); } };
+paintCard();
+paintPhone('idle', new Date(), 0);
+document.fonts.ready.then(() => { paintCard(); });
+requestAnimationFrame(function tick(ms){ try { frame(ms); } catch (e) { console.error(e); } requestAnimationFrame(tick); });
+</script>
+</body>
+</html>
