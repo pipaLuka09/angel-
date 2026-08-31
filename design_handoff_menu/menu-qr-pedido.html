@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Simulación — menú QR y pedido</title>
+<link rel="stylesheet" href="_ds/modernist-4e39d72f-67e8-4c3c-a4f8-011aa3009942/styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+  html,body{margin:0;height:100%;background:var(--color-bg);font-family:var(--font-body)}
+  three-d-stage:not(:defined){visibility:hidden}
+  #hud{position:fixed;left:0;top:0;z-index:10;padding:20px 24px;pointer-events:none;max-width:340px}
+  #hud .kicker{font-family:var(--font-heading);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);margin:0 0 6px}
+  #hud h1{font-family:var(--font-heading);font-size:22px;line-height:1.1;margin:0 0 12px;color:var(--color-text)}
+  #hud .rule{height:2px;background:var(--color-divider);margin:0 0 12px}
+  #hud dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:13px;color:var(--color-text)}
+  #hud dt{font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.08em;font-size:11px;opacity:.6}
+  #hud dd{margin:0;font-variant-numeric:tabular-nums}
+  #hud .state{font-family:var(--font-heading);font-weight:700}
+</style>
+</head>
+<body>
+<div id="hud">
+  <p class="kicker">Döber · Mesa 20</p>
+  <h1>Acerca tu celular</h1>
+  <div class="rule"></div>
+  <dl>
+    <dt>Paso</dt><dd class="state" id="hud-state">En espera</dd>
+    <dt>Enlace</dt><dd id="hud-order">—</dd>
+    <dt>Mesa</dt><dd id="hud-total">20 · Döber</dd>
+  </dl>
+</div>
+<three-d-stage name="menu-qr-pedido" background="#f3f2f2"></three-d-stage>
+<script src="three-d-stage.js"></script>
+<script type="module">
+const stage = document.querySelector('three-d-stage');
+const { THREE } = await stage.ready;
+
+const BRAND = { orange:'#f26722', deep:'#d64a12', paper:'#fbd9c0', ink:'#2b1a12' };
+const two = n => String(n).padStart(2, '0');
+const hhmm = d => two(d.getHours()) + ':' + two(d.getMinutes());
+
+function roundedRect(w, h, r) {
+  const s = new THREE.Shape(), x = -w/2, y = -h/2;
+  s.moveTo(x + r, y);
+  s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+  s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  return s;
+}
+function plate(w, h, r, d, mat, name, bevel) {
+  const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+    ? { depth:d, bevelEnabled:true, bevelThickness:bevel, bevelSize:bevel, bevelSegments:4, curveSegments:24 }
+    : { depth:d, bevelEnabled:false, curveSegments:24 });
+  g.center();
+  const m = new THREE.Mesh(g, mat); m.name = name; return m;
+}
+function screenCanvas(w, h) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  return { c, ctx: c.getContext('2d'), tex };
+}
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+const MAT = {
+  acrylic: new THREE.MeshStandardMaterial({ name:'acrylic_clear', color:0xdfe3e2, roughness:0.15, metalness:0.05, transparent:true, opacity:0.42 }),
+  cardEdge: new THREE.MeshStandardMaterial({ name:'card_stock', color:0xf7dcc5, roughness:0.55, metalness:0.0 }),
+  table: new THREE.MeshStandardMaterial({ name:'table_walnut', color:0x4a2f21, roughness:0.55, metalness:0.05 }),
+  accent: new THREE.MeshStandardMaterial({ name:'accent_red', color:0xec3013, roughness:0.4, metalness:0.05 }),
+  phoneBody: new THREE.MeshStandardMaterial({ name:'phone_body', color:0x1c1b1a, roughness:0.4, metalness:0.3 }),
+  glass: new THREE.MeshStandardMaterial({ name:'phone_back_glass', color:0x24221f, roughness:0.25, metalness:0.4 }),
+  pulse: new THREE.MeshStandardMaterial({ name:'nfc_pulse', color:0xf26722, emissive:0xf26722, emissiveIntensity:1.2, transparent:true, opacity:0.0, roughness:0.3 }),
+};
+
+const scene = new THREE.Group();
+scene.name = 'menu_qr_scene';
+
+// ---- table top ----
+const table = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.022, 0.26), MAT.table);
+table.name = 'table_top'; table.position.set(0, 0.011, 0.02); scene.add(table);
+const tableEdge = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.004, 0.001), MAT.accent);
+tableEdge.name = 'table_edge'; tableEdge.position.set(0, 0.020, 0.1505); scene.add(tableEdge);
+
+// ---- acrylic L-stand ----
+const standFoot = new THREE.Mesh(new THREE.BoxGeometry(0.098, 0.004, 0.070), MAT.acrylic);
+standFoot.name = 'stand_foot'; standFoot.position.set(-0.055, 0.024, -0.012); scene.add(standFoot);
+const standPanel = new THREE.Mesh(new THREE.BoxGeometry(0.098, 0.146, 0.003), MAT.acrylic);
+standPanel.name = 'stand_panel';
+standPanel.position.set(-0.055, 0.096, -0.043); standPanel.rotation.x = -0.10; scene.add(standPanel);
+const standLip = new THREE.Mesh(new THREE.BoxGeometry(0.098, 0.010, 0.006), MAT.acrylic);
+standLip.name = 'stand_lip'; standLip.position.set(-0.055, 0.028, -0.030); scene.add(standLip);
+
+// ---- printed menu card ----
+const CW = 0.090, CH = 0.140, CT = 0.0018;
+const cardRig = new THREE.Group(); cardRig.name = 'card_rig';
+cardRig.position.set(-0.055, 0.098, -0.039); cardRig.rotation.x = -0.10;
+scene.add(cardRig);
+cardRig.add(plate(CW, CH, 0.002, CT, MAT.cardEdge, 'card_stock'));
+
+const cs = screenCanvas(700, 1090);
+const cardFaceMat = new THREE.MeshStandardMaterial({ name:'card_print', map: cs.tex, roughness:0.6, metalness:0.0 });
+const cardFace = new THREE.Mesh(new THREE.PlaneGeometry(CW - 0.0008, CH - 0.0008), cardFaceMat);
+cardFace.name = 'card_face'; cardFace.position.z = CT/2 + 0.0006; cardRig.add(cardFace);
+
+const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.020, 0.0014, 10, 56), MAT.pulse);
+pulse.name = 'nfc_pulse_ring';
+pulse.position.set(0, 0.006, CT/2 + 0.004); cardRig.add(pulse);
+
+// ---- phone ----
+const phoneRig = new THREE.Group(); phoneRig.name = 'phone_rig'; scene.add(phoneRig);
+const phone = new THREE.Group(); phone.name = 'phone'; phoneRig.add(phone);
+phone.add(plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, 'phone_body', 0.0012));
+const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+phoneBack.name = 'phone_back'; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, 'camera_bump', 0.0006);
+camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+const ps = screenCanvas(560, 1150);
+const phoneScreenMat = new THREE.MeshStandardMaterial({
+  name:'phone_screen', map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+  emissiveIntensity: 0.95, roughness: 0.2, metalness: 0.0
+});
+const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), phoneScreenMat);
+phoneScreen.name = 'phone_screen_glass'; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+stage.setObject(scene);
+
+function nfcGlyph(ctx, cx, cy, w) {
+  ctx.save();
+  ctx.strokeStyle = BRAND.ink; ctx.lineWidth = w * 0.030; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.ellipse(cx, cy, w * 0.50, w * 0.30, 0, 0, Math.PI*2); ctx.stroke();
+  for (let i = 0; i < 4; i++) {
+    ctx.lineWidth = w * (0.048 - i * 0.006);
+    ctx.beginPath(); ctx.arc(cx - w * 0.30, cy, w * 0.07 + i * w * 0.085, -0.95, 0.95); ctx.stroke();
+  }
+  ctx.lineWidth = w * 0.028;
+  const px = cx + w * 0.16, py = cy - w * 0.19, pw = w * 0.20, ph = w * 0.34;
+  rr(ctx, px, py, pw, ph, w * 0.035); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(px, py + ph * 0.72); ctx.quadraticCurveTo(px - w*0.08, py + ph*1.05, px + w*0.05, py + ph*1.14);
+  ctx.lineTo(px + pw + w*0.06, py + ph*1.14);
+  ctx.quadraticCurveTo(px + pw + w*0.15, py + ph*1.08, px + pw + w*0.10, py + ph*0.92);
+  ctx.lineTo(px + pw*0.9, py + ph*0.78); ctx.stroke();
+  ctx.restore();
+}
+
+function paintCard() {
+  const { ctx, c, tex } = cs;
+  ctx.fillStyle = BRAND.paper; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.textAlign = 'right'; ctx.fillStyle = BRAND.orange;
+  ctx.font = '800 96px Archivo, sans-serif';
+  ctx.fillText('20', c.width - 46, 118);
+  ctx.textAlign = 'left';
+  ctx.font = '800 92px Archivo, sans-serif';
+  ctx.fillText('DÖBER', 60, 210);
+  ctx.fillStyle = BRAND.ink; ctx.font = '700 30px Archivo, sans-serif';
+  ctx.fillText('SANDWICHS & BOWLS', 62, 254);
+
+  ctx.strokeStyle = BRAND.orange; ctx.lineWidth = 8;
+  ctx.strokeRect(70, 310, c.width - 140, 350);
+  nfcGlyph(ctx, c.width/2, 486, 460);
+
+  ctx.textAlign = 'left'; ctx.fillStyle = BRAND.ink;
+  ctx.font = '800 40px Archivo, sans-serif';
+  ctx.fillText('Acerca tu celular (NFC)', 60, 742);
+  ctx.fillStyle = '#7b6a60'; ctx.font = '700 28px Archivo, sans-serif';
+  ctx.fillText('y se abre el menú al instante', 60, 784);
+  ctx.fillStyle = BRAND.deep; ctx.font = '800 54px Archivo, sans-serif';
+  ctx.fillText('#FielAlSabor', 60, 866);
+
+  // paw + bone motif (flat, no illustration detail)
+  ctx.fillStyle = BRAND.orange;
+  for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.ellipse(500 + i*38, 900 + (i%2?14:0), 15, 20, 0, 0, Math.PI*2); ctx.fill(); }
+  ctx.beginPath(); ctx.ellipse(556, 962, 52, 38, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = BRAND.paper;
+  ctx.fillRect(500, 1010, 120, 16);
+  ctx.beginPath(); ctx.arc(500, 1018, 16, 0, Math.PI*2); ctx.arc(620, 1018, 16, 0, Math.PI*2); ctx.fill();
+  tex.needsUpdate = true;
+}
+
+// ---------- phone screens ----------
+const MENU = [
+  ['Döber Clásico', 'Pierna, queso, salsa de la casa', '95'],
+  ['Bowl Fiel', 'Arroz, pollo BBQ, aguacate', '110'],
+  ['Sandwich Rottw', 'Pastrami, pepinillo, mostaza', '120'],
+  ['Papas Döber', 'Con queso y tocino', '65'],
+];
+function statusBar(ctx, c, now, right) {
+  ctx.fillStyle = '#8a8a8a'; ctx.font = '600 22px Archivo, sans-serif';
+  ctx.textAlign = 'left'; ctx.fillText(hhmm(now), 28, 40);
+  ctx.textAlign = 'right'; ctx.fillText(right, c.width - 28, 40);
+}
+function paintPhone(state, now, k) {
+  const { ctx, c, tex } = ps;
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+
+  if (state === 'nfc') {
+    ctx.fillStyle = '#0d0f14'; ctx.fillRect(0, 0, c.width, c.height);
+    statusBar(ctx, c, now, 'NFC');
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = BRAND.orange; ctx.lineWidth = 8;
+    for (let i = 0; i < 3; i++) {
+      const r = 70 + i * 46 + Math.sin(k * Math.PI * 3) * 12;
+      ctx.globalAlpha = 0.9 - i * 0.25;
+      ctx.beginPath(); ctx.arc(c.width/2, 470, r, 0, Math.PI*2); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#ffffff'; ctx.font = '800 34px Archivo, sans-serif';
+    ctx.fillText('NFC', c.width/2, 484);
+    ctx.font = '700 28px Archivo, sans-serif';
+    ctx.fillText('Conectando con la mesa…', c.width/2, 700);
+    ctx.fillStyle = '#8b8785'; ctx.font = '600 24px Archivo, sans-serif';
+    ctx.fillText('DÖBER · MESA 20', c.width/2, 744);
+    ctx.strokeStyle = '#2a2827'; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(c.width - 120, 820); ctx.stroke();
+    ctx.strokeStyle = BRAND.orange;
+    ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(120 + (c.width - 240) * Math.min(1, k), 820); ctx.stroke();
+  } else if (state === 'menu') {
+    ctx.fillStyle = BRAND.orange; ctx.fillRect(0, 0, c.width, 190);
+    statusBar(ctx, c, now, 'MESA 20');
+    ctx.textAlign = 'left'; ctx.fillStyle = '#ffffff';
+    ctx.font = '800 52px Archivo, sans-serif'; ctx.fillText('DÖBER', 28, 120);
+    ctx.font = '700 22px Archivo, sans-serif'; ctx.fillText('SANDWICHS & BOWLS · MENÚ', 28, 160);
+    let y = 250;
+    const shown = Math.min(MENU.length, Math.max(1, Math.ceil(k * MENU.length * 1.4)));
+    for (let i = 0; i < shown; i++) {
+      const [n, d, p] = MENU[i];
+      ctx.fillStyle = BRAND.ink; ctx.font = '800 30px Archivo, sans-serif';
+      ctx.fillText(n, 28, y);
+      ctx.fillStyle = '#7b6a60'; ctx.font = '600 22px Archivo, sans-serif';
+      ctx.fillText(d, 28, y + 34);
+      ctx.textAlign = 'right'; ctx.fillStyle = BRAND.deep; ctx.font = '800 30px Archivo, sans-serif';
+      ctx.fillText('$' + p, c.width - 28, y);
+      ctx.textAlign = 'left';
+      ctx.strokeStyle = '#eadfd7'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(28, y + 62); ctx.lineTo(c.width - 28, y + 62); ctx.stroke();
+      y += 128;
+    }
+    ctx.fillStyle = BRAND.ink; rr(ctx, 28, 900, c.width - 56, 84, 0); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.font = '800 28px Archivo, sans-serif';
+    ctx.fillText('VER MENÚ COMPLETO', 52, 950);
+    ctx.fillStyle = '#9aa0a6'; ctx.font = '600 22px Archivo, sans-serif';
+    ctx.fillText('Abierto por NFC desde la mesa', 28, 1030);
+  } else {
+    ctx.fillStyle = '#0d0f14'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.textAlign = 'center'; ctx.fillStyle = '#f3f2f2';
+    ctx.font = '700 132px Archivo, sans-serif'; ctx.fillText(hhmm(now), c.width/2, 300);
+    ctx.fillStyle = '#8b8785'; ctx.font = '600 26px Archivo, sans-serif';
+    ctx.fillText(now.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }).toUpperCase(), c.width/2, 350);
+    ctx.fillStyle = '#2a2827'; ctx.fillRect(40, 940, c.width - 80, 120);
+    ctx.fillStyle = '#9aa0a6'; ctx.font = '600 24px Archivo, sans-serif';
+    ctx.fillText('NFC activado', c.width/2, 1010);
+  }
+  tex.needsUpdate = true;
+}
+
+// ---------- animation ----------
+const hudState = document.getElementById('hud-state');
+const hudOrder = document.getElementById('hud-order');
+const hudTotal = document.getElementById('hud-total');
+const CYCLE = 11.0, T_IN = 2.2, T_NFC = 4.0, T_MENU = 9.4, T_OUT = 10.4;
+const ease = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+const FAR = new THREE.Vector3(0.125, 0.140, 0.190);
+const TAP = new THREE.Vector3(-0.050, 0.104, 0.028);
+const READ = new THREE.Vector3(0.050, 0.150, 0.130);
+let last = '';
+
+function frame(ms) {
+  const t = (ms / 1000) % CYCLE;
+  const now = new Date();
+  let p, rx, ry, state, k = 0;
+
+  if (t < T_IN) {
+    k = ease(t / T_IN);
+    p = FAR.clone().lerp(TAP, k);
+    rx = -0.55 + 0.45 * k; ry = 0.45 - 0.44 * k; state = 'idle';
+  } else if (t < T_NFC) {
+    k = (t - T_IN) / (T_NFC - T_IN);
+    p = TAP.clone(); p.z += Math.sin(k * Math.PI) * 0.004;
+    rx = -0.10; ry = 0.01; state = 'nfc';
+  } else if (t < T_MENU) {
+    k = (t - T_NFC) / (T_MENU - T_NFC);
+    const e = ease(Math.min(1, k * 2.2));
+    p = TAP.clone().lerp(READ, e);
+    rx = -0.10 - 0.33 * e; ry = 0.14 * e; state = 'menu';
+  } else if (t < T_OUT) {
+    k = ease((t - T_MENU) / (T_OUT - T_MENU));
+    p = READ.clone().lerp(FAR, k);
+    rx = -0.43 - 0.12 * k; ry = 0.14 + 0.31 * k; state = 'menu'; k = 1;
+  } else {
+    p = FAR.clone(); rx = -0.55; ry = 0.45; state = 'idle';
+  }
+
+  phoneRig.position.copy(p);
+  phone.rotation.set(rx, ry, Math.sin(ms / 1300) * 0.02);
+  paintPhone(state, now, k);
+
+  const glow = state === 'nfc' ? 0.55 + 0.45 * Math.sin(k * Math.PI * 4) : 0;
+  MAT.pulse.opacity = glow;
+  pulse.scale.setScalar(1 + (state === 'nfc' ? k * 0.5 : 0));
+
+  if (state !== last) {
+    last = state;
+    hudState.textContent = state === 'nfc' ? 'Conexión NFC' : state === 'menu' ? 'Menú abierto' : 'En espera';
+    hudState.style.color = state === 'idle' ? 'var(--color-text)' : 'var(--color-accent-700)';
+    hudOrder.textContent = state === 'idle' ? '—' : 'menu.dober.mx/20';
+  }
+}
+paintCard();
+paintPhone('idle', new Date(), 0);
+document.fonts.ready.then(() => paintCard());
+phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) { console.error(e); } };
+requestAnimationFrame(function tick(ms){ try { frame(ms); } catch (e) { console.error(e); } requestAnimationFrame(tick); });
+</script>
+</body>
+</html>
