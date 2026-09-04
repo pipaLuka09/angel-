@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Collar NFC — qué pasa en el celular</title>
+<link rel="stylesheet" href="_ds/modernist-4e39d72f-67e8-4c3c-a4f8-011aa3009942/styles.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)}
+  body{display:grid;place-items:center;padding:24px}
+  a{color:var(--color-accent-700)}a:hover{color:var(--color-accent)}
+
+  .wrap{display:grid;grid-template-columns:minmax(280px,400px) auto;gap:44px;align-items:center;
+        max-width:1120px;height:calc(100vh - 48px)}
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;height:auto;gap:24px;justify-items:center}
+    .copy{max-width:420px}
+  }
+
+  /* ---------- left: the narration ---------- */
+  .kicker{font-family:var(--font-heading);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+          color:var(--color-accent-700);margin:0 0 10px}
+  .copy h1{font-family:var(--font-heading);font-size:38px;line-height:1.0;margin:0 0 16px;text-wrap:pretty}
+  .rule{height:2px;background:var(--color-divider);margin:0 0 18px}
+  .lead{font-size:15px;line-height:1.55;color:#4a4644;margin:0 0 22px;text-wrap:pretty;min-height:96px}
+  .steps{display:flex;gap:6px;margin:0 0 20px}
+  .steps i{flex:1;height:4px;background:var(--color-neutral-200,#ddd9d7);display:block}
+  .steps i.on{background:var(--color-accent)}
+  .ctx{display:flex;align-items:center;gap:12px}
+  .ctx u{width:56px;height:56px;display:block;
+         background:url("assets/dog-nfc.png") 30% 26%/230% no-repeat}
+  .ctx p{margin:0;font-size:12px;line-height:1.4;color:#6f6a67}
+  .ctx b{display:block;font-family:var(--font-heading);font-size:11px;letter-spacing:.12em;
+         text-transform:uppercase;color:var(--color-text)}
+
+  /* ---------- right: the phone ---------- */
+  .devicebox{container-type:size;flex:none;height:min(716px,calc(100vh - 48px));aspect-ratio:352/716}
+  .device{position:relative;width:352px;height:716px;background:#141312;border-radius:46px;
+          padding:11px;box-shadow:var(--shadow-lg);
+          transform-origin:top left;transform:scale(calc(100cqh / 716px))}
+  .device::after{content:"";position:absolute;inset:3px;border-radius:44px;
+                 border:1px solid rgba(255,255,255,.10);pointer-events:none}
+  .screen{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:#0b0f12}
+  .island{position:absolute;left:50%;top:12px;transform:translateX(-50%);width:98px;height:26px;
+          background:#000;border-radius:14px;z-index:9}
+  .home{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:112px;height:5px;
+        border-radius:3px;background:rgba(255,255,255,.55);z-index:9}
+  .home.dark{background:rgba(20,19,18,.35)}
+
+  .bar{position:absolute;left:0;right:0;top:0;height:52px;display:flex;align-items:center;
+       justify-content:space-between;padding:16px 24px 0;font-size:13px;font-weight:600;z-index:8;
+       font-family:var(--font-heading);letter-spacing:.02em}
+  .bar .r{display:flex;align-items:center;gap:6px}
+  .bar em{font-style:normal;font-size:10px;letter-spacing:.14em}
+  .bar s{width:22px;height:11px;border:1.5px solid currentColor;border-radius:3px;position:relative;
+         text-decoration:none;display:block;opacity:.9}
+  .bar s::after{content:"";position:absolute;inset:1.5px;right:6px;background:currentColor}
+
+  .view{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease}
+  .view.on{opacity:1}
+
+  /* lock screen */
+  #v-lock{background:linear-gradient(180deg,#16202a,#0a0f13 60%,#080a0c);color:#fff}
+  #v-lock .clock{position:absolute;left:0;right:0;top:132px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  #v-lock .clock b{display:block;font-family:var(--font-heading);font-size:76px;line-height:1;margin:0;font-weight:700}
+  #v-lock .clock span{display:block;font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+                      color:rgba(255,255,255,.62);margin:0}
+  #v-lock .hint{position:absolute;left:22px;right:22px;bottom:78px;background:rgba(255,255,255,.10);
+                border:1px solid rgba(255,255,255,.16);padding:14px 16px;display:flex;gap:12px;align-items:center}
+  #v-lock .hint b{font-family:var(--font-heading);font-size:12px;letter-spacing:.12em;text-transform:uppercase;display:block}
+  #v-lock .hint p{margin:3px 0 0;font-size:12px;color:rgba(255,255,255,.66)}
+
+  /* nfc sheet */
+  #v-nfc{background:rgba(4,7,9,.55);backdrop-filter:blur(2px)}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;padding:26px 24px 34px;
+         border-radius:22px 22px 0 0;transform:translateY(102%);transition:transform .55s cubic-bezier(.22,1,.28,1)}
+  .view.on .sheet{transform:none}
+  .sheet .grab{width:44px;height:4px;background:#d8d3d0;margin:0 auto 22px}
+  .waves{position:relative;height:118px;margin:0 0 18px}
+  .waves i{position:absolute;left:50%;top:50%;border:3px solid var(--color-accent);border-radius:50%;
+           transform:translate(-50%,-50%);opacity:0}
+  .waves u{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:36px;height:36px;
+           background:var(--color-text);border-radius:50%;display:grid;place-items:center;
+           color:#fff;font-family:var(--font-heading);font-size:10px;letter-spacing:.08em;font-weight:700}
+  .sheet h2{font-family:var(--font-heading);font-size:22px;margin:0 0 6px;text-align:center}
+  .sheet p{margin:0 0 20px;font-size:13px;color:#6f6a67;text-align:center}
+  .prog{height:4px;background:#eae6e4;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--color-accent)}
+
+  /* app: ficha */
+  #v-ficha,#v-mapa{background:#fff;color:var(--color-text)}
+  .hero{position:relative;height:196px;background:url("assets/dog-nfc.png") 32% 24%/210% no-repeat}
+  .hero::after{content:"";position:absolute;inset:0;
+               background:linear-gradient(180deg,rgba(10,12,10,.42) 0 38%,rgba(10,12,10,.86))}
+  .hero .who{position:absolute;left:22px;right:22px;bottom:16px;z-index:2;color:#fff}
+  .hero .who b{display:block;font-family:var(--font-heading);font-size:32px;line-height:1}
+  .hero .who span{display:block;font-size:12px;color:rgba(255,255,255,.78);margin-top:5px}
+  .tagpill{position:absolute;left:22px;top:64px;z-index:2;background:var(--color-accent);color:#fff;
+           font-family:var(--font-heading);font-size:10px;letter-spacing:.14em;padding:5px 9px}
+
+  .body{padding:18px 22px 0}
+  .sec{font-family:var(--font-heading);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+       color:#8d8580;margin:0 0 8px}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 0;
+       border-bottom:2px solid var(--color-divider);opacity:0;transform:translateY(7px);
+       transition:opacity .38s ease,transform .38s ease}
+  .row.in{opacity:1;transform:none}
+  .row b{font-family:var(--font-heading);font-size:15px;font-weight:700}
+  .row span{font-family:var(--font-heading);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+  .ok{color:#1f7a3d}.soon{color:var(--color-accent-700)}
+  .alert{background:var(--color-accent);color:#fff;padding:11px 13px;margin:14px 0 0}
+  .alert b{display:block;font-family:var(--font-heading);font-size:9px;letter-spacing:.16em;opacity:.85;margin-bottom:3px}
+  .alert span{font-family:var(--font-heading);font-size:15px;font-weight:700}
+  .meta{display:flex;justify-content:space-between;font-size:11px;color:#6f6a67;margin:12px 0 0}
+  .cta{position:absolute;left:22px;right:22px;bottom:30px;background:var(--color-text);color:#fff;
+       font-family:var(--font-heading);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+       font-weight:700;padding:15px 16px;display:flex;justify-content:space-between;align-items:center}
+  .cta.accent{background:var(--color-accent)}
+  .cta i{font-style:normal;opacity:.8}
+
+  /* app: mapa */
+  .navbar{display:flex;align-items:center;gap:10px;padding:60px 22px 12px;
+          font-family:var(--font-heading);font-weight:700;font-size:15px}
+  .navbar u{width:9px;height:9px;border-left:2px solid var(--color-text);border-bottom:2px solid var(--color-text);
+            transform:rotate(45deg);display:block}
+  .map{position:relative;height:262px;background:#e8eee6;overflow:hidden}
+  .map i{position:absolute;background:#cfd8cd;height:14px;left:-8%;right:-8%}
+  .map i:nth-child(1){top:26%;transform:rotate(-4deg)}
+  .map i:nth-child(2){top:68%;transform:rotate(3deg)}
+  .map u{position:absolute;background:#fff;width:16px;top:-8%;bottom:-8%;left:24%;transform:rotate(4deg)}
+  .map u.b{left:68%;transform:rotate(-3deg)}
+  .map s{position:absolute;left:50%;top:50%;width:132px;height:132px;transform:translate(-50%,-50%);
+         border:2px solid rgba(27,127,138,.45);background:rgba(27,127,138,.10);border-radius:50%;
+         text-decoration:none;display:block}
+  .map em{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-30px 0 0 -11px;
+          background:var(--color-accent);border-radius:50% 50% 50% 0;rotate:-45deg;
+          box-shadow:0 3px 8px rgba(0,0,0,.3)}
+  .addr{padding:18px 22px 0}
+  .addr h3{font-family:var(--font-heading);font-size:21px;line-height:1.15;margin:0 0 4px}
+  .addr p{margin:0;font-size:13px;color:#6f6a67}
+  .pair{display:flex;gap:10px;position:absolute;left:22px;right:22px;bottom:30px}
+  .pair .cta{position:static;left:auto;right:auto;bottom:auto;flex:1}
+
+  @media (prefers-reduced-motion: reduce){
+    .view,.row,.sheet{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="copy">
+    <p class="kicker" id="kicker">Collar NFC · Mascotas</p>
+    <h1 id="title">Lo que ves en el celular</h1>
+    <div class="rule"></div>
+    <p class="lead" id="lead">Acercas el celular al dije del collar. No hace falta app ni escanear nada: el teléfono lee el chip y abre la ficha de la mascota al instante.</p>
+    <div class="steps" id="steps"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="ctx">
+      <u></u>
+      <p><b>Milo · Golden Retriever</b>Chip NFC dentro del dije del collar</p>
+    </div>
+  </div>
+
+  <div class="devicebox">
+  <div class="device">
+    <div class="screen">
+      <div class="island"></div>
+
+      <!-- 1. reposo -->
+      <div class="view on" id="v-lock">
+        <div class="bar" style="color:#fff"><span id="clock-a">7:42</span>
+          <span class="r"><em>NFC</em><s></s></span></div>
+        <div class="clock"><b id="clock-b">7:42</b><span id="date-b">lunes 1 de septiembre</span></div>
+        <div class="hint">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+            <path d="M5 8.5a9 9 0 0 1 0 7"/><path d="M9 6.5a13 13 0 0 1 0 11"/>
+            <rect x="13" y="4" width="7" height="16" rx="2"/>
+          </svg>
+          <div><b>NFC activado</b><p>Acerca la parte superior del teléfono al dije</p></div>
+        </div>
+        <div class="home"></div>
+      </div>
+
+      <!-- 2. lectura -->
+      <div class="view" id="v-nfc">
+        <div class="bar" style="color:#fff"><span>7:42</span>
+          <span class="r"><em>NFC</em><s></s></span></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="waves" id="waves"><i></i><i></i><i></i><u>NFC</u></div>
+          <h2>Etiqueta detectada</h2>
+          <p>Leyendo el collar de Milo…</p>
+          <div class="prog"><i id="prog"></i></div>
+        </div>
+      </div>
+
+      <!-- 3. ficha médica -->
+      <div class="view" id="v-ficha">
+        <div class="bar" style="color:#fff"><span>7:42</span>
+          <span class="r"><em>NFC</em><s></s></span></div>
+        <div class="hero">
+          <span class="tagpill">FICHA ABIERTA POR NFC</span>
+          <div class="who"><b>Milo</b><span>Golden Retriever · 4 años · 28 kg</span></div>
+        </div>
+        <div class="body">
+          <p class="sec">Vacunas y control</p>
+          <div class="row" data-i="0"><b>Rabia</b><span class="ok">Al día</span></div>
+          <div class="row" data-i="1"><b>Parvovirus</b><span class="ok">Al día</span></div>
+          <div class="row" data-i="2"><b>Refuerzo múltiple</b><span class="soon">En 2 meses</span></div>
+          <div class="row" data-i="3"><b>Desparasitación</b><span class="ok">Al día</span></div>
+          <div class="alert"><b>ALERGIAS</b><span>Pollo · Antiinflamatorios</span></div>
+          <div class="meta"><span>MICROCHIP 956 0001 2288 741</span><span>Clínica San Roque</span></div>
+        </div>
+        <div class="cta">Dónde vive <i>→</i></div>
+        <div class="home dark"></div>
+      </div>
+
+      <!-- 4. dónde vive -->
+      <div class="view" id="v-mapa">
+        <div class="bar" style="color:var(--color-text)"><span>7:42</span>
+          <span class="r"><em>NFC</em><s></s></span></div>
+        <div class="navbar"><u></u> Dónde vive Milo</div>
+        <div class="map"><i></i><i></i><u></u><u class="b"></u><s></s><em></em></div>
+        <div class="addr">
+          <p class="sec">Casa</p>
+          <h3>Av. Las Palmas 1425, Norte</h3>
+          <p>Responsable · Ana Rivas</p>
+        </div>
+        <div class="pair">
+          <div class="cta accent">Llamar</div>
+          <div class="cta">Cómo llegar</div>
+        </div>
+        <div class="home dark"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const kicker = document.getElementById('kicker');
+  const title = document.getElementById('title');
+  const lead = document.getElementById('lead');
+  const prog = document.getElementById('prog');
+  const steps = [...document.querySelectorAll('#steps i')];
+  const waves = [...document.querySelectorAll('#waves i')];
+  const rows = [...document.querySelectorAll('#v-ficha .row')];
+  const views = {
+    lock: document.getElementById('v-lock'),
+    nfc: document.getElementById('v-nfc'),
+    ficha: document.getElementById('v-ficha'),
+    mapa: document.getElementById('v-mapa')
+  };
+  const ORDER = ['lock', 'nfc', 'ficha', 'mapa'];
+  const COPY = {
+    lock: ['Collar NFC · Paso 1', 'Lo que ves en el celular',
+      'Acercas el celular al dije del collar. No hace falta app ni escanear nada: el teléfono lee el chip y abre la ficha de la mascota al instante.'],
+    nfc: ['Collar NFC · Paso 2', 'El teléfono lee el chip',
+      'Al contacto aparece el aviso del sistema: etiqueta detectada. Tarda menos de un segundo y funciona con la pantalla bloqueada.'],
+    ficha: ['Collar NFC · Paso 3', 'Ficha médica al instante',
+      'Se abre la ficha: vacunas al día, alergias en rojo, número de microchip y la clínica de cabecera. Quien encontró a la mascota ve lo importante primero.'],
+    mapa: ['Collar NFC · Paso 4', 'Dónde vive y a quién llamar',
+      'Un toque más y aparece la dirección de casa con el mapa, el nombre del responsable y el botón para llamarlo directo.']
+  };
+
+  const two = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const hhmm = now.getHours() + ':' + two(now.getMinutes());
+  document.getElementById('clock-a').textContent = hhmm;
+  document.getElementById('clock-b').textContent = hhmm;
+  document.querySelectorAll('.bar span:first-child').forEach(el => el.textContent = hhmm);
+  document.getElementById('date-b').textContent =
+    now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  const CYCLE = 16, T_NFC = 3.4, T_FICHA = 5.6, T_MAPA = 11.2, T_END = 15.2;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let last = '';
+
+  function setState(s) {
+    if (s === last) return;
+    last = s;
+    kicker.textContent = COPY[s][0];
+    title.textContent = COPY[s][1];
+    lead.textContent = COPY[s][2];
+    for (const k in views) views[k].classList.toggle('on', k === s);
+    steps.forEach((el, i) => el.classList.toggle('on', i === ORDER.indexOf(s)));
+    if (s !== 'ficha') rows.forEach(r => r.classList.remove('in'));
+    if (s !== 'nfc') prog.style.width = '0%';
+  }
+
+  function frame(ms) {
+    const t = (ms / 1000) % CYCLE;
+    let s, k = 0;
+    if (t < T_NFC) { s = 'lock'; k = t / T_NFC; }
+    else if (t < T_FICHA) { s = 'nfc'; k = (t - T_NFC) / (T_FICHA - T_NFC); }
+    else if (t < T_MAPA) { s = 'ficha'; k = (t - T_FICHA) / (T_MAPA - T_FICHA); }
+    else if (t < T_END) { s = 'mapa'; k = (t - T_MAPA) / (T_END - T_MAPA); }
+    else { s = 'lock'; k = 1; }
+    setState(s);
+
+    waves.forEach((r, i) => {
+      const u = ((ms / 780) + i / waves.length) % 1;
+      const d = 40 + u * 116;
+      r.style.width = d + 'px';
+      r.style.height = d + 'px';
+      r.style.opacity = String(0.9 * (1 - u) * (1 - u));
+    });
+    if (s === 'nfc') prog.style.width = Math.min(100, k * 130) + '%';
+    if (s === 'ficha') {
+      const shown = Math.min(rows.length, Math.floor(k * rows.length * 2.8) + 1);
+      rows.forEach((r, i) => r.classList.toggle('in', i < shown));
+    }
+    requestAnimationFrame(frame);
+  }
+
+  if (reduce) {
+    setState('ficha');
+    rows.forEach(r => r.classList.add('in'));
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+</body>
+</html>

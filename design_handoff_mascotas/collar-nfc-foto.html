@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Collar NFC — ficha médica y dirección</title>
+<link rel="stylesheet" href="_ds/modernist-4e39d72f-67e8-4c3c-a4f8-011aa3009942/styles.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)}
+  body{display:grid;place-items:center;padding:24px}
+
+  .wrap{display:grid;grid-template-columns:auto minmax(300px,380px);gap:28px;align-items:center;
+        height:calc(100vh - 48px);max-width:1180px}
+  .stage{position:relative;aspect-ratio:640/857;height:100%;width:auto;max-width:100%;
+         overflow:hidden;background:#2f3a22}
+  .side{display:flex;flex-direction:column;gap:14px;min-width:0}
+  @media (max-width:880px){
+    .wrap{grid-template-columns:1fr;height:auto;gap:18px}
+    .stage{height:auto;width:100%;max-width:520px}
+  }
+  .shot{position:absolute;inset:0;background:url("assets/dog-nfc.png") center/cover no-repeat;
+        transform:scale(1.02);transform-origin:38% 62%;transition:transform 2.4s cubic-bezier(.4,0,.2,1)}
+  .stage[data-state="ficha"] .shot,.stage[data-state="mapa"] .shot{transform:scale(1.075)}
+
+  /* ---- screen light on the phone that is already in the photo ---- */
+  .glow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0;
+        transition:opacity .5s ease, filter .5s ease;
+        clip-path:polygon(55.0% 59.7%,73.4% 63.9%,74.7% 68.3%,57.5% 69.6%);
+        background:linear-gradient(115deg,rgba(255,255,255,.62),rgba(255,224,178,.30) 60%,rgba(255,255,255,0))}
+  .stage[data-state="nfc"] .glow{opacity:.85}
+  .stage[data-state="ficha"] .glow,.stage[data-state="mapa"] .glow{opacity:1}
+
+  /* ---- NFC field over the tag on the collar ---- */
+  .field{position:absolute;left:44.84%;top:68.61%;width:0;height:0;pointer-events:none}
+  .field i{position:absolute;left:0;top:0;display:block;border:2.5px solid var(--color-accent);
+           border-radius:50%;opacity:0;
+           transform:translate(-50%,-50%) rotate(-12deg) scaleY(.9)}
+  .tagdot{position:absolute;left:44.84%;top:68.61%;width:5.6%;aspect-ratio:1;
+          transform:translate(-50%,-50%) rotate(-12deg) scaleY(.92);
+          border:1.5px solid rgba(255,255,255,.62);border-radius:50%;
+          box-shadow:0 0 0 2px rgba(32,30,29,.35), 0 0 18px rgba(236,48,19,.0);
+          transition:box-shadow .4s ease;pointer-events:none}
+  .stage[data-state="nfc"] .tagdot{box-shadow:0 0 0 2px rgba(32,30,29,.35), 0 0 26px 6px rgba(236,48,19,.55)}
+
+  .pin{position:absolute;left:44.84%;top:68.61%;transform:translate(-50%,-100%);
+       display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none;
+       opacity:1;transition:opacity .45s ease;padding-bottom:6%}
+  .stage[data-state="ficha"] .pin,.stage[data-state="mapa"] .pin{opacity:0}
+  .pin span{background:var(--color-text);color:#fff;font-family:var(--font-heading);font-weight:700;
+            font-size:11px;letter-spacing:.14em;padding:5px 9px;white-space:nowrap}
+  .pin b{width:2px;height:26px;background:var(--color-text);display:block}
+
+  /* ---- the card ---- */
+  .card{background:#fff;padding:24px 24px 22px;box-shadow:var(--shadow-md)}
+  .kicker{font-family:var(--font-heading);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+          color:var(--color-accent-700);margin:0 0 8px}
+  .card h1{font-family:var(--font-heading);font-size:30px;line-height:1.02;margin:0 0 14px;text-wrap:pretty}
+  .rule{height:2px;background:var(--color-divider);margin:0 0 16px}
+
+  .panel{display:none}
+  .panel.on{display:block}
+
+  .lead{font-size:15px;line-height:1.5;margin:0 0 16px;color:#4a4644;text-wrap:pretty}
+  .bar{height:4px;background:var(--color-neutral-200,#e3e1e0);overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--color-accent);width:0%}
+
+  .row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:baseline;
+       padding:7px 0;border-bottom:2px solid var(--color-divider);
+       opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}
+  .row.in{opacity:1;transform:none}
+  .row .n{font-family:var(--font-heading);font-weight:700;font-size:16px}
+  .row .v{font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  .ok{color:#1f7a3d}.soon{color:var(--color-accent-700)}
+  .meta{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#6f6a67;margin:12px 0 0}
+  .alert{background:var(--color-accent);color:#fff;padding:9px 11px;margin:12px 0 0}
+  .alert b{display:block;font-family:var(--font-heading);font-size:9px;letter-spacing:.16em;margin-bottom:3px;opacity:.85}
+  .alert span{font-family:var(--font-heading);font-weight:700;font-size:16px}
+
+  .addr{font-family:var(--font-heading);font-weight:700;font-size:19px;line-height:1.2;margin:0 0 3px}
+  .who{font-size:13px;color:#6f6a67;margin:0}
+  .map{position:relative;height:132px;background:#e8eee6;margin:0 0 14px;overflow:hidden}
+  .map i{position:absolute;background:#cfd8cd;height:9px;left:-8%;right:-8%}
+  .map i:nth-child(1){top:28%;transform:rotate(-4deg)}
+  .map i:nth-child(2){top:70%;transform:rotate(3deg)}
+  .map u{position:absolute;background:#fff;width:11px;top:-8%;bottom:-8%;left:26%;transform:rotate(4deg)}
+  .map u:nth-of-type(2){left:66%;transform:rotate(-3deg)}
+  .map s{position:absolute;left:50%;top:52%;width:74px;height:74px;transform:translate(-50%,-50%);
+         border:2px solid rgba(27,127,138,.5);background:rgba(27,127,138,.10);border-radius:50%}
+  .map em{position:absolute;left:50%;top:52%;width:14px;height:14px;transform:translate(-50%,-140%);
+          background:var(--color-accent);border-radius:50% 50% 50% 0;rotate:-45deg;
+          box-shadow:0 2px 6px rgba(0,0,0,.28)}
+  .btn-row{display:flex;gap:8px;margin-top:12px}
+  .cta{flex:1;background:var(--color-text);color:#fff;font-family:var(--font-heading);font-weight:700;
+       font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:13px 14px;text-align:left}
+  .cta.accent{background:var(--color-accent)}
+
+  .foot{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:11px;letter-spacing:.12em;
+        text-transform:uppercase;font-family:var(--font-heading);color:#8d8580}
+  .foot b{width:7px;height:7px;background:var(--color-accent);display:block}
+
+  .steps{display:flex;gap:6px}
+  .steps i{flex:1;height:4px;background:var(--color-neutral-200,#ddd9d7);display:block}
+  .steps i.on{background:var(--color-accent)}
+
+  a{color:var(--color-accent-700)}
+  a:hover{color:var(--color-accent)}
+  @media (prefers-reduced-motion: reduce){
+    .shot,.glow,.row,.pin,.tagdot{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="stage" id="stage" data-state="idle">
+  <div class="shot"></div>
+  <div class="glow"></div>
+
+  <div class="field" id="field"><i></i><i></i><i></i></div>
+  <div class="tagdot"></div>
+  <div class="pin"><span>CHIP NFC EN EL DIJE</span><b></b></div>
+
+</div>
+
+<div class="side">
+  <div class="card">
+    <p class="kicker" id="kicker">Collar NFC · Mascotas</p>
+    <h1 id="title">Acerca tu celular al dije</h1>
+    <div class="rule"></div>
+
+    <div class="panel on" id="p-idle">
+      <p class="lead">Sin apps y sin QR. El chip va dentro del dije del collar: un toque con el celular y aparece la ficha completa de la mascota.</p>
+      <div class="foot"><b></b> Compatible con Android e iPhone</div>
+    </div>
+
+    <div class="panel" id="p-nfc">
+      <p class="lead">Leyendo el collar…</p>
+      <div class="bar"><i id="bar"></i></div>
+      <div class="foot"><b></b> Ficha de mascota</div>
+    </div>
+
+    <div class="panel" id="p-ficha">
+      <div class="row" data-i="0"><span class="n">Rabia</span><span class="v ok">Al día</span></div>
+      <div class="row" data-i="1"><span class="n">Parvovirus</span><span class="v ok">Al día</span></div>
+      <div class="row" data-i="2"><span class="n">Refuerzo múltiple</span><span class="v soon">En 2 meses</span></div>
+      <div class="row" data-i="3"><span class="n">Desparasitación</span><span class="v ok">Al día</span></div>
+      <div class="alert"><b>ALERGIAS</b><span>Pollo · Antiinflamatorios</span></div>
+      <div class="meta"><span>MICROCHIP 956 0001 2288 741</span><span>4 años</span></div>
+      <div class="foot"><b></b> Clínica San Roque</div>
+    </div>
+
+    <div class="panel" id="p-mapa">
+      <div class="map"><i></i><i></i><u></u><u></u><s></s><em></em></div>
+      <p class="addr">Av. Las Palmas 1425, Norte</p>
+      <p class="who">Responsable · Ana Rivas</p>
+      <div class="btn-row">
+        <div class="cta accent">Llamar</div>
+        <div class="cta">Cómo llegar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="steps" id="steps"><i class="on"></i><i></i><i></i><i></i></div>
+</div>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const kicker = document.getElementById('kicker');
+  const title = document.getElementById('title');
+  const bar = document.getElementById('bar');
+  const rings = [...document.querySelectorAll('#field i')];
+  const steps = [...document.querySelectorAll('#steps i')];
+  const panels = {
+    idle: document.getElementById('p-idle'),
+    nfc: document.getElementById('p-nfc'),
+    ficha: document.getElementById('p-ficha'),
+    mapa: document.getElementById('p-mapa')
+  };
+  const rows = [...document.querySelectorAll('#p-ficha .row')];
+
+  const COPY = {
+    idle:  ['Collar NFC · Mascotas', 'Acerca tu celular al dije'],
+    nfc:   ['Conexión NFC', 'Leyendo el collar de Milo'],
+    ficha: ['Milo · Golden Retriever', 'Ficha médica al instante'],
+    mapa:  ['Milo · Si lo encuentras', 'Dónde vive y a quién llamar']
+  };
+  const ORDER = ['idle', 'nfc', 'ficha', 'mapa'];
+
+  const CYCLE = 15, T_NFC = 3.2, T_FICHA = 5.0, T_MAPA = 10.2, T_END = 14.2;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let last = '';
+
+  function setState(s) {
+    if (s === last) return;
+    last = s;
+    stage.dataset.state = s;
+    kicker.textContent = COPY[s][0];
+    title.textContent = COPY[s][1];
+    for (const key in panels) panels[key].classList.toggle('on', key === s);
+    steps.forEach((el, i) => el.classList.toggle('on', i === ORDER.indexOf(s)));
+    if (s !== 'ficha') rows.forEach(r => r.classList.remove('in'));
+  }
+
+  function frame(ms) {
+    const t = (ms / 1000) % CYCLE;
+    let s, k = 0;
+    if (t < T_NFC) { s = 'idle'; k = t / T_NFC; }
+    else if (t < T_FICHA) { s = 'nfc'; k = (t - T_NFC) / (T_FICHA - T_NFC); }
+    else if (t < T_MAPA) { s = 'ficha'; k = (t - T_FICHA) / (T_MAPA - T_FICHA); }
+    else if (t < T_END) { s = 'mapa'; k = (t - T_MAPA) / (T_END - T_MAPA); }
+    else { s = 'idle'; k = 1; }
+    setState(s);
+
+    // NFC field: a slow invitation at rest, a fast handshake on contact
+    const fast = s === 'nfc';
+    rings.forEach((r, i) => {
+      const period = fast ? 700 : 1900;
+      const u = ((ms / period) + i / rings.length) % 1;
+      const d = (fast ? 34 : 30) + u * (fast ? 148 : 96);
+      r.style.width = d + 'px';
+      r.style.height = d + 'px';
+      r.style.opacity = String((fast ? 0.95 : 0.42) * (1 - u) * (1 - u));
+      r.style.borderWidth = (fast ? 3 : 2) + 'px';
+    });
+
+    if (s === 'nfc') bar.style.width = Math.min(100, k * 118) + '%';
+    if (s === 'ficha') {
+      const shown = Math.min(rows.length, Math.floor(k * rows.length * 2.6) + 1);
+      rows.forEach((r, i) => r.classList.toggle('in', i < shown));
+    }
+    requestAnimationFrame(frame);
+  }
+
+  if (reduce) {
+    setState('ficha');
+    rows.forEach(r => r.classList.add('in'));
+    rings.forEach((r, i) => { r.style.width = (34 + i * 26) + 'px'; r.style.height = (34 + i * 26) + 'px'; r.style.opacity = '0.35'; });
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+</body>
+</html>
