@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Llavero NFC — Döber</title>
+<link rel="stylesheet" href="_ds/modernist-4e39d72f-67e8-4c3c-a4f8-011aa3009942/styles.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)}
+  body{display:grid;place-items:center;padding:24px}
+  a{color:var(--color-accent-700)}a:hover{color:var(--color-accent)}
+
+  .wrap{display:grid;grid-template-columns:minmax(250px,360px) auto;gap:32px;align-items:center;
+        max-width:1180px;height:calc(100vh - 48px)}
+  @media (max-width:850px){
+    .wrap{grid-template-columns:1fr;height:auto;gap:24px;justify-items:center}
+    .copy{max-width:420px}
+  }
+
+  /* ---------- narration ---------- */
+  .kicker{font-family:var(--font-heading);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+          color:var(--color-accent-700);margin:0 0 10px}
+  .copy h1{font-family:var(--font-heading);font-size:38px;line-height:1.0;margin:0 0 16px;text-wrap:pretty}
+  .rule{height:2px;background:var(--color-divider);margin:0 0 18px}
+  .lead{font-size:15px;line-height:1.55;color:#4a4644;margin:0 0 22px;text-wrap:pretty;min-height:100px}
+  .steps{display:flex;gap:6px;margin:0 0 20px}
+  .steps i{flex:1;height:4px;background:var(--color-neutral-200,#ddd9d7);display:block}
+  .steps i.on{background:var(--color-accent)}
+  .ctx{display:flex;align-items:center;gap:12px}
+  .ctx u{width:52px;height:52px;flex:none;background:#0d0c0c url("assets/dober-fob.png") 50% 34%/150% no-repeat}
+  .ctx p{margin:0;font-size:12px;line-height:1.4;color:#6f6a67}
+  .ctx b{display:block;font-family:var(--font-heading);font-size:11px;letter-spacing:.12em;
+         text-transform:uppercase;color:var(--color-text)}
+
+  /* ---------- stage ---------- */
+  .stagebox{container-type:size;flex:none;height:min(716px,calc(100vh - 48px));aspect-ratio:600/716}
+  .stage{position:relative;width:600px;height:716px;overflow:hidden;
+         background:radial-gradient(120% 90% at 26% 44%,#1c1a19 0%,#0f0e0e 58%,#080808 100%);
+         transform-origin:top left;transform:scale(calc(100cqh / 716px))}
+  .stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--color-accent);z-index:9}
+
+  /* --- the keychain: keys above the ring, fob hanging below it --- */
+  .chain{position:absolute;left:26px;top:214px;width:250px;height:452px;z-index:3;
+         transition:transform 1.2s cubic-bezier(.4,0,.2,1)}
+  .stage[data-state="lectura"] .chain{transform:translate(4px,-8px) rotate(-2deg)}
+
+  /* split ring — band y 0..62 */
+  .sring{position:absolute;left:96px;top:0;width:62px;height:62px;border-radius:50%;
+         border:5px solid #c6cace;
+         background:radial-gradient(circle at 34% 26%,rgba(255,255,255,.5),rgba(255,255,255,0) 58%);
+         box-shadow:0 4px 12px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.35)}
+  .sring::after{content:"";position:absolute;left:-5px;top:20px;width:16px;height:5px;background:#dfe3e6;
+                border-radius:3px;transform:rotate(-24deg)}
+
+  /* two keys splayed UP off the ring — blades never enter the fob band */
+  .key{position:absolute;transform-origin:14px 14px}
+  .key .head{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;
+             background:linear-gradient(150deg,#d3d7da,#8d9196);
+             box-shadow:inset 0 1px 2px rgba(255,255,255,.55),0 3px 8px rgba(0,0,0,.5)}
+  .key .head i{position:absolute;left:9px;top:9px;width:10px;height:10px;border-radius:50%;background:#141414}
+  .key .blade{position:absolute;left:9px;top:24px;width:11px;height:112px;
+              background:linear-gradient(90deg,#9fa4a8,#e2e6e9 40%,#8b9095);
+              box-shadow:0 3px 8px rgba(0,0,0,.5)}
+  .key .blade::before,.key .blade::after{content:"";position:absolute;right:-5px;width:6px;height:8px;
+              background:#b9bec2}
+  .key .blade::before{top:48px}
+  .key .blade::after{top:70px}
+  .key.a{left:100px;top:6px;transform:rotate(206deg)}
+  .key.b{left:120px;top:6px;transform:rotate(158deg)}
+  .key.b .head{background:linear-gradient(150deg,#e2c583,#a07f36)}
+  .key.b .blade{background:linear-gradient(90deg,#a9873c,#e9d091 40%,#9c7c33)}
+  .key.b .blade::before,.key.b .blade::after{background:#c2a25b}
+
+  /* loop + cap join the ring to the piece — band y 44..92 */
+  .loop{position:absolute;left:118px;top:44px;width:18px;height:18px;border-radius:50%;
+        border:4px solid #cdd1d5;box-shadow:0 2px 6px rgba(0,0,0,.55)}
+  .cap{position:absolute;left:114px;top:60px;width:26px;height:16px;border-radius:3px;
+       background:linear-gradient(160deg,#d8dcdf,#8f9499);box-shadow:0 3px 8px rgba(0,0,0,.55)}
+  .stem{position:absolute;left:123px;top:74px;width:8px;height:26px;
+        background:linear-gradient(90deg,#8b9095,#d5d9dc 45%,#83888d)}
+
+  /* printed fob — band y 96..396, nothing else crosses it */
+  .fob{position:absolute;left:34px;top:96px;width:186px;height:300px;
+       background:url("assets/dober-fob.png") 50% 46%/104% no-repeat;
+       -webkit-mask-image:radial-gradient(closest-side at 50% 46%,#000 68%,rgba(0,0,0,.5) 88%,transparent 100%);
+       mask-image:radial-gradient(closest-side at 50% 46%,#000 68%,rgba(0,0,0,.5) 88%,transparent 100%)}
+  .fobshadow{position:absolute;left:52px;top:378px;width:150px;height:22px;border-radius:50%;
+             background:radial-gradient(closest-side,rgba(0,0,0,.62),rgba(0,0,0,0) 78%)}
+
+  /* chip hidden inside the piece — at its base, clear of the face */
+  .chip{position:absolute;left:96px;top:262px;width:58px;height:58px;border-radius:50%;z-index:11;
+        border:2px dashed rgba(255,255,255,.42);display:grid;place-items:center;
+        color:rgba(255,255,255,.62);font-family:var(--font-heading);font-size:8px;letter-spacing:.14em;
+        transition:border-color .4s ease,box-shadow .4s ease,color .4s ease}
+  .stage[data-state="lectura"] .chip{border-color:var(--color-accent);color:#fff;
+        box-shadow:0 0 26px 8px rgba(236,48,19,.45)}
+
+  .field{position:absolute;left:151px;top:505px;width:0;height:0;pointer-events:none;z-index:10}
+  .field i{position:absolute;left:0;top:0;border:2.5px solid var(--color-accent);border-radius:50%;
+           transform:translate(-50%,-50%);opacity:0}
+
+  /* label sits below the piece, stem pointing up into it */
+  .pin{position:absolute;left:44px;top:620px;z-index:6;display:flex;flex-direction:column;align-items:flex-start;
+       opacity:1;transition:opacity .45s ease;pointer-events:none}
+  .stage:not([data-state="acerca"]) .pin{opacity:0}
+  .pin b{width:2px;height:26px;background:#fff;display:block;margin-left:60px}
+  .pin span{background:#fff;color:var(--color-text);font-family:var(--font-heading);font-weight:700;
+            font-size:10px;letter-spacing:.14em;padding:5px 9px;white-space:nowrap}
+
+  /* ---------- phone ---------- */
+  .device{position:absolute;left:290px;top:48px;width:296px;height:606px;background:#131211;
+          border-radius:40px;padding:10px;box-shadow:0 40px 60px -22px rgba(0,0,0,.8);
+          transition:transform 1.25s cubic-bezier(.4,0,.2,1);z-index:6;
+          transform:translate(30px,52px) rotate(8deg) scale(.86)}
+  .stage[data-state="lectura"] .device{transform:translate(-8px,74px) rotate(-7deg) scale(.84)}
+  .stage[data-state="perfil"] .device,.stage[data-state="reel"] .device{transform:translate(0,0) rotate(0) scale(1)}
+  .device::after{content:"";position:absolute;inset:3px;border-radius:38px;
+                 border:1px solid rgba(255,255,255,.10);pointer-events:none}
+  .screen{position:relative;width:100%;height:100%;border-radius:31px;overflow:hidden;background:#0b0b0d}
+  .island{position:absolute;left:50%;top:11px;transform:translateX(-50%);width:86px;height:23px;
+          background:#000;border-radius:12px;z-index:9}
+  .home{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:98px;height:4px;
+        border-radius:3px;background:rgba(255,255,255,.5);z-index:9}
+  .home.dark{background:rgba(20,19,18,.32)}
+  .bar{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;
+       justify-content:space-between;padding:14px 20px 0;font-size:12px;font-weight:600;z-index:8;
+       font-family:var(--font-heading);letter-spacing:.02em}
+  .bar .r{display:flex;align-items:center;gap:6px}
+  .bar em{font-style:normal;font-size:9px;letter-spacing:.14em}
+  .bar s{width:20px;height:10px;border:1.5px solid currentColor;border-radius:3px;position:relative;
+         text-decoration:none;display:block;opacity:.9}
+  .bar s::after{content:"";position:absolute;inset:1.5px;right:6px;background:currentColor}
+
+  .view{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease}
+  .view.on{opacity:1}
+
+  #v-lock{background:linear-gradient(180deg,#1d1a19,#0d0c0c 62%,#080808);color:#fff}
+  #v-lock .clock{position:absolute;left:0;right:0;top:110px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  #v-lock .clock b{display:block;font-family:var(--font-heading);font-size:64px;line-height:1;margin:0;font-weight:700}
+  #v-lock .clock span{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+                      color:rgba(255,255,255,.6);margin:0}
+  #v-lock .hint{position:absolute;left:18px;right:18px;bottom:64px;background:rgba(255,255,255,.09);
+                border:1px solid rgba(255,255,255,.16);padding:12px 14px;display:flex;gap:11px;align-items:center}
+  #v-lock .hint b{font-family:var(--font-heading);font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:block}
+  #v-lock .hint p{margin:3px 0 0;font-size:11px;color:rgba(255,255,255,.62)}
+
+  #v-nfc{background:rgba(6,6,8,.62)}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;padding:22px 20px 28px;
+         transform:translateY(102%);transition:transform .55s cubic-bezier(.22,1,.28,1)}
+  .view.on .sheet{transform:none}
+  .sheet .grab{width:40px;height:4px;background:#d8d3d0;margin:0 auto 18px}
+  .waves{position:relative;height:104px;margin:0 0 16px}
+  .waves i{position:absolute;left:50%;top:50%;border:3px solid var(--color-accent);border-radius:50%;
+           transform:translate(-50%,-50%);opacity:0}
+  .waves u{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;
+           background:var(--color-text);border-radius:50%;display:grid;place-items:center;
+           color:#fff;font-family:var(--font-heading);font-size:9px;font-weight:700}
+  .sheet h2{font-family:var(--font-heading);font-size:20px;margin:0 0 5px;text-align:center}
+  .sheet p{margin:0 0 18px;font-size:12px;color:#6f6a67;text-align:center}
+  .prog{height:4px;background:#eae6e4;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--color-accent)}
+
+  /* ---------- instagram: the real feed ---------- */
+  #v-perfil{background:#0a0a0a;color:#fff}
+  .ig-top{display:flex;align-items:center;gap:12px;padding:54px 16px 10px;
+          font-family:var(--font-heading);font-weight:700;font-size:17px}
+  .ig-top u{width:9px;height:9px;border-left:2px solid #fff;border-bottom:2px solid #fff;
+            transform:rotate(45deg);display:block;flex:none}
+  .ig-top em{margin-left:auto;font-style:normal;font-size:14px;letter-spacing:.12em;color:rgba(255,255,255,.6)}
+  .ig-head{display:flex;gap:16px;align-items:center;padding:0 16px 10px}
+  .ig-av{width:66px;height:66px;flex:none;border-radius:50%;
+         background:#0d0c0c url("assets/dober-fob.png") 50% 34%/150% no-repeat;
+         box-shadow:0 0 0 2px #0a0a0a,0 0 0 4px #e8531f}
+  .ig-nums{display:flex;gap:18px;flex:1}
+  .ig-nums b{display:block;font-family:var(--font-heading);font-size:16px}
+  .ig-nums span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+                color:rgba(255,255,255,.55);font-family:var(--font-heading)}
+  .ig-bio{padding:0 16px 10px}
+  .ig-bio b{font-family:var(--font-heading);font-size:13px;display:block}
+  .ig-bio p{margin:3px 0 0;font-size:11.5px;line-height:1.45;color:rgba(255,255,255,.74)}
+  .ig-bio i{font-style:normal;color:#ff7a3d}
+  .ig-btns{display:flex;gap:7px;padding:0 16px 12px}
+  .ig-btns div{flex:1 1 0;min-width:0;font-family:var(--font-heading);font-size:10px;letter-spacing:.06em;
+               text-transform:uppercase;font-weight:700;padding:9px 8px;text-align:center;white-space:nowrap;
+               background:#1f1f21;color:#fff;transition:background .35s ease,color .35s ease}
+  .ig-btns div.pri{background:#e8531f}
+  .ig-btns div.pri.done{background:#1f1f21}
+  .ig-btns div.icon{flex:0 0 38px;display:grid;place-items:center;padding:9px 0}
+  .ig-btns div.icon svg{display:block}
+  .ig-tabs{display:flex;border-top:1px solid #222;margin-bottom:2px}
+  .ig-tabs i{flex:1;height:34px;display:grid;place-items:center;opacity:.45}
+  .ig-tabs i.on{opacity:1;box-shadow:inset 0 -2px 0 #fff}
+  .ig-scroll{position:absolute;left:0;right:0;bottom:0;top:296px;overflow:hidden}
+  .ig-scroll::after{content:"";position:absolute;left:0;right:0;bottom:0;height:22px;
+                    background:linear-gradient(180deg,rgba(10,10,10,0),rgba(10,10,10,.85))}
+  .ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+           transition:transform .2s linear;will-change:transform}
+  .ig-grid i{position:relative;padding-top:125%;display:block;
+             background-image:url("assets/dober-feed.png");background-size:300% 400%;
+             background-repeat:no-repeat}
+  .ig-grid i::after{content:"";position:absolute;right:5px;top:5px;width:13px;height:13px;
+                    background:rgba(0,0,0,.28);border:1.5px solid #fff;border-radius:2px}
+  .ig-grid i.reel::after{border-radius:50%;border-width:1.5px}
+
+  /* ---------- reel ---------- */
+  #v-reel{background:#000}
+  .reel{position:absolute;inset:0;background:#0a0909 url("assets/dober-reel.png") 50% 46%/cover no-repeat}
+  .reel::after{content:"";position:absolute;inset:0;
+               background:linear-gradient(180deg,rgba(0,0,0,.55) 0 20%,rgba(0,0,0,0) 44%,rgba(0,0,0,.88))}
+  .reel-meta{position:absolute;left:16px;right:74px;bottom:34px;z-index:3;color:#fff}
+  .reel-meta b{font-family:var(--font-heading);font-size:14px;display:block;margin-bottom:6px}
+  .reel-meta p{margin:0;font-size:11.5px;line-height:1.45;color:rgba(255,255,255,.84)}
+  .reel-side{position:absolute;right:12px;bottom:40px;z-index:3;display:flex;flex-direction:column;
+             gap:16px;align-items:center;color:#fff;font-family:var(--font-heading);font-size:10px}
+  .reel-side div{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .reel-side svg{display:block}
+  .reel-bar{position:absolute;left:16px;right:16px;bottom:20px;height:3px;background:rgba(255,255,255,.25);z-index:3}
+  .reel-bar i{display:block;height:100%;background:#fff;width:0}
+  .reel-tag{position:absolute;left:16px;top:54px;z-index:3;background:#e8531f;color:#fff;
+            font-family:var(--font-heading);font-size:9px;letter-spacing:.14em;padding:5px 9px}
+
+  @media (prefers-reduced-motion: reduce){
+    .view,.device,.chain,.ig-grid,.sheet{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="copy">
+    <p class="kicker" id="kicker">Llavero NFC · Paso 1</p>
+    <h1 id="title">El llavero abre tu Instagram</h1>
+    <div class="rule"></div>
+    <p class="lead" id="lead">El chip va oculto dentro de la pieza impresa, junto a las llaves de siempre. El cliente acerca el celular al llavero y tu perfil se abre solo: sin QR, sin buscar el nombre, sin escribir nada.</p>
+    <div class="steps" id="steps"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="ctx">
+      <u></u>
+      <p><b>@dober_ec</b>Sánduches y bowls · chip NFC dentro de la pieza</p>
+    </div>
+  </div>
+
+  <div class="stagebox">
+  <div class="stage" id="stage" data-state="acerca">
+    <div class="chain">
+      <div class="key a"><div class="head"><i></i></div><div class="blade"></div></div>
+      <div class="key b"><div class="head"><i></i></div><div class="blade"></div></div>
+      <div class="sring"></div>
+      <div class="loop"></div>
+      <div class="cap"></div>
+      <div class="stem"></div>
+      <div class="fob"></div>
+      <div class="fobshadow"></div>
+      <div class="chip">NFC</div>
+    </div>
+
+    <div class="field" id="field"><i></i><i></i><i></i></div>
+    <div class="pin"><b></b><span>CHIP NFC DENTRO DE LA PIEZA</span></div>
+
+    <div class="device">
+      <div class="screen">
+        <div class="island"></div>
+
+        <div class="view on" id="v-lock">
+          <div class="bar" style="color:#fff"><span class="t">7:33</span><span class="r"><em>NFC</em><s></s></span></div>
+          <div class="clock"><b id="clock-b">7:33</b><span id="date-b">miércoles 2 de septiembre</span></div>
+          <div class="hint">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+              <path d="M5 8.5a9 9 0 0 1 0 7"/><path d="M9 6.5a13 13 0 0 1 0 11"/><rect x="13" y="4" width="7" height="16" rx="2"/>
+            </svg>
+            <div><b>NFC activado</b><p>Acerca el celular al llavero</p></div>
+          </div>
+          <div class="home"></div>
+        </div>
+
+        <div class="view" id="v-nfc">
+          <div class="bar" style="color:#fff"><span class="t">7:33</span><span class="r"><em>NFC</em><s></s></span></div>
+          <div class="sheet">
+            <div class="grab"></div>
+            <div class="waves" id="waves"><i></i><i></i><i></i><u>NFC</u></div>
+            <h2>Llavero detectado</h2>
+            <p>Abriendo instagram.com/dober_ec…</p>
+            <div class="prog"><i id="prog"></i></div>
+          </div>
+        </div>
+
+        <div class="view" id="v-perfil">
+          <div class="bar" style="color:#fff"><span class="t">7:33</span><span class="r"><em>NFC</em><s></s></span></div>
+          <div class="ig-top"><u></u> dober_ec <em>···</em></div>
+          <div class="ig-head">
+            <div class="ig-av"></div>
+            <div class="ig-nums">
+              <div><b>412</b><span>Publi.</span></div>
+              <div><b>18,4 k</b><span>Seguid.</span></div>
+              <div><b>286</b><span>Sigue</span></div>
+            </div>
+          </div>
+          <div class="ig-bio">
+            <b>Döber · Sánduches y bowls</b>
+            <p>Pulled pork, bowls y choclo Döber. Guayaquil.<br><i>#FielAlSabor</i> · pedidos y locales</p>
+          </div>
+          <div class="ig-btns">
+            <div class="pri" id="follow">Seguir</div>
+            <div>Mensaje</div>
+            <div class="icon" title="Compartir">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 16V3"/><path d="M7 8l5-5 5 5"/>
+              </svg>
+            </div>
+          </div>
+          <div class="ig-tabs">
+            <i class="on">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+              </svg>
+            </i>
+            <i>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9l5 3-5 3z"/>
+              </svg>
+            </i>
+            <i>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                <path d="M17 3l4 4-4 4"/><path d="M21 7H7a4 4 0 0 0-4 4v1"/><path d="M7 21l-4-4 4-4"/><path d="M3 17h14a4 4 0 0 0 4-4v-1"/>
+              </svg>
+            </i>
+            <i>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                <circle cx="12" cy="9" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/><rect x="3" y="3" width="18" height="18" rx="2"/>
+              </svg>
+            </i>
+          </div>
+          <div class="ig-scroll">
+            <div class="ig-grid" id="grid"></div>
+          </div>
+          <div class="home"></div>
+        </div>
+
+        <div class="view" id="v-reel">
+          <div class="reel"></div>
+          <div class="bar" style="color:#fff"><span class="t">7:33</span><span class="r"><em>NFC</em><s></s></span></div>
+          <span class="reel-tag">REEL · @DOBER_EC</span>
+          <div class="reel-side">
+            <div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 21s-8-4.6-8-10a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.4-8 10-8 10z"/></svg>
+              <span>2.184</span>
+            </div>
+            <div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"/></svg>
+              <span>148</span>
+            </div>
+            <div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M22 3 11 14"/><path d="M22 3l-7 18-4-7-7-4z"/></svg>
+              <span>396</span>
+            </div>
+          </div>
+          <div class="reel-meta">
+            <b>@dober_ec</b>
+            <p>Pide desde el celular y retira en el local. Bowls, sánduches y el choclo Döber. <i style="font-style:normal;color:#ff9a6b">#FielAlSabor</i></p>
+          </div>
+          <div class="reel-bar"><i id="reelbar"></i></div>
+          <div class="home"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const kicker = document.getElementById('kicker');
+  const title = document.getElementById('title');
+  const lead = document.getElementById('lead');
+  const prog = document.getElementById('prog');
+  const reelbar = document.getElementById('reelbar');
+  const follow = document.getElementById('follow');
+  const grid = document.getElementById('grid');
+  const steps = [...document.querySelectorAll('#steps i')];
+  const rings = [...document.querySelectorAll('#field i')];
+  const waves = [...document.querySelectorAll('#waves i')];
+
+  // build the 3x4 feed from the real screenshot
+  const REELS = [2, 3, 5, 6, 8, 10];
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 3; c++) {
+      const el = document.createElement('i');
+      el.style.backgroundPosition = (c * 50) + '% ' + (r * 100 / 3) + '%';
+      if (REELS.includes(r * 3 + c)) el.classList.add('reel');
+      grid.appendChild(el);
+    }
+  }
+
+  const views = {
+    acerca: document.getElementById('v-lock'),
+    lectura: document.getElementById('v-nfc'),
+    perfil: document.getElementById('v-perfil'),
+    reel: document.getElementById('v-reel')
+  };
+  const ORDER = ['acerca', 'lectura', 'perfil', 'reel'];
+  const COPY = {
+    acerca: ['Llavero NFC · Paso 1', 'El llavero abre tu Instagram',
+      'El chip va oculto dentro de la pieza impresa, junto a las llaves de siempre. El cliente acerca el celular al llavero y tu perfil se abre solo: sin QR, sin buscar el nombre, sin escribir nada.'],
+    lectura: ['Llavero NFC · Paso 2', 'El celular lee el chip',
+      'Al tocar la pieza aparece el aviso del sistema con tu enlace. Tarda menos de un segundo y funciona con la pantalla bloqueada.'],
+    perfil: ['Llavero NFC · Paso 3', 'Tu feed, al instante',
+      'Se abre @dober_ec con la bio, los seguidores y el feed real: pulled pork, bowls y el choclo Döber. El botón de seguir queda a un toque.'],
+    reel: ['Llavero NFC · Paso 4', 'Y el reel del pedido',
+      'De ahí pasa al reel: cómo se pide desde el celular y qué le espera en el local. Un llavero que trabaja como vendedor.']
+  };
+
+  const two = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const hhmm = now.getHours() + ':' + two(now.getMinutes());
+  document.querySelectorAll('.bar .t').forEach(el => el.textContent = hhmm);
+  document.getElementById('clock-b').textContent = hhmm;
+  document.getElementById('date-b').textContent =
+    now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  const CYCLE = 18, T_LECT = 3.4, T_PERFIL = 5.8, T_REEL = 12.6, T_END = 17.0;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let last = '';
+
+  function setState(s) {
+    if (s === last) return;
+    last = s;
+    stage.dataset.state = s;
+    kicker.textContent = COPY[s][0];
+    title.textContent = COPY[s][1];
+    lead.textContent = COPY[s][2];
+    for (const k in views) views[k].classList.toggle('on', k === s);
+    steps.forEach((el, i) => el.classList.toggle('on', i === ORDER.indexOf(s)));
+    if (s !== 'perfil') {
+      grid.style.transform = 'translateY(0)';
+      follow.classList.remove('done'); follow.textContent = 'Seguir';
+    }
+    if (s !== 'lectura') prog.style.width = '0%';
+    if (s !== 'reel') reelbar.style.width = '0%';
+  }
+
+  function frame(ms) {
+    const t = (ms / 1000) % CYCLE;
+    let s, k = 0;
+    if (t < T_LECT) { s = 'acerca'; k = t / T_LECT; }
+    else if (t < T_PERFIL) { s = 'lectura'; k = (t - T_LECT) / (T_PERFIL - T_LECT); }
+    else if (t < T_REEL) { s = 'perfil'; k = (t - T_PERFIL) / (T_REEL - T_PERFIL); }
+    else if (t < T_END) { s = 'reel'; k = (t - T_REEL) / (T_END - T_REEL); }
+    else { s = 'acerca'; k = 1; }
+    setState(s);
+
+    const fast = s === 'lectura';
+    rings.forEach((r, i) => {
+      const u = ((ms / (fast ? 700 : 1900)) + i / rings.length) % 1;
+      const d = (fast ? 56 : 46) + u * (fast ? 190 : 124);
+      r.style.width = d + 'px'; r.style.height = d + 'px';
+      r.style.borderWidth = (fast ? 3 : 2) + 'px';
+      r.style.opacity = String((fast ? 0.95 : 0.42) * (1 - u) * (1 - u));
+    });
+    waves.forEach((r, i) => {
+      const u = ((ms / 780) + i / waves.length) % 1;
+      const d = 38 + u * 104;
+      r.style.width = d + 'px'; r.style.height = d + 'px';
+      r.style.opacity = String(0.9 * (1 - u) * (1 - u));
+    });
+
+    if (s === 'lectura') prog.style.width = Math.min(100, k * 132) + '%';
+    if (s === 'perfil') {
+      // slow scroll through the real feed, after a beat on the header
+      const scroll = Math.max(0, Math.min(1, (k - 0.28) / 0.62));
+      grid.style.transform = 'translateY(' + (-scroll * 300).toFixed(1) + 'px)';
+      if (k > 0.55 && !follow.classList.contains('done')) {
+        follow.classList.add('done'); follow.textContent = 'Siguiendo';
+      }
+    }
+    if (s === 'reel') reelbar.style.width = Math.min(100, k * 104) + '%';
+    requestAnimationFrame(frame);
+  }
+
+  if (reduce) setState('perfil');
+  else requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
