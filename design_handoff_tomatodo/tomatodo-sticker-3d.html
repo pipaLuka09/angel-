@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Simulación 3D — sticker NFC en el tomatodo</title>
+<link rel="stylesheet" href="_ds/modernist-4e39d72f-67e8-4c3c-a4f8-011aa3009942/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+  html,body{margin:0;height:100%;background:var(--color-bg);font-family:var(--font-body)}
+  three-d-stage:not(:defined){visibility:hidden}
+  #hud{position:fixed;left:0;top:0;z-index:10;padding:20px 24px;pointer-events:none;max-width:340px}
+  #hud .kicker{font-family:var(--font-heading);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+               color:var(--color-accent-700);margin:0 0 6px}
+  #hud h1{font-family:var(--font-heading);font-size:22px;line-height:1.1;margin:0 0 12px;color:var(--color-text)}
+  #hud .rule{height:2px;background:var(--color-divider);margin:0 0 12px}
+  #hud dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:13px;color:var(--color-text)}
+  #hud dt{font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.08em;font-size:11px;opacity:.6}
+  #hud dd{margin:0;font-variant-numeric:tabular-nums}
+  #hud .state{font-family:var(--font-heading);font-weight:700}
+</style>
+</head>
+<body>
+<div id="hud">
+  <p class="kicker">Sticker NFC · enemy®</p>
+  <h1>El tomatodo abre tu Instagram</h1>
+  <div class="rule"></div>
+  <dl>
+    <dt>Paso</dt><dd class="state" id="hud-state">En espera</dd>
+    <dt>Cuenta</dt><dd id="hud-acc">—</dd>
+    <dt>Destino</dt><dd id="hud-dest">—</dd>
+  </dl>
+</div>
+<three-d-stage name="tomatodo-sticker-nfc" background="#f3f2f2"></three-d-stage>
+<script src="three-d-stage.js"></script>
+<script type="module">
+const stage = document.querySelector('three-d-stage');
+const { THREE } = await stage.ready;
+
+const ACC = '@enemy___';
+const two = n => String(n).padStart(2, '0');
+const hhmm = d => two(d.getHours()) + ':' + two(d.getMinutes());
+const C = { accent:'#ec3013', ink:'#201e1d', dim:'#8d8580', ig:'#3f5bf6' };
+
+function loadImg(src) {
+  return new Promise(res => {
+    const i = new Image();
+    i.onload = () => res(i); i.onerror = () => res(null); i.src = src;
+  });
+}
+const [feedImg, avaImg] = await Promise.all([
+  loadImg('assets/enemy-feed.png'), loadImg('assets/enemy-avatar.png')
+]);
+
+function canvasTex(w, h) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  return { c, ctx: c.getContext('2d'), tex };
+}
+function roundedRect(w, h, r) {
+  const s = new THREE.Shape(), x = -w/2, y = -h/2;
+  s.moveTo(x + r, y);
+  s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+  s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  return s;
+}
+function plate(w, h, r, d, mat, name, bevel) {
+  const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+    ? { depth:d, bevelEnabled:true, bevelThickness:bevel, bevelSize:bevel, bevelSegments:4, curveSegments:24 }
+    : { depth:d, bevelEnabled:false, curveSegments:24 });
+  g.center();
+  const m = new THREE.Mesh(g, mat); m.name = name; return m;
+}
+
+// brushed aluminium for the bottle wall
+function brushedTex() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 256;
+  const x = c.getContext('2d');
+  x.fillStyle = '#20343a'; x.fillRect(0, 0, c.width, c.height);
+  let seed = 91;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  for (let i = 0; i < 12000; i++) {
+    const py = rnd() * c.height;
+    x.strokeStyle = rnd() > 0.5 ? 'rgba(255,255,255,0.030)' : 'rgba(0,0,0,0.035)';
+    x.lineWidth = 0.35 + rnd() * 0.5;
+    x.beginPath(); x.moveTo(0, py); x.lineTo(c.width, py + (rnd() - 0.5) * 1.5); x.stroke();
+  }
+  // vertical highlight band: the wall catches one soft reflection
+  const hl = x.createLinearGradient(0, 0, c.width, 0);
+  hl.addColorStop(0, 'rgba(255,255,255,0)'); hl.addColorStop(0.30, 'rgba(255,255,255,0.16)');
+  hl.addColorStop(0.42, 'rgba(255,255,255,0)'); hl.addColorStop(1, 'rgba(0,0,0,0.10)');
+  x.fillStyle = hl; x.fillRect(0, 0, c.width, c.height);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 4); t.anisotropy = 8;
+  return t;
+}
+
+const MAT = {
+  bottle: new THREE.MeshStandardMaterial({ name:'bottle_wall', color:0xffffff, map: brushedTex(),
+           roughness:0.30, metalness:0.34 }),
+  collar: new THREE.MeshStandardMaterial({ name:'bottle_collar', color:0xb9bec2, roughness:0.28, metalness:0.60 }),
+  cap: new THREE.MeshStandardMaterial({ name:'bottle_cap', color:0x1d1e20, roughness:0.62, metalness:0.08 }),
+  loop: new THREE.MeshStandardMaterial({ name:'cap_loop', color:0x2a2c2f, roughness:0.70, metalness:0.06 }),
+  desk: new THREE.MeshStandardMaterial({ name:'desk_top', color:0xc9c6c2, roughness:0.60, metalness:0.10 }),
+  accent: new THREE.MeshStandardMaterial({ name:'desk_edge', color:0xec3013, roughness:0.40, metalness:0.05 }),
+  phoneBody: new THREE.MeshStandardMaterial({ name:'phone_body', color:0x1c1b1a, roughness:0.40, metalness:0.30 }),
+  glass: new THREE.MeshStandardMaterial({ name:'phone_back_glass', color:0x24221f, roughness:0.25, metalness:0.40 }),
+  pulse: new THREE.MeshStandardMaterial({ name:'nfc_pulse', color:0xec3013, emissive:0xec3013,
+          emissiveIntensity:1.2, transparent:true, opacity:0, roughness:0.3 }),
+};
+
+const scene = new THREE.Group();
+scene.name = 'tomatodo_nfc_scene';
+
+// ---- desk ----
+const desk = new THREE.Mesh(new THREE.BoxGeometry(0.320, 0.016, 0.180), MAT.desk);
+desk.name = 'desk_top'; desk.position.set(0.014, 0.008, 0.020); scene.add(desk);
+const deskEdge = new THREE.Mesh(new THREE.BoxGeometry(0.320, 0.004, 0.001), MAT.accent);
+deskEdge.name = 'desk_edge'; deskEdge.position.set(0.014, 0.014, 0.1105); scene.add(deskEdge);
+
+// ---- the bottle ----
+const BR = 0.0385, BH = 0.212;
+const bottle = new THREE.Group(); bottle.name = 'tomatodo';
+bottle.position.set(-0.062, 0.016, 0.004);
+scene.add(bottle);
+
+const wall = new THREE.Mesh(new THREE.CylinderGeometry(BR, BR * 0.985, BH, 64, 1, false), MAT.bottle);
+wall.name = 'bottle_wall'; wall.position.y = BH/2; bottle.add(wall);
+const base = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.985, BR * 0.94, 0.006, 64), MAT.cap);
+base.name = 'bottle_base'; base.position.y = 0.003; bottle.add(base);
+
+const shoulder = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.60, BR, 0.030, 64), MAT.bottle);
+shoulder.name = 'bottle_shoulder'; shoulder.position.y = BH + 0.015; bottle.add(shoulder);
+const neck = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.55, BR * 0.58, 0.016, 48), MAT.collar);
+neck.name = 'bottle_neck'; neck.position.y = BH + 0.038; bottle.add(neck);
+const cap = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.60, BR * 0.60, 0.028, 48), MAT.cap);
+cap.name = 'bottle_cap'; cap.position.y = BH + 0.060; bottle.add(cap);
+const capTop = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.58, BR * 0.60, 0.004, 48), MAT.loop);
+capTop.name = 'cap_top'; capTop.position.y = BH + 0.076; bottle.add(capTop);
+const loop = new THREE.Mesh(new THREE.TorusGeometry(0.0130, 0.0030, 12, 40), MAT.loop);
+loop.name = 'cap_loop';
+loop.position.set(0, BH + 0.080, -BR * 0.30); loop.rotation.x = 0.28; bottle.add(loop);
+
+// ---- the 593 sticker, adhered to the curved wall ----
+const STICK_D = 0.062;
+const stickRig = new THREE.Group(); stickRig.name = 'sticker_rig';
+stickRig.rotation.y = 0.62;
+bottle.add(stickRig);
+
+const ss = canvasTex(640, 640);
+const stickerMat = new THREE.MeshStandardMaterial({
+  name:'sticker_593', map: ss.tex, emissiveMap: ss.tex, emissive: 0xffffff, emissiveIntensity: 0.30,
+  transparent: true, roughness: 0.28, metalness: 0.06, side: THREE.DoubleSide
+});
+const theta = STICK_D / BR;
+const stickerGeo = new THREE.CylinderGeometry(BR + 0.0008, BR + 0.0008, STICK_D, 48, 1, true,
+  -theta / 2, theta);
+const sticker = new THREE.Mesh(stickerGeo, stickerMat);
+sticker.name = 'sticker_593'; sticker.position.y = 0.128; stickRig.add(sticker);
+
+const NORMAL = new THREE.Vector3(Math.sin(0.62), 0, Math.cos(0.62));
+const STICK_C = new THREE.Vector3(
+  bottle.position.x + NORMAL.x * BR, 0.016 + 0.128, bottle.position.z + NORMAL.z * BR);
+
+const chip = new THREE.Mesh(new THREE.TorusGeometry(0.0135, 0.0009, 10, 44), MAT.pulse);
+chip.name = 'nfc_chip_marker';
+chip.position.copy(STICK_C).addScaledVector(NORMAL, 0.0016);
+chip.lookAt(chip.position.clone().add(NORMAL)); scene.add(chip);
+
+const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.026, 0.0012, 10, 56), MAT.pulse);
+pulse.name = 'nfc_pulse_ring';
+pulse.position.copy(STICK_C).addScaledVector(NORMAL, 0.004);
+pulse.lookAt(pulse.position.clone().add(NORMAL)); scene.add(pulse);
+
+// ---- phone ----
+const phoneRig = new THREE.Group(); phoneRig.name = 'phone_rig'; scene.add(phoneRig);
+const phone = new THREE.Group(); phone.name = 'phone'; phoneRig.add(phone);
+phone.add(plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, 'phone_body', 0.0012));
+const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+phoneBack.name = 'phone_back'; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, 'camera_bump', 0.0006);
+camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+const ps = canvasTex(560, 1150);
+const screenMat = new THREE.MeshStandardMaterial({
+  name:'phone_screen', map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+  emissiveIntensity: 0.95, roughness: 0.2, metalness: 0.0
+});
+const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), screenMat);
+phoneScreen.name = 'phone_screen_glass'; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+stage.setObject(scene);
+
+// ---------- sticker artwork ----------
+function paintSticker() {
+  const { ctx, c, tex } = ss;
+  ctx.clearRect(0, 0, c.width, c.height);
+  const R = c.width / 2, cx = R, cy = R;
+
+  // dark disc with the holographic rim
+  const g = ctx.createRadialGradient(R * 0.70, R * 0.56, 12, cx, cy, R);
+  g.addColorStop(0, '#4a4d52'); g.addColorStop(0.56, '#26282c'); g.addColorStop(1, '#121316');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(cx, cy, R - 18, 0, Math.PI*2); ctx.fill();
+
+  const holo = ['#9ef0d2', '#d9c9ff', '#ffd9a8', '#a8e6ff', '#ffc7e6', '#c9ffd8', '#9ef0d2'];
+  ctx.lineWidth = 20; ctx.lineCap = 'butt';
+  for (let i = 0; i < holo.length - 1; i++) {
+    const a0 = -Math.PI/2 + (i / (holo.length - 1)) * Math.PI * 2;
+    const a1 = -Math.PI/2 + ((i + 1) / (holo.length - 1)) * Math.PI * 2;
+    const gr = ctx.createLinearGradient(
+      cx + Math.cos(a0) * R, cy + Math.sin(a0) * R, cx + Math.cos(a1) * R, cy + Math.sin(a1) * R);
+    gr.addColorStop(0, holo[i]); gr.addColorStop(1, holo[i + 1]);
+    ctx.strokeStyle = gr;
+    ctx.beginPath(); ctx.arc(cx, cy, R - 11, a0 - 0.02, a1 + 0.02); ctx.stroke();
+  }
+
+  ctx.textAlign = 'center';
+
+  // 593, silver serif
+  const num = ctx.createLinearGradient(0, R * 0.28, 0, R * 1.02);
+  num.addColorStop(0, '#ffffff'); num.addColorStop(0.48, '#cfd4d8'); num.addColorStop(1, '#83888d');
+  ctx.fillStyle = num;
+  ctx.font = '700 224px "Cormorant Garamond", Georgia, serif';
+  ctx.fillText('593', cx, R * 1.06);
+
+  ctx.fillStyle = '#eef2f5';
+  ctx.font = '700 32px Archivo, sans-serif';
+  ctx.fillText('FROM THE MIDDLE OF THE EARTH', cx, R * 1.20);
+
+  const ec = ctx.createLinearGradient(0, R * 1.24, 0, R * 1.52);
+  ec.addColorStop(0, '#ffffff'); ec.addColorStop(1, '#c2c7cb');
+  ctx.fillStyle = ec;
+  ctx.font = '400 104px "Pinyon Script", cursive';
+  ctx.fillText('Ecuador', cx, R * 1.50);
+
+  ctx.fillStyle = 'rgba(226,232,236,0.80)';
+  ctx.font = '700 22px Archivo, sans-serif';
+  ctx.fillText('POWERED BY ENEMY COMPANY™', cx, R * 1.66);
+
+  // the NFC glyph, small, at the base
+  ctx.strokeStyle = 'rgba(255,255,255,0.62)'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath(); ctx.arc(cx - 18, R * 1.76, 10 + i * 11, -0.85, 0.85); ctx.stroke();
+  }
+  tex.needsUpdate = true;
+}
+
+// ---------- phone screens ----------
+function statusBar(ctx, c, now, right, color) {
+  ctx.fillStyle = color || C.dim; ctx.font = '600 22px Archivo, sans-serif';
+  ctx.textAlign = 'left'; ctx.fillText(hhmm(now), 28, 40);
+  ctx.textAlign = 'right'; ctx.fillText(right, c.width - 28, 40);
+}
+function paintPhone(state, now, k) {
+  const { ctx, c, tex } = ps;
+
+  if (state === 'nfc') {
+    ctx.fillStyle = '#08080a'; ctx.fillRect(0, 0, c.width, c.height);
+    statusBar(ctx, c, now, 'NFC', 'rgba(255,255,255,0.7)');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 636, c.width, 514);
+    ctx.fillStyle = '#d8d3d0'; ctx.fillRect(c.width/2 - 40, 668, 80, 8);
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = C.accent;
+    for (let i = 0; i < 3; i++) {
+      const u = ((k * 3.2) + i / 3) % 1;
+      ctx.lineWidth = 7; ctx.globalAlpha = 0.9 * (1 - u) * (1 - u);
+      ctx.beginPath(); ctx.arc(c.width/2, 786, 42 + u * 110, 0, Math.PI*2); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = C.ink;
+    ctx.beginPath(); ctx.arc(c.width/2, 786, 34, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '800 20px Archivo, sans-serif';
+    ctx.fillText('NFC', c.width/2, 794);
+    ctx.fillStyle = C.ink; ctx.font = '800 38px Archivo, sans-serif';
+    ctx.fillText('Sticker detectado', c.width/2, 916);
+    ctx.fillStyle = C.dim; ctx.font = '600 23px Archivo, sans-serif';
+    ctx.fillText('Abriendo instagram.com/enemy___…', c.width/2, 958);
+    ctx.fillStyle = '#eae6e4'; ctx.fillRect(40, 1008, c.width - 80, 8);
+    ctx.fillStyle = C.accent; ctx.fillRect(40, 1008, (c.width - 80) * Math.min(1, k * 1.3), 8);
+
+  } else if (state === 'perfil') {
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, c.width, c.height);
+    statusBar(ctx, c, now, 'INSTAGRAM', 'rgba(255,255,255,0.62)');
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#fff'; ctx.font = '800 34px Archivo, sans-serif';
+    ctx.fillText('enemy___', 28, 108);
+
+    if (avaImg) {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(84, 200, 48, 0, Math.PI*2); ctx.clip();
+      ctx.fillStyle = '#fff'; ctx.fillRect(36, 152, 96, 96);
+      ctx.drawImage(avaImg, 44, 160, 80, 80);
+      ctx.restore();
+      ctx.strokeStyle = '#f0397a'; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(84, 200, 52, 0, Math.PI*2); ctx.stroke();
+    }
+    let x = 178;
+    for (const [n, l] of [['317', 'PUBLIC.'], ['47,1 k', 'SEGUID.'], ['3', 'SIGUE']]) {
+      ctx.fillStyle = '#fff'; ctx.font = '800 30px Archivo, sans-serif'; ctx.fillText(n, x, 190);
+      ctx.fillStyle = 'rgba(255,255,255,0.58)'; ctx.font = '700 18px Archivo, sans-serif'; ctx.fillText(l, x, 220);
+      x += 128;
+    }
+    ctx.fillStyle = '#fff'; ctx.font = '800 26px Archivo, sans-serif';
+    ctx.fillText('enemy®', 28, 296);
+    ctx.fillStyle = 'rgba(255,255,255,0.52)'; ctx.font = '600 22px Archivo, sans-serif';
+    ctx.fillText('Ropa (marca)', 28, 328);
+    ctx.fillStyle = 'rgba(255,255,255,0.86)';
+    ctx.fillText('Santo Domingo – Santiago', 28, 362);
+    ctx.fillText('Worldwide Shipping', 28, 394);
+    ctx.fillStyle = '#7cb0ff'; ctx.fillText('www.enemyrd.com', 28, 428);
+
+    const followed = k > 0.55;
+    ctx.fillStyle = followed ? '#26262a' : C.ig;
+    ctx.fillRect(28, 456, 236, 68);
+    ctx.fillStyle = '#fff'; ctx.font = '800 23px Archivo, sans-serif';
+    ctx.fillText(followed ? 'SIGUIENDO' : 'SEGUIR', 50, 498);
+    ctx.fillStyle = '#26262a'; ctx.fillRect(278, 456, 184, 68);
+    ctx.fillText('MENSAJE', 300, 498);
+
+    if (feedImg) {
+      const top = 560;
+      const scroll = Math.max(0, Math.min(1, (k - 0.3) / 0.6));
+      const w = c.width, h = feedImg.height * (w / feedImg.width);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, top, w, c.height - top); ctx.clip();
+      ctx.drawImage(feedImg, 0, top - scroll * Math.max(0, h - (c.height - top) + 120), w, h);
+      ctx.restore();
+      const g = ctx.createLinearGradient(0, c.height - 90, 0, c.height);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.9)');
+      ctx.fillStyle = g; ctx.fillRect(0, c.height - 90, c.width, 90);
+    }
+
+  } else if (state === 'tienda') {
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    statusBar(ctx, c, now, 'ENEMYRD.COM');
+    ctx.fillStyle = '#f1eeec'; ctx.fillRect(28, 62, c.width - 56, 54);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = C.dim; ctx.font = '600 22px Archivo, sans-serif';
+    ctx.fillText('www.enemyrd.com', 46, 96);
+
+    ctx.fillStyle = '#131315'; ctx.fillRect(0, 138, c.width, 250);
+    ctx.fillStyle = '#fff'; ctx.font = '800 52px Archivo, sans-serif';
+    ctx.fillText('enemy®', 34, 256);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '700 22px Archivo, sans-serif';
+    ctx.fillText('WORLDWIDE SHIPPING', 34, 300);
+    if (avaImg) {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(c.width - 92, 232, 44, 0, Math.PI*2); ctx.clip();
+      ctx.fillStyle = '#fff'; ctx.fillRect(c.width - 136, 188, 88, 88);
+      ctx.drawImage(avaImg, c.width - 129, 195, 74, 74);
+      ctx.restore();
+    }
+
+    const rows = [['Camisetas', 'NUEVO'], ['Gorras', 'RESTOCK'], ['Lentes', 'CÁPSULA'], ['Summer essentials', '0026']];
+    let y = 456;
+    const shown = Math.min(rows.length, Math.floor(k * rows.length * 2.6) + 1);
+    for (let i = 0; i < shown; i++) {
+      ctx.fillStyle = C.ink; ctx.font = '800 30px Archivo, sans-serif';
+      ctx.fillText(rows[i][0], 34, y);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = C.dim; ctx.font = '700 19px Archivo, sans-serif';
+      ctx.fillText(rows[i][1], c.width - 34, y);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#e6e2df'; ctx.fillRect(34, y + 22, c.width - 68, 4);
+      y += 92;
+    }
+    ctx.fillStyle = C.ink; ctx.fillRect(34, 1000, c.width - 68, 84);
+    ctx.fillStyle = '#fff'; ctx.font = '800 24px Archivo, sans-serif';
+    ctx.fillText('VER LA TIENDA', 56, 1050);
+
+  } else {
+    ctx.fillStyle = '#0c0c0e'; ctx.fillRect(0, 0, c.width, c.height);
+    statusBar(ctx, c, now, 'NFC', 'rgba(255,255,255,0.6)');
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#f3f2f2'; ctx.font = '700 132px Archivo, sans-serif';
+    ctx.fillText(hhmm(now), c.width/2, 320);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '600 24px Archivo, sans-serif';
+    ctx.fillText(now.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }).toUpperCase(),
+      c.width/2, 372);
+    ctx.fillStyle = 'rgba(255,255,255,0.09)'; ctx.fillRect(36, 926, c.width - 72, 132);
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 3;
+    ctx.strokeRect(36, 926, c.width - 72, 132);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#fff'; ctx.font = '800 24px Archivo, sans-serif';
+    ctx.fillText('NFC ACTIVADO', 68, 982);
+    ctx.fillStyle = 'rgba(255,255,255,0.62)'; ctx.font = '600 22px Archivo, sans-serif';
+    ctx.fillText('Acerca el celular al sticker', 68, 1020);
+  }
+  tex.needsUpdate = true;
+}
+
+// ---------- animation ----------
+const hudState = document.getElementById('hud-state');
+const hudAcc = document.getElementById('hud-acc');
+const hudDest = document.getElementById('hud-dest');
+const CYCLE = 18.0, T_IN = 2.6, T_NFC = 4.6, T_PERFIL = 11.4, T_TIENDA = 16.2, T_OUT = 17.2;
+const ease = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+
+const FAR = new THREE.Vector3(0.152, 0.204, 0.118);
+const TAP = STICK_C.clone().addScaledVector(NORMAL, 0.034);
+TAP.y += 0.090;
+const READ = new THREE.Vector3(0.112, 0.136, 0.080);
+let last = '';
+
+function frame(ms) {
+  const t = (ms / 1000) % CYCLE;
+  const now = new Date();
+  let p, rx, ry, state, k = 0;
+
+  if (t < T_IN) {
+    k = ease(t / T_IN);
+    p = FAR.clone().lerp(TAP, k);
+    rx = -0.30 - 0.14 * k; ry = -0.30 + 0.92 * k; state = 'idle';
+  } else if (t < T_NFC) {
+    k = (t - T_IN) / (T_NFC - T_IN);
+    p = TAP.clone().addScaledVector(NORMAL, -Math.sin(k * Math.PI) * 0.005);
+    rx = -0.16; ry = 0.62; state = 'nfc';
+  } else if (t < T_PERFIL) {
+    k = (t - T_NFC) / (T_PERFIL - T_NFC);
+    const e = ease(Math.min(1, k * 2.2));
+    p = TAP.clone().lerp(READ, e);
+    rx = -0.16 - 0.18 * e; ry = 0.62 - 0.96 * e; state = 'perfil';
+  } else if (t < T_TIENDA) {
+    k = (t - T_PERFIL) / (T_TIENDA - T_PERFIL);
+    p = READ.clone(); p.y += Math.sin(k * Math.PI) * 0.004;
+    rx = -0.34; ry = -0.34; state = 'tienda';
+  } else {
+    k = ease((t - T_TIENDA) / (T_OUT - T_TIENDA));
+    p = READ.clone().lerp(FAR, Math.min(1, k));
+    rx = -0.34 + 0.04 * k; ry = -0.34 + 0.04 * k; state = 'tienda'; k = 1;
+  }
+
+  phoneRig.position.copy(p);
+  phone.rotation.set(rx, ry, Math.sin(ms / 1400) * 0.02);
+  paintPhone(state, now, k);
+
+  const active = state === 'nfc';
+  MAT.pulse.opacity = active ? 0.55 + 0.45 * Math.sin(k * Math.PI * 4) : 0.26;
+  pulse.scale.setScalar(active ? 1 + k * 0.5 : 1);
+  pulse.visible = active;
+
+  if (state !== last) {
+    last = state;
+    hudState.textContent = active ? 'Conexión NFC' : state === 'perfil' ? 'Perfil abierto'
+      : state === 'tienda' ? 'Tienda abierta' : 'En espera';
+    hudState.style.color = state === 'idle' ? 'var(--color-text)' : 'var(--color-accent-700)';
+    hudAcc.textContent = state === 'idle' ? '—' : ACC;
+    hudDest.textContent = state === 'perfil' ? 'Instagram · feed'
+      : state === 'tienda' ? 'enemyrd.com' : '—';
+  }
+}
+paintSticker();
+paintPhone('idle', new Date(), 0);
+document.fonts.ready.then(paintSticker);
+phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) { console.error(e); } };
+requestAnimationFrame(function tick(ms){ try { frame(ms); } catch (e) { console.error(e); } requestAnimationFrame(tick); });
+
+// frame the bottle and the phone together
+{
+  const cam = stage._camera, ctl = stage._controls;
+  const center = new THREE.Vector3(0.018, 0.140, 0.030);
+  const dist = (0.226 / Math.tan((cam.fov * Math.PI) / 360)) * 1.04;
+  const dir = new THREE.Vector3(0.86, 0.34, 1).normalize();
+  cam.position.copy(center).add(dir.multiplyScalar(dist));
+  cam.near = Math.max(dist / 100, 0.005);
+  cam.far = dist * 100;
+  cam.updateProjectionMatrix();
+  ctl.target.copy(center);
+  ctl.update();
+}
+</script>
+</body>
+</html>
