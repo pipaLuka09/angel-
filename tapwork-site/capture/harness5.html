@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html,body{margin:0;background:#0b0f0e;}</style>
+</head>
+<body>
+<div id="badge-wrap"></div>
+<div id="status" style="position:fixed;top:0;left:0;color:red;font:14px monospace;background:#fff;">loading</div>
+<script type="module">
+import * as ThreeModule from './three.module.js';
+window.__CAPTURE_SCALE = 3;
+function PatchedRenderer(params) {
+  const r = new ThreeModule.WebGLRenderer(params);
+  const orig = r.setPixelRatio.bind(r);
+  r.setPixelRatio = function () { orig(window.__CAPTURE_SCALE); };
+  return r;
+}
+window.THREE = new Proxy(ThreeModule, {
+  get(t, k) { return k === 'WebGLRenderer' ? PatchedRenderer : t[k]; },
+  has(t, k) { return k in t; }
+});
+
+class DCLogic {
+  constructor(props) { this.props = props || {}; }
+  setState(patch) {
+    this.state = Object.assign({}, this.state, patch);
+    this._applyRenderVals();
+  }
+  _applyRenderVals() {
+    const vals = this.renderVals();
+    const wrap = document.getElementById('badge-wrap');
+    wrap.innerHTML = `<div style="${vals.lab.badgeCanvasStyle}">
+      <canvas id="tw-asistencia-canvas" width="840" height="845" style="display:block;width:440px;height:auto;"></canvas>
+      <img id="tw-asistencia-fallback" src="badge-seq-3.webp" style="display:none;width:440px;height:auto;">
+    </div>
+    <div style="${vals.lab.reviewCanvasStyle}">
+      <canvas id="tw-resenas-canvas" width="840" height="845" style="display:block;width:440px;height:auto;"></canvas>
+      <img id="tw-resenas-fallback" src="google-review.webp" style="display:none;width:440px;height:auto;">
+    </div>
+    <div style="${vals.lab.menuCanvasStyle}">
+      <canvas id="tw-menu-canvas" width="840" height="845" style="display:block;width:440px;height:auto;"></canvas>
+      <img id="tw-menu-fallback" src="acrylic.webp" style="display:none;width:440px;height:auto;">
+    </div>
+    <div style="${vals.lab.wifiCanvasStyle}">
+      <canvas id="tw-wifi-canvas" width="840" height="845" style="display:block;width:440px;height:auto;"></canvas>
+      <img id="tw-wifi-fallback" src="acrylic.webp" style="display:none;width:440px;height:auto;">
+    </div>
+    <div style="${vals.lab.gymCanvasStyle}">
+      <canvas id="tw-gym-canvas" width="840" height="845" style="display:block;width:440px;height:auto;"></canvas>
+      <img id="tw-gym-fallback" src="gym-tap.webp" style="display:none;width:440px;height:auto;">
+    </div>`;
+    window.__lastLab = vals.lab;
+  }
+}
+window.DCLogic = DCLogic;
+
+const statusEl = document.getElementById('status');
+try {
+  const scriptText = await (await fetch('./nfclab_component.js')).text();
+  const factory = new Function(scriptText + '\nreturn Component;');
+  window.Component = factory();
+
+  const comp = new window.Component({});
+  window.__comp = comp;
+  comp.state = { selected: 8, mx: 0, my: 0 };
+  comp._applyRenderVals();
+  comp.componentDidMount();
+  statusEl.textContent = 'mounted';
+  window.__mounted = true;
+} catch (err) {
+  statusEl.textContent = 'ERROR: ' + (err && err.stack || err);
+  window.__mountError = String(err && err.stack || err);
+  console.error(err);
+}
+</script>
+</body>
+</html>

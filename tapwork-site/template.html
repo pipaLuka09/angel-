@@ -1,0 +1,860 @@
+<title>Tap Work NFC</title>
+<script>document.documentElement.className += ' js';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ink: #ffffff;
+    --ink-90: rgba(255,255,255,.9);
+    --ink-70: rgba(255,255,255,.7);
+    --ink-45: rgba(255,255,255,.45);
+    --ink-15: rgba(255,255,255,.16);
+    --glass: rgba(9,20,32,.66);
+    --glass-solid: rgba(7,17,28,.86);
+    --mint: #9fd3c5;
+    --accent: #ec3013;
+    --font: 'Readex Pro', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: #1c6ca8; color: var(--ink); font-family: var(--font); font-weight: 300;
+         -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 8px; }
+  .hero-title { letter-spacing: -0.04em; line-height: 0.95; }
+
+  /* the real sky from the ad, continued: looking straight up, clouds drifting outward */
+  #sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; }
+
+  /* ---------- floating pill navbar ---------- */
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 700; padding: 22px 22px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  @media (min-width: 768px) { .nav { padding: 24px 40px 0; } }
+  .pill { display: flex; align-items: center; gap: 8px; background: var(--glass-solid); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-radius: 999px; border: 1px solid var(--ink-15); }
+  .pill-brand { padding: 12px 22px 12px 16px; font-size: 14px; letter-spacing: -0.01em; }
+  .pill-brand svg { width: 20px; height: 20px; display: block; }
+  .pill-links { display: none; gap: 2px; padding: 7px 10px; }
+  @media (min-width: 940px) { .pill-links { display: flex; } }
+  .pill-links a { color: #d7e2ec; font-size: 14px; padding: 8px 16px; border-radius: 999px; transition: color .2s, background .2s; }
+  .pill-links a:hover { color: #fff; background: rgba(255,255,255,.1); }
+  .btn-start { background: #fff; color: #0b1a2a; font-size: 14px; border-radius: 999px; padding: 12px 22px; transition: background .2s; white-space: nowrap; }
+  .btn-start:hover { background: #dde8f0; }
+
+  /* ---------- side rails, on their own glass so they read over the sky ---------- */
+  .rail { position: fixed; top: 50%; transform: translateY(-50%); z-index: 600; display: none; flex-direction: column; gap: 16px; width: 176px;
+          padding: 16px 16px 18px; border-radius: 16px; background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          border: 1px solid var(--ink-15); opacity: 0; pointer-events: none; transition: opacity .45s ease; width: 190px; }
+  .rail.on { opacity: 1; pointer-events: auto; }
+  .rail-left { left: 28px; }
+  .rail-right { right: 28px; text-align: right; }
+  .rail-right .rail-group { align-items: flex-end; }
+  .rail-group { display: flex; flex-direction: column; gap: 2px; }
+  @media (min-width: 1280px) { .rail { display: flex; } }
+  .rail-label { font-family: var(--mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-45); margin-bottom: 5px; }
+  .rail a { font-size: 12.5px; color: var(--ink-70); padding: 2px 0; transition: color .2s; display: inline-flex; align-items: center; gap: 7px; }
+  .rail a:hover { color: #fff; }
+  .rail a.is-live { color: var(--mint); }
+  .rail a .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0; transition: opacity .2s; }
+  .rail a.is-live .dot { opacity: 1; }
+  .rail-right a { flex-direction: row-reverse; }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; height: 100vh; height: 100svh; width: 100%; overflow: hidden; background: #06121e; }
+  .hero-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; }
+  .hero video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero-fg { position: relative; height: 100%; width: 100%; }
+  .hero-word { position: absolute; margin: 0; font-weight: 500; font-size: 14vw; color: #fff; text-transform: lowercase; text-shadow: 0 6px 30px rgba(0,20,40,.35); }
+  @media (min-width: 768px) { .hero-word { font-size: 13vw; } }
+  .w1 { left: 16px; top: 18%; } .w2 { right: 16px; top: 38%; } .w3 { left: 18%; top: 58%; }
+  @media (min-width: 768px) { .w1 { left: 40px; } .w2 { right: 40px; } .w3 { left: 28%; } }
+  .hero-desc { position: absolute; left: 24px; top: 46%; max-width: 240px; font-size: 15px; line-height: 1.375; color: var(--ink-90); margin: 0; text-shadow: 0 2px 12px rgba(0,20,40,.5); }
+  @media (min-width: 768px) { .hero-desc { left: 40px; } }
+  .stat { position: absolute; text-shadow: 0 2px 12px rgba(0,20,40,.5); }
+  .stat-row { display: flex; align-items: center; gap: 12px; }
+  .stat-row.end { justify-content: flex-end; }
+  .stat-num { font-size: 36px; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  @media (min-width: 768px) { .stat-num { font-size: 48px; } }
+  .stat-sub { font-size: 12px; color: var(--ink-90); margin-top: 4px; }
+  @media (min-width: 768px) { .stat-sub { font-size: 14px; } }
+  .divider { display: none; height: 1px; width: 96px; background: rgba(255,255,255,.55); }
+  @media (min-width: 768px) { .divider { display: block; } }
+  .rot-p { transform: rotate(20deg); } .rot-n { transform: rotate(-20deg); }
+  .stat-tr { right: 24px; top: 14%; } @media (min-width: 768px) { .stat-tr { right: 96px; } }
+  .stat-bl { left: 24px; bottom: 80px; } @media (min-width: 768px) { .stat-bl { left: 80px; bottom: 96px; } }
+  .stat-br { right: 24px; bottom: 64px; text-align: right; } @media (min-width: 768px) { .stat-br { right: 80px; bottom: 80px; } }
+  .scroll-hint { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.75); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .scroll-hint i { display: block; width: 1px; height: 28px; background: rgba(255,255,255,.75); animation: hint 2s ease-in-out infinite; transform-origin: top; }
+  @keyframes hint { 0%,100% { transform: scaleY(.3); opacity: .3; } 50% { transform: scaleY(1); opacity: 1; } }
+
+  /* ---------- scroll reveals ---------- */
+  html.js .reveal { opacity: 0; transform: translateY(20px); transition: opacity .75s cubic-bezier(.2,.7,.2,1), transform .75s cubic-bezier(.2,.7,.2,1); }
+  html.js .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* ---------- shared ---------- */
+  .section { position: relative; padding: 108px 22px; max-width: 1000px; margin: 0 auto; }
+  @media (min-width: 1280px) { .section { max-width: 880px; padding-left: 0; padding-right: 0; } }
+  .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--mint); }
+  .slab { border-radius: 22px; background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--ink-15); box-shadow: 0 30px 60px -30px rgba(0,18,36,.7); }
+  .section-head { padding: 32px 30px 34px; }
+  .section-head h2 { margin: 10px 0 0; font-size: clamp(28px, 4vw, 48px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.02; text-wrap: balance; }
+  .section-head p { margin: 14px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-70); max-width: 54ch; }
+
+  /* ---------- el toque ---------- */
+  .tap { position: relative; height: 300vh; }
+  .tap-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  .tap-stage { position: absolute; inset: 0; display: grid; grid-template-rows: auto 1fr auto; align-items: center; justify-items: center; padding: 100px 22px 36px; }
+  .tap-glow { position: absolute; left: 50%; top: 50%; width: 110vmin; height: 110vmin; transform: translate(-50%,-50%); pointer-events: none; opacity: 0;
+              background: radial-gradient(circle, rgba(236,48,19,.30) 0%, rgba(236,48,19,.08) 34%, rgba(0,0,0,0) 68%); }
+  .tap-copy { position: relative; z-index: 2; text-align: center; max-width: 44ch; padding: 20px 26px 22px; border-radius: 18px;
+              background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--ink-15); }
+  .tap-copy h2 { margin: 8px 0 0; font-size: clamp(23px, 3.2vw, 40px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.05; text-wrap: balance; }
+  .tap-copy p { margin: 9px 0 0; font-size: 14px; color: var(--ink-70); }
+  .tap-mid { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .tap-core { position: relative; width: 300px; height: 330px; }
+  .tap-card { position: absolute; left: 50%; top: 60%; width: 232px; height: 146px; margin: -73px 0 0 -116px; border-radius: 12px;
+              background: linear-gradient(140deg,#232326 0%,#0d0d0f 48%,#1b1b1e 100%);
+              box-shadow: 0 30px 46px -18px rgba(0,14,28,.85), inset 0 1px 0 rgba(255,255,255,.08);
+              transform: rotateX(52deg) rotateZ(-14deg); }
+  .tap-card::before { content: ""; position: absolute; left: -8%; top: -30%; width: 34%; height: 170%; transform: rotate(18deg); opacity: var(--glint, 0);
+              background: linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,.2), rgba(255,255,255,0)); }
+  .tap-card .brand { position: absolute; left: 16px; top: 13px; display: flex; align-items: center; gap: 7px; font-size: 11px; }
+  .tap-card .brand svg { width: 14px; height: 14px; }
+  .tap-card .chip { position: absolute; left: 16px; bottom: 16px; width: 30px; height: 23px; border-radius: 4px; background: linear-gradient(150deg,#e8e2cf,#9d9585); }
+  .tap-card .nfc { position: absolute; right: 14px; bottom: 13px; color: rgba(255,255,255,.5); }
+  .tap-card .nfc svg { width: 18px; height: 18px; display: block; }
+  .tap-phone { position: absolute; left: 50%; top: 0; width: 150px; height: 306px; margin-left: -75px; border-radius: 26px; background: #131211; padding: 6px; z-index: 4;
+               box-shadow: 0 40px 60px -22px rgba(0,14,28,.85); }
+  .tap-phone::after { content: ""; position: absolute; inset: 2px; border-radius: 25px; border: 1px solid rgba(255,255,255,.10); }
+  .tap-phone .scr { position: relative; width: 100%; height: 100%; border-radius: 21px; overflow: hidden; background: #0b0b0d; }
+  .tap-phone .isl { position: absolute; left: 50%; top: 7px; transform: translateX(-50%); width: 48px; height: 14px; background: #000; border-radius: 8px; z-index: 3; }
+  .tap-scr { position: absolute; inset: 0; opacity: 0; transition: opacity .35s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 16px; text-align: center; }
+  .tap-scr.on { opacity: 1; }
+  .tap-scr .big { font-size: 30px; font-weight: 500; letter-spacing: -0.04em; }
+  .tap-scr .lbl { font-family: var(--mono); font-size: 8px; line-height: 1.7; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-45); }
+  .tap-scr .lbl.hot { color: var(--accent); }
+  .tap-field { position: absolute; left: 50%; top: 60%; width: 0; height: 0; z-index: 3; pointer-events: none; }
+  .tap-field i { position: absolute; left: 0; top: 0; border: 2px solid var(--accent); border-radius: 50%; opacity: 0; transform: translate(-50%,-50%) rotateX(52deg) rotateZ(-14deg); }
+  .tap-fan { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+  .tap-tile { position: absolute; left: 50%; top: 50%; width: var(--tile); height: var(--tile); margin: calc(var(--tile) / -2) 0 0 calc(var(--tile) / -2);
+              border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,.3); background: #0c0c0d; pointer-events: auto; cursor: pointer; opacity: 0;
+              box-shadow: 0 18px 34px -12px rgba(0,14,28,.85); }
+  .tap-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tap-tile figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 8px 7px; font-size: 10px; line-height: 1.15; text-align: center; opacity: 0; transition: opacity .25s;
+              background: linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,0)); }
+  .tap-tile:hover figcaption, .tap-tile:focus-visible figcaption { opacity: 1; }
+  .tap-tile:hover, .tap-tile:focus-visible { border-color: var(--accent); }
+  .tap-note { position: relative; z-index: 2; font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #fff;
+              background: var(--glass); padding: 8px 14px; border-radius: 999px; border: 1px solid var(--ink-15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+  /* ---------- productos: one chapter per piece, driven by scroll ---------- */
+  .pr { position: relative; }
+  .pr-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  .pr-inner { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr; align-content: center; gap: 20px; padding: 104px 22px 96px; }
+  @media (min-width: 900px) { .pr-inner { grid-template-columns: 1.05fr 1fr; align-items: center; gap: 44px; padding: 104px 8vw 96px; } }
+  @media (min-width: 1280px) { .pr-inner { padding-left: 250px; padding-right: 250px; } }
+
+  .pr-stage { position: relative; aspect-ratio: 1; width: min(100%, 460px); justify-self: center; }
+  .pr-shot { position: absolute; inset: 0; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,.24);
+             box-shadow: 0 44px 80px -30px rgba(0,14,32,.8); opacity: 0; transform: scale(.92) translateY(26px); }
+  .pr-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pr-shot .tag { position: absolute; left: 14px; top: 14px; font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+                  background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 6px 11px; }
+  .pr-rings { position: absolute; right: 8%; bottom: 10%; width: 0; height: 0; pointer-events: none; z-index: 3; }
+  .pr-rings i { position: absolute; left: 0; top: 0; border: 2px solid var(--accent); border-radius: 50%; transform: translate(-50%,-50%); opacity: 0; }
+
+  .pr-copy { position: relative; padding: 30px 28px 32px; }
+  .pr-copy .n { font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: var(--mint); }
+  .pr-copy .kind { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-45); margin-top: 12px; }
+  .pr-copy h3 { margin: 8px 0 0; font-size: clamp(24px, 3.2vw, 40px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.04; text-wrap: balance; }
+  .pr-copy p { margin: 14px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink-70); max-width: 46ch; }
+  .pr-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .chipx { font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-70);
+           border: 1px solid var(--ink-15); border-radius: 999px; padding: 6px 11px; }
+  .chipx.real { color: var(--mint); border-color: rgba(159,211,197,.4); }
+  .pr-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+  .cta { display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #0b1a2a; font-size: 13px; border-radius: 999px; padding: 12px 20px; transition: background .2s, transform .2s; }
+  .cta:hover { background: #dde8f0; transform: translateY(-1px); }
+  .cta-ghost { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-family: inherit; font-size: 13px; background: transparent; border: 1px solid rgba(255,255,255,.34); border-radius: 999px; padding: 12px 18px; cursor: pointer; transition: background .2s; }
+  .cta-ghost:hover { background: rgba(255,255,255,.12); }
+
+  /* the dock: every piece at a glance, and where you are in the run */
+  .pr-dock { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 6px;
+             padding: 9px 12px; border-radius: 999px; background: var(--glass-solid); border: 1px solid var(--ink-15); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); max-width: calc(100vw - 44px); overflow-x: auto; }
+  .pr-dock button { width: 30px; height: 30px; padding: 0; border-radius: 9px; border: 1px solid transparent; background: none; cursor: pointer; overflow: hidden; opacity: .42; transition: opacity .25s, border-color .25s, transform .25s; flex: 0 0 auto; }
+  .pr-dock button img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pr-dock button:hover { opacity: .8; }
+  .pr-dock button.on { opacity: 1; border-color: #fff; transform: translateY(-2px); }
+  .pr-count { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; color: var(--ink-45); padding: 0 8px 0 4px; font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+
+  /* ---------- cómo funciona ---------- */
+  .steps { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
+  @media (min-width: 820px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .step { position: relative; padding: 24px 22px 28px; overflow: hidden; }
+  .step .who { display: block; width: 100%; height: 158px; margin-bottom: 16px; }
+  .step .how { font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+  .step h3 { margin: 8px 0 0; font-size: 23px; font-weight: 500; letter-spacing: -0.03em; text-transform: lowercase; }
+  .step p { margin: 8px 0 0; font-size: 14px; line-height: 1.55; color: var(--ink-70); }
+  .who .arm { animation: reach 4.6s ease-in-out infinite; }
+  .who .wv { transform-origin: center; animation: wv 1.8s ease-out infinite; opacity: 0; }
+  .who .wv2 { animation-delay: .6s; } .who .wv3 { animation-delay: 1.2s; }
+  @keyframes reach { 0%, 62%, 100% { transform: translate(0,0) rotate(0deg); } 26%, 44% { transform: translate(7px,-13px) rotate(-8deg); } }
+  @keyframes wv { 0% { transform: scale(.4); opacity: 0; } 30% { opacity: .85; } 100% { transform: scale(1.6); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .who .arm, .who .wv { animation: none; } }
+
+  /* ---------- contacto ---------- */
+  .contact { display: grid; grid-template-columns: 1fr; gap: 34px; padding: 34px 30px 36px; }
+  @media (min-width: 820px) { .contact { grid-template-columns: 1.15fr 1fr; align-items: end; } }
+  .contact h2 { margin: 10px 0 0; font-size: clamp(30px, 4.6vw, 60px); font-weight: 400; letter-spacing: -0.05em; line-height: .98; text-wrap: balance; }
+  .contact .wa { display: inline-flex; align-items: center; gap: 12px; margin-top: 24px; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .contact .wa svg { width: 22px; height: 22px; }
+  .social { display: flex; flex-direction: column; }
+  .social a { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-top: 1px solid var(--ink-15); font-size: 15px; color: var(--ink-70); transition: color .2s; }
+  .social a:hover { color: #fff; }
+  .social a:last-child { border-bottom: 1px solid var(--ink-15); }
+  .social a small { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-45); }
+  footer { padding: 26px 22px 40px; display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.6); max-width: 1000px; margin: 0 auto; }
+</style>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<nav class="nav" aria-label="principal">
+  <a class="pill pill-brand" href="#top" aria-label="tap work, inicio">
+    <svg viewBox="0 0 256 256" aria-hidden="true"><path fill="#ffffff" d="M 128 192 L 128 256 L 64.5 256 L 32 223 L 0 192 L 0 128 L 64 128 Z M 256 192 L 256 256 L 192.5 256 L 160 223 L 128 192 L 128 128 L 192 128 Z M 128 64 L 128 128 L 64.5 128 L 32 95 L 0 64 L 0 0 L 64 0 Z M 256 64 L 256 128 L 192.5 128 L 160 95 L 128 64 L 128 0 L 192 0 Z"/></svg>
+    <span>tap work</span>
+  </a>
+  <div class="pill pill-links">
+    <a href="#el-toque">el toque</a>
+    <a href="#productos">productos</a>
+    <a href="#como-funciona">cómo funciona</a>
+    <a href="#contacto">contacto</a>
+  </div>
+  <a class="btn-start" href="https://wa.me/593967794882?text=Hola%2C%20quiero%20cotizar%20productos%20NFC%20de%20Tap%20Work" target="_blank" rel="noopener">cotizar</a>
+</nav>
+
+<aside class="rail rail-left" aria-label="lista de productos">
+  <div class="rail-group">
+    <div class="rail-label">productos</div>
+    __RAIL_LEFT__
+  </div>
+</aside>
+<aside class="rail rail-right" aria-label="secciones y redes">
+  <div class="rail-group">
+    <div class="rail-label">recorrido</div>
+    <a href="#el-toque"><span class="dot"></span>el toque</a>
+    <a href="#productos"><span class="dot"></span>productos</a>
+    <a href="#como-funciona"><span class="dot"></span>cómo funciona</a>
+  </div>
+  <div class="rail-group">
+    <div class="rail-label">contacto</div>
+    <a href="https://wa.me/593967794882" target="_blank" rel="noopener"><span class="dot"></span>whatsapp</a>
+    <a href="#contacto"><span class="dot"></span>escríbenos</a>
+  </div>
+  <div class="rail-group">
+    <div class="rail-label">redes</div>
+    <a href="#contacto"><span class="dot"></span>instagram</a>
+    <a href="#contacto"><span class="dot"></span>tiktok</a>
+    <a href="#contacto"><span class="dot"></span>facebook</a>
+  </div>
+</aside>
+
+<main id="top">
+  <section class="hero" id="hero" aria-label="tap work, productos nfc">
+    <div class="hero-sticky" id="hero-sticky">
+      <video autoplay loop muted playsinline preload="auto" aria-hidden="true" poster="__POSTER__">
+        <source src="__VIDEO_WEBM__" type="video/webm">
+        <source src="__VIDEO_MP4__" type="video/mp4">
+      </video>
+      <div class="hero-fg">
+        <h1 class="hero-title hero-word w1">acerca</h1>
+        <h1 class="hero-title hero-word w2">toca</h1>
+        <h1 class="hero-title hero-word w3">listo</h1>
+        <p class="hero-desc">productos nfc que abren tu menú, tus reseñas, tu instagram o tu página con un toque del celular. sin apps, sin qr.</p>
+        <div class="stat stat-tr">
+          <div class="stat-row end"><span class="divider rot-p"></span><span class="stat-num">__COUNT__</span></div>
+          <div class="stat-sub" style="text-align:right">soluciones nfc listas</div>
+        </div>
+        <div class="stat stat-bl">
+          <div class="stat-row"><span class="stat-num">0</span><span class="divider rot-n"></span></div>
+          <div class="stat-sub">apps que instalar</div>
+        </div>
+        <div class="stat stat-br">
+          <div class="stat-row end"><span class="divider rot-n"></span><span class="stat-num">&lt;1 s</span></div>
+          <div class="stat-sub">por lectura, con la pantalla bloqueada</div>
+        </div>
+        <div class="scroll-hint"><span>el toque</span><i></i></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tap" id="el-toque" aria-label="el toque: el celular lee la tarjeta y aparecen los productos">
+    <div class="tap-sticky">
+      <div class="tap-glow" id="tap-glow"></div>
+      <div class="tap-stage">
+        <div class="tap-copy" id="tap-copy">
+          <div class="eyebrow" id="tap-eyebrow">el toque</div>
+          <h2 id="tap-title">un gesto que abre tu negocio.</h2>
+          <p id="tap-lead">baja para acercar el celular a la tarjeta.</p>
+        </div>
+        <div class="tap-mid">
+          <div class="tap-fan" id="tap-fan"></div>
+          <div class="tap-core" id="tap-core">
+            <div class="tap-card" id="tap-card">
+              <span class="brand">
+                <svg viewBox="0 0 256 256" aria-hidden="true"><path fill="#fff" d="M 128 192 L 128 256 L 64.5 256 L 32 223 L 0 192 L 0 128 L 64 128 Z M 256 192 L 256 256 L 192.5 256 L 160 223 L 128 192 L 128 128 L 192 128 Z M 128 64 L 128 128 L 64.5 128 L 32 95 L 0 64 L 0 0 L 64 0 Z M 256 64 L 256 128 L 192.5 128 L 160 95 L 128 64 L 128 0 L 192 0 Z"/></svg>
+                tap work
+              </span>
+              <span class="chip"></span>
+              <span class="nfc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 8.5a9 9 0 0 1 0 7"/><path d="M10 6.5a13 13 0 0 1 0 11"/><path d="M14 4.5a17 17 0 0 1 0 15"/></svg></span>
+            </div>
+            <div class="tap-field" id="tap-field"><i></i><i></i><i></i></div>
+            <div class="tap-phone" id="tap-phone">
+              <div class="scr">
+                <div class="isl"></div>
+                <div class="tap-scr on" id="tap-s1"><span class="lbl">nfc activado</span><span class="big">7:42</span><span class="lbl">acerca el celular</span></div>
+                <div class="tap-scr" id="tap-s2"><span class="lbl hot">etiqueta detectada</span><span class="big">···</span><span class="lbl">leyendo</span></div>
+                <div class="tap-scr" id="tap-s3"><span class="lbl hot">tap work</span><span class="big">__COUNT__</span><span class="lbl">productos nfc</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tap-note" id="tap-note">toca una pieza para ver su ficha</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pr" id="productos" aria-label="los productos, uno por uno">
+    <div class="pr-sticky">
+      <div class="pr-inner">
+        <div class="pr-stage" id="pr-stage">
+          <div class="pr-rings" id="pr-rings"><i></i><i></i><i></i></div>
+        </div>
+        <div class="pr-copy slab" id="pr-copy">
+          <div class="n" id="pr-n">01 / __COUNT__</div>
+          <div class="kind" id="pr-kind"></div>
+          <h3 id="pr-title"></h3>
+          <p id="pr-text"></p>
+          <div class="pr-meta">
+            <span class="chipx" id="pr-client"></span>
+            <span class="chipx" id="pr-code"></span>
+            <span class="chipx real" id="pr-real"></span>
+          </div>
+          <div class="pr-actions">
+            <a class="cta" id="pr-cta" href="#" target="_blank" rel="noopener"></a>
+            <button class="cta-ghost" type="button" id="pr-next">siguiente pieza <span aria-hidden="true">&darr;</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="pr-dock" id="pr-dock" role="tablist" aria-label="ir a una pieza"></div>
+    </div>
+  </section>
+
+  <section class="section" id="como-funciona">
+    <div class="section-head slab reveal">
+      <div class="eyebrow">cómo funciona</div>
+      <h2>no hay app, no hay qr, no hay que escribir nada.</h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step slab">
+        <svg class="who" viewBox="0 0 220 168" role="img" aria-label="una clienta acerca su celular a un acrilico sobre la mesa">
+          <ellipse cx="110" cy="152" rx="74" ry="9" fill="rgba(0,0,0,.45)"/>
+          <rect x="150" y="94" width="46" height="54" rx="4" fill="#11161d" stroke="rgba(255,255,255,.2)"/>
+          <rect x="158" y="104" width="30" height="34" rx="2" fill="#1b2430"/>
+          <g class="arm">
+            <rect x="52" y="72" width="26" height="46" rx="6" fill="#111820" stroke="rgba(255,255,255,.24)"/>
+            <rect x="57" y="78" width="16" height="30" rx="2" fill="#0b0f14"/>
+            <circle cx="65" cy="124" r="9" fill="#d9a884"/>
+          </g>
+          <circle cx="96" cy="52" r="22" fill="#d9a884"/>
+          <path d="M74 50a22 22 0 0 1 44 0v-6a22 22 0 0 0-44 0z" fill="#2a2118"/>
+          <path d="M74 148c0-24 10-42 22-42s22 18 22 42z" fill="#ec3013" opacity=".9"/>
+          <g stroke="#ec3013" fill="none" stroke-width="2.4" stroke-linecap="round">
+            <circle class="wv" cx="122" cy="96" r="12"/><circle class="wv wv2" cx="122" cy="96" r="12"/><circle class="wv wv3" cx="122" cy="96" r="12"/>
+          </g>
+        </svg>
+        <div class="how">1 &middot; el cliente</div>
+        <h3>acerca</h3>
+        <p>acerca la parte superior del celular al objeto: la tarjeta, el acrílico, el llavero, el sticker o el collar. android e iphone lo leen con la pantalla bloqueada.</p>
+      </div>
+      <div class="step slab">
+        <svg class="who" viewBox="0 0 220 168" role="img" aria-label="un mesero muestra el llavero nfc a una clienta">
+          <ellipse cx="110" cy="152" rx="74" ry="9" fill="rgba(0,0,0,.45)"/>
+          <circle cx="152" cy="58" r="20" fill="#8d5f43"/>
+          <path d="M132 56a20 20 0 0 1 40 0v-4a20 20 0 0 0-40 0z" fill="#171310"/>
+          <path d="M130 148c0-23 10-40 22-40s22 17 22 40z" fill="#16202b"/>
+          <g class="arm">
+            <rect x="60" y="70" width="24" height="44" rx="6" fill="#111820" stroke="rgba(255,255,255,.24)"/>
+            <rect x="65" y="76" width="14" height="28" rx="2" fill="#0b0f14"/>
+            <circle cx="72" cy="120" r="9" fill="#e8c9a0"/>
+          </g>
+          <circle cx="66" cy="50" r="20" fill="#e8c9a0"/>
+          <path d="M46 48a20 20 0 0 1 40 0v-5a20 20 0 0 0-40 0z" fill="#5a3a1e"/>
+          <path d="M44 148c0-23 10-40 22-40s22 17 22 40z" fill="#9fd3c5" opacity=".8"/>
+          <g stroke="#ec3013" fill="none" stroke-width="2.4" stroke-linecap="round">
+            <circle class="wv" cx="108" cy="92" r="12"/><circle class="wv wv2" cx="108" cy="92" r="12"/><circle class="wv wv3" cx="108" cy="92" r="12"/>
+          </g>
+        </svg>
+        <div class="how">2 &middot; el chip</div>
+        <h3>toca</h3>
+        <p>el chip nfc dentro del objeto entrega tu enlace en menos de un segundo. tú decides a dónde apunta y lo cambias después sin reprogramar nada.</p>
+      </div>
+      <div class="step slab">
+        <svg class="who" viewBox="0 0 220 168" role="img" aria-label="una clienta mira el menu abierto en su celular">
+          <ellipse cx="110" cy="152" rx="74" ry="9" fill="rgba(0,0,0,.45)"/>
+          <circle cx="96" cy="48" r="22" fill="#c98f6a"/>
+          <path d="M74 46a22 22 0 0 1 44 0v-5a22 22 0 0 0-44 0z" fill="#241a12"/>
+          <path d="M72 148c0-25 11-44 24-44s24 19 24 44z" fill="#1d2a36"/>
+          <rect x="124" y="70" width="32" height="56" rx="7" fill="#0d1218" stroke="rgba(255,255,255,.26)"/>
+          <rect x="130" y="77" width="20" height="42" rx="2" fill="#f3f2f2"/>
+          <rect x="130" y="77" width="20" height="12" rx="2" fill="#ec3013"/>
+          <rect x="133" y="94" width="14" height="2.6" rx="1.3" fill="#c9c9c9"/>
+          <rect x="133" y="100" width="14" height="2.6" rx="1.3" fill="#c9c9c9"/>
+          <rect x="133" y="106" width="9" height="2.6" rx="1.3" fill="#c9c9c9"/>
+          <circle cx="140" cy="121" r="2.4" fill="#9fd3c5"/>
+        </svg>
+        <div class="how">3 &middot; tu negocio</div>
+        <h3>listo</h3>
+        <p>se abre tu menú, tu reseña de google, tu instagram, tu página, tu wi-fi o tu link de pago. sin fricción, en el momento exacto.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contacto">
+    <div class="contact slab reveal">
+      <div>
+        <div class="eyebrow">contacto</div>
+        <h2>cuéntanos qué quieres que abra tu primer toque.</h2>
+        <a class="wa" href="https://wa.me/593967794882?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20productos%20NFC%20de%20Tap%20Work" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L4 20l1.1-4.4A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 10.5c.3 2.5 2.5 4.7 5 5"/></svg>
+          +593 96 779 4882
+        </a>
+      </div>
+      <div class="social" aria-label="redes sociales">
+        <a href="#" data-net="instagram"><span>instagram</span><small>pendiente</small></a>
+        <a href="#" data-net="tiktok"><span>tiktok</span><small>pendiente</small></a>
+        <a href="#" data-net="facebook"><span>facebook</span><small>pendiente</small></a>
+        <a href="https://wa.me/593967794882" target="_blank" rel="noopener"><span>whatsapp</span><small>+593 96 779 4882</small></a>
+      </div>
+    </div>
+  </section>
+  <footer><span>tap work &middot; productos nfc &middot; ecuador</span><span>acerca &middot; toca &middot; listo</span></footer>
+</main>
+
+<script>
+(() => {
+  const PRODUCTS = __PRODUCTS_JSON__;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const ease = (t) => t * t * (3 - 2 * t);
+
+  /* ============ the sky: looking straight up, clouds drifting outward ============ */
+  (() => {
+    const cv = document.getElementById('sky');
+    const ctx = cv.getContext('2d');
+    let W = 0, H = 0, dpr = 1;
+
+    /* value-noise cloud sprites: wispy edges instead of obvious circles */
+    const noiseSprite = (w, h) => {
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d');
+      const img = x.createImageData(w, h);
+      const grid = [];
+      const octaves = [[6, 1], [12, 0.5], [24, 0.25], [48, 0.14]];
+      for (const [n] of octaves) {
+        const g = new Float32Array((n + 1) * (n + 1));
+        for (let i = 0; i < g.length; i++) g[i] = Math.random();
+        grid.push(g);
+      }
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const smooth = (t) => t * t * (3 - 2 * t);
+      for (let py = 0; py < h; py++) {
+        for (let px = 0; px < w; px++) {
+          let v = 0, amp = 0;
+          for (let o = 0; o < octaves.length; o++) {
+            const n = octaves[o][0], a = octaves[o][1], g = grid[o];
+            const fx = (px / w) * n, fy = (py / h) * n;
+            const x0 = Math.floor(fx), y0 = Math.floor(fy);
+            const tx = smooth(fx - x0), ty = smooth(fy - y0);
+            const i00 = g[y0 * (n + 1) + x0], i10 = g[y0 * (n + 1) + x0 + 1];
+            const i01 = g[(y0 + 1) * (n + 1) + x0], i11 = g[(y0 + 1) * (n + 1) + x0 + 1];
+            v += a * lerp(lerp(i00, i10, tx), lerp(i01, i11, tx), ty);
+            amp += a;
+          }
+          v /= amp;
+          /* an elliptical falloff turns the noise field into a single cloud */
+          const nx = (px / w - 0.5) * 2, ny = (py / h - 0.5) * 2;
+          const fall = clamp(1 - Math.sqrt(nx * nx * 1.0 + ny * ny * 1.9), 0, 1);
+          let a = clamp((v - 0.36) * 3.1, 0, 1) * Math.pow(fall, 1.1);
+          a = Math.pow(a, 0.92);
+          const i = (py * w + px) * 4;
+          const shade = 232 + 23 * (1 - ny * 0.5);
+          img.data[i] = Math.min(255, shade);
+          img.data[i + 1] = Math.min(255, shade + 2);
+          img.data[i + 2] = 255;
+          img.data[i + 3] = Math.round(a * 255);
+        }
+      }
+      x.putImageData(img, 0, 0);
+      return c;
+    };
+
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const sprites = [noiseSprite(256, 148), noiseSprite(230, 130), noiseSprite(280, 160), noiseSprite(200, 120)];
+    const clouds = [];
+    const seed = (c, spread) => {
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.pow(Math.random(), 0.55) * spread;
+      c.a = a; c.r = r;
+      c.s = sprites[(Math.random() * sprites.length) | 0];
+      c.rot = (Math.random() - 0.5) * 0.5;
+      c.spin = (Math.random() - 0.5) * 0.02;
+      c.k = 0.20 + Math.random() * 0.30;      /* base size */
+      return c;
+    };
+    for (let i = 0; i < 44; i++) clouds.push(seed({}, 1.0));
+
+    const planes = [], birds = [];
+    const spawnPlane = () => planes.push({ x: -0.16, y: 0.16 + Math.random() * 0.6, sp: 0.035 + Math.random() * 0.025, sc: 0.6 + Math.random() * 0.6, up: Math.random() > 0.5 });
+    const spawnBirds = () => {
+      const n = 3 + ((Math.random() * 4) | 0), baseY = 0.2 + Math.random() * 0.5, dir = Math.random() > 0.5 ? 1 : -1;
+      for (let i = 0; i < n; i++) birds.push({ x: dir > 0 ? -0.05 - i * 0.03 : 1.05 + i * 0.03, y: baseY + (i % 2 ? 0.028 : -0.02) + i * 0.005,
+        sp: (0.055 + Math.random() * 0.02) * dir, ph: Math.random() * 6.28, sc: 0.6 + Math.random() * 0.45, dir: dir });
+    };
+    if (!reduce) {
+      setTimeout(spawnPlane, 3000); setInterval(spawnPlane, 19000);
+      setTimeout(spawnBirds, 7000); setInterval(spawnBirds, 15000);
+    }
+
+    let last = performance.now(), scrollY = 0, drift = 0;
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+    const draw = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      if (!reduce) drift += dt * 0.028;
+      const par = scrollY * 0.00016;
+
+      /* zenith overhead, haze toward the edges: the sky of the ad, seen looking up */
+      const cx = W * 0.5, cy = H * 0.44, R = Math.hypot(W, H) * 0.72;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+      g.addColorStop(0, '#1a68a6');
+      g.addColorStop(0.40, '#3d8cc4');
+      g.addColorStop(0.72, '#7db6da');
+      g.addColorStop(1, '#c2e0ef');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+      /* the sun flare sits where it does in the ad, low and to the left */
+      const sg = ctx.createRadialGradient(W * 0.14, H * 0.74, 0, W * 0.14, H * 0.74, Math.min(W, H) * 0.62);
+      sg.addColorStop(0, 'rgba(255,247,225,.5)');
+      sg.addColorStop(0.35, 'rgba(255,244,214,.16)');
+      sg.addColorStop(1, 'rgba(255,240,205,0)');
+      ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H);
+
+      /* clouds ride outward from the zenith and grow: that is the looking-up perspective */
+      const maxR = Math.hypot(W, H) * 0.62;
+      for (const c of clouds) {
+        const rr = (c.r + drift + par) % 1.35;
+        if (rr > 1.3) { seed(c, 0.06); continue; }
+        const persp = Math.pow(rr, 1.5);
+        const dist = persp * maxR;
+        const x = cx + Math.cos(c.a) * dist, y = cy + Math.sin(c.a) * dist * 0.86;
+        const scale = (0.22 + persp * 2.3) * c.k * (Math.min(W, H) / 300);
+        const w = c.s.width * scale, h = c.s.height * scale;
+        if (x + w < -80 || x - w > W + 80 || y + h < -80 || y - h > H + 80) continue;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(c.rot + c.a * 0.35 + drift * c.spin * 12);
+        ctx.globalAlpha = clamp(rr * 4.5, 0, 1) * clamp((1.3 - rr) * 5.5, 0, 1);
+        ctx.drawImage(c.s, -w / 2, -h / 2, w, h);
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+
+      for (let i = planes.length - 1; i >= 0; i--) {
+        const p = planes[i];
+        if (!reduce) p.x += p.sp * dt;
+        if (p.x > 1.22) { planes.splice(i, 1); continue; }
+        const x = p.x * W, y = p.y * H + (p.up ? -1 : 1) * Math.sin(p.x * 3) * 8;
+        ctx.save(); ctx.translate(x, y); ctx.scale(p.sc, p.sc);
+        ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.lineWidth = 2.4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-12, 0); ctx.lineTo(-150, p.up ? 9 : -9); ctx.stroke();
+        ctx.fillStyle = 'rgba(250,252,255,.92)';
+        ctx.beginPath();
+        ctx.moveTo(13, 0); ctx.lineTo(-6, 3); ctx.lineTo(-10, 10); ctx.lineTo(-13, 9); ctx.lineTo(-11, 2);
+        ctx.lineTo(-11, -2); ctx.lineTo(-13, -9); ctx.lineTo(-10, -10); ctx.lineTo(-6, -3); ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+
+      for (let i = birds.length - 1; i >= 0; i--) {
+        const b = birds[i];
+        if (!reduce) { b.x += b.sp * dt; b.ph += dt * 7; }
+        if (b.x > 1.14 || b.x < -0.14) { birds.splice(i, 1); continue; }
+        const x = b.x * W, y = b.y * H + Math.sin(b.ph * 0.4) * 6;
+        const flap = Math.sin(b.ph) * 0.55 + 0.45;
+        ctx.save(); ctx.translate(x, y); ctx.scale(b.sc * (b.dir > 0 ? 1 : -1), b.sc);
+        ctx.strokeStyle = 'rgba(30,58,84,.6)'; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-10, -flap * 6); ctx.quadraticCurveTo(-4, 1, 0, 0);
+        ctx.quadraticCurveTo(4, 1, 10, -flap * 6); ctx.stroke();
+        ctx.restore();
+      }
+      requestAnimationFrame(draw);
+    };
+    requestAnimationFrame(draw);
+  })();
+
+  /* ============ scroll reveals ============ */
+  (() => {
+    const items = Array.from(document.querySelectorAll('.reveal'));
+    const showAll = () => items.forEach(el => el.classList.add('in'));
+    if (reduce || !('IntersectionObserver' in window)) { showAll(); return; }
+    const io = new IntersectionObserver((es) => {
+      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    items.forEach(el => io.observe(el));
+    setTimeout(showAll, 4000);
+  })();
+
+  /* ============ hero fade + rails ============ */
+  (() => {
+    const heroSticky = document.getElementById('hero-sticky');
+    const hero = document.getElementById('hero');
+    const rails = Array.from(document.querySelectorAll('.rail'));
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(() => {
+        const h = hero.offsetHeight || window.innerHeight;
+        const k = clamp(window.scrollY / (h * 0.85), 0, 1);
+        heroSticky.style.opacity = String(1 - k);
+        heroSticky.style.transform = 'scale(' + (1 - k * 0.04).toFixed(4) + ')';
+        rails.forEach(r => r.classList.toggle('on', window.scrollY > h * 0.6));
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  /* ============ el toque ============ */
+  (() => {
+    const sec = document.getElementById('el-toque');
+    const fan = document.getElementById('tap-fan');
+    const card = document.getElementById('tap-card');
+    const phone = document.getElementById('tap-phone');
+    const glow = document.getElementById('tap-glow');
+    const core = document.getElementById('tap-core');
+    const rings = Array.from(document.querySelectorAll('#tap-field i'));
+    const screens = ['tap-s1', 'tap-s2', 'tap-s3'].map(id => document.getElementById(id));
+    const eyebrow = document.getElementById('tap-eyebrow');
+    const title = document.getElementById('tap-title');
+    const lead = document.getElementById('tap-lead');
+    const copy = document.getElementById('tap-copy');
+    const note = document.getElementById('tap-note');
+    const COPY = [
+      ['el toque', 'un gesto que abre tu negocio.', 'baja para acercar el celular a la tarjeta.'],
+      ['contacto', 'el chip responde en menos de un segundo.', 'sin apps, sin qr, con la pantalla bloqueada.'],
+      ['tu catálogo', PRODUCTS.length + ' piezas, un solo gesto.', 'cada una lleva el chip a un sitio distinto de tu negocio.']
+    ];
+    const tiles = PRODUCTS.map((p, i) => {
+      const el = document.createElement('figure');
+      el.className = 'tap-tile'; el.style.margin = '0';
+      el.setAttribute('role', 'link'); el.setAttribute('tabindex', '0'); el.setAttribute('aria-label', p.label);
+      el.innerHTML = '<img src="' + p.img + '" alt="' + p.productName + '" loading="lazy"><figcaption>' + p.label + '</figcaption>';
+      el.addEventListener('click', () => window.__goProduct(i));
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.__goProduct(i); } });
+      fan.appendChild(el);
+      return el;
+    });
+    let phase = -1;
+    const draw = (ms) => {
+      const rect = sec.getBoundingClientRect();
+      const span = sec.offsetHeight - window.innerHeight;
+      const p = clamp(-rect.top / (span || 1), 0, 1);
+      const approach = ease(clamp(p / 0.30, 0, 1));
+      const contact = clamp((p - 0.30) / 0.14, 0, 1);
+      const open = ease(clamp((p - 0.44) / 0.46, 0, 1));
+
+      phone.style.transform = 'translateY(' + (-186 + approach * 156).toFixed(1) + 'px) scale(' + (0.9 + approach * 0.1).toFixed(3) + ')';
+      card.style.transform = 'rotateX(52deg) rotateZ(-14deg) scale(' + (1 + contact * 0.04 - open * 0.10).toFixed(3) + ')';
+      card.style.setProperty('--glint', String(contact));
+      glow.style.opacity = (contact * 0.9).toFixed(2);
+      core.style.transform = 'scale(' + (1 - open * 0.16).toFixed(3) + ')';
+      core.style.opacity = (1 - open * 0.25).toFixed(2);
+      copy.style.opacity = (1 - ease(clamp(open / 0.45, 0, 1))).toFixed(3);
+
+      const next = p < 0.30 ? 0 : (p < 0.50 ? 1 : 2);
+      if (next !== phase) {
+        phase = next;
+        screens.forEach((s, i) => s.classList.toggle('on', i === next));
+        eyebrow.textContent = COPY[next][0];
+        title.textContent = COPY[next][1];
+        lead.textContent = COPY[next][2];
+        note.textContent = next === 2 ? PRODUCTS.length + ' piezas · toca una para ver su ficha' : 'toca una pieza para ver su ficha';
+      }
+      const hot = contact > 0 && open < 0.35;
+      rings.forEach((r, i) => {
+        const u = ((ms / (hot ? 700 : 2000)) + i / rings.length) % 1;
+        const d = 30 + u * (hot ? 190 : 90);
+        r.style.width = d + 'px'; r.style.height = d + 'px';
+        r.style.opacity = String((hot ? 0.95 : 0.22) * (1 - u) * (1 - u) * (0.25 + contact * 0.75));
+      });
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const tile = vw < 620 ? 60 : (vw < 1000 ? 84 : 104);
+      const rx = Math.min(vw * 0.29, 390), ry = Math.min(vh * 0.29, 270);
+      const n = tiles.length;
+      for (let i = 0; i < n; i++) {
+        const local = ease(clamp((open - (i / n) * 0.30) / 0.70, 0, 1));
+        const a = (i / n) * Math.PI * 2 - Math.PI / 2 + Math.PI / n;
+        const x = Math.cos(a) * rx * local, y = Math.sin(a) * ry * local;
+        const el = tiles[i];
+        el.style.setProperty('--tile', tile + 'px');
+        el.style.opacity = local.toFixed(3);
+        el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(' + (0.4 + local * 0.6).toFixed(3) + ') rotate(' + ((1 - local) * -18).toFixed(1) + 'deg)';
+        el.style.pointerEvents = local > 0.9 ? 'auto' : 'none';
+      }
+    };
+    let visible = true;
+    if ('IntersectionObserver' in window) new IntersectionObserver((e) => { visible = e[0].isIntersecting; }, { threshold: 0 }).observe(sec);
+    const loop = (ms) => { if (visible) draw(ms); requestAnimationFrame(loop); };
+    draw(0); requestAnimationFrame(loop);
+  })();
+
+  /* ============ productos, one chapter per piece ============ */
+  (() => {
+    const sec = document.getElementById('productos');
+    const stage = document.getElementById('pr-stage');
+    const dock = document.getElementById('pr-dock');
+    const ringEls = Array.from(document.querySelectorAll('#pr-rings i'));
+    const nEl = document.getElementById('pr-n');
+    const kindEl = document.getElementById('pr-kind');
+    const titleEl = document.getElementById('pr-title');
+    const textEl = document.getElementById('pr-text');
+    const clientEl = document.getElementById('pr-client');
+    const codeEl = document.getElementById('pr-code');
+    const realEl = document.getElementById('pr-real');
+    const ctaEl = document.getElementById('pr-cta');
+    const nextEl = document.getElementById('pr-next');
+    const copyEl = document.getElementById('pr-copy');
+    const N = PRODUCTS.length;
+    const CHAPTER = 0.8;                     /* viewport heights of scroll per piece */
+    sec.style.height = (N * CHAPTER * 100 + 100) + 'vh';
+
+    /* every piece gets a plate; only the active one is opaque */
+    const shots = PRODUCTS.map((p, i) => {
+      const el = document.createElement('div');
+      el.className = 'pr-shot';
+      el.innerHTML = '<img src="' + p.img + '" alt="' + p.productName + '"' + (i ? ' loading="lazy"' : '') + '>' +
+        '<span class="tag">' + p.code + '</span>';
+      stage.insertBefore(el, stage.firstChild);
+      return el;
+    });
+
+    const dots = PRODUCTS.map((p, i) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-label', p.label);
+      b.innerHTML = '<img src="' + p.img + '" alt="" loading="lazy">';
+      b.addEventListener('click', () => go(i));
+      dock.appendChild(b);
+      return b;
+    });
+    const countEl = document.createElement('span');
+    countEl.className = 'pr-count';
+    dock.appendChild(countEl);
+
+    const go = (i) => {
+      const k = clamp(i, 0, N - 1);
+      const top = sec.offsetTop + (k + 0.5) * CHAPTER * window.innerHeight;
+      window.scrollTo({ top: top, behavior: reduce ? 'auto' : 'smooth' });
+    };
+    window.__goProduct = go;
+    nextEl.addEventListener('click', () => go(current + 1));
+
+    let current = -1;
+    const present = (i) => {
+      if (i === current) return;
+      current = i;
+      const p = PRODUCTS[i];
+      nEl.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+      kindEl.textContent = p.kind;
+      titleEl.textContent = p.headline;
+      textEl.textContent = p.benefit;
+      clientEl.textContent = 'para ' + p.client;
+      codeEl.textContent = p.code;
+      realEl.textContent = p.real ? 'cliente real · ' + p.real : '';
+      realEl.style.display = p.real ? '' : 'none';
+      ctaEl.textContent = p.cta; ctaEl.href = p.wa;
+      dots.forEach((d, j) => d.classList.toggle('on', j === i));
+      countEl.textContent = String(i + 1).padStart(2, '0') + '/' + String(N).padStart(2, '0');
+      nextEl.style.visibility = i >= N - 1 ? 'hidden' : '';
+      /* the copy re-enters with each piece so the change reads as a new chapter */
+      copyEl.animate(
+        [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }],
+        { duration: reduce ? 0 : 460, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      );
+    };
+
+    const draw = (ms) => {
+      const rect = sec.getBoundingClientRect();
+      const span = sec.offsetHeight - window.innerHeight;
+      const p = clamp(-rect.top / (span || 1), 0, 1);
+      const pos = p * N;                       /* continuous position along the run */
+      const idx = clamp(Math.floor(pos), 0, N - 1);
+      present(idx);
+
+      for (let i = 0; i < N; i++) {
+        const d = pos - i;                     /* 0 = entering, 1 = leaving */
+        const el = shots[i];
+        if (d < -0.85 || d > 1.85) { el.style.opacity = '0'; el.style.visibility = 'hidden'; continue; }
+        el.style.visibility = 'visible';
+        let o, sc, y, rot, blur;
+        if (d < 0) {                            /* still coming up from below */
+          const t = ease(clamp(d + 0.85, 0, 1) / 0.85);
+          o = t; sc = 0.86 + t * 0.14; y = (1 - t) * 60; rot = (1 - t) * 5; blur = (1 - t) * 7;
+        } else if (d <= 1) {                    /* on stage */
+          o = 1; sc = 1 - d * 0.03; y = -d * 8; rot = 0; blur = 0;
+        } else {                                /* leaving upward */
+          const t = ease(clamp(d - 1, 0, 0.85) / 0.85);
+          o = 1 - t; sc = 0.97 - t * 0.1; y = -8 - t * 70; rot = -t * 5; blur = t * 8;
+        }
+        el.style.opacity = o.toFixed(3);
+        el.style.filter = blur > 0.05 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+        el.style.transform = 'translateY(' + y.toFixed(1) + 'px) scale(' + sc.toFixed(3) + ') rotate(' + rot.toFixed(2) + 'deg)';
+        el.style.zIndex = String(100 - Math.round(Math.abs(d) * 10));
+      }
+
+      /* the NFC pulse over the active piece */
+      const local = pos - idx;
+      const hot = local < 0.35;
+      ringEls.forEach((r, i) => {
+        const u = ((ms / (hot ? 700 : 1800)) + i / ringEls.length) % 1;
+        const d = 26 + u * (hot ? 150 : 84);
+        r.style.width = d + 'px'; r.style.height = d + 'px';
+        r.style.opacity = String((hot ? 0.9 : 0.28) * (1 - u) * (1 - u));
+      });
+    };
+    let visible = true;
+    if ('IntersectionObserver' in window) new IntersectionObserver((e) => { visible = e[0].isIntersecting; }, { threshold: 0 }).observe(sec);
+    const loop = (ms) => { if (visible) draw(ms); requestAnimationFrame(loop); };
+    draw(0); requestAnimationFrame(loop);
+
+    /* the left rail jumps straight to a chapter */
+    document.querySelectorAll('.rail-left a[data-i]').forEach(a => {
+      a.addEventListener('click', (e) => { e.preventDefault(); go(Number(a.dataset.i)); });
+    });
+    let liveTick = 0;
+    setInterval(() => {
+      if (current === liveTick) return;
+      liveTick = current;
+      document.querySelectorAll('.rail-left a[data-i]').forEach(a => a.classList.toggle('is-live', Number(a.dataset.i) === current));
+    }, 200);
+  })();
+})();
+</script>

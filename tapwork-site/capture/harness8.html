@@ -1,0 +1,3428 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Pinyon+Script&display=swap">
+<style>
+html,body{margin:0;background:#0b0f0e;}
+
+  body { margin: 0; font-family: "Archivo", system-ui, sans-serif; }
+  .tw-pill { font-family: inherit; font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: background 160ms, color 160ms, border-color 160ms; }
+  .tw-pill[aria-pressed="false"] { background: transparent; color: #eaf3f0; border: 1px solid rgba(255,255,255,.24); }
+  .tw-pill[aria-pressed="false"]:hover { background: rgba(255,255,255,.1); }
+  .tw-pill[aria-pressed="true"] { background: #f3f2f2; color: #075044; border: 1px solid transparent; }
+  .tw-cta { font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; padding: 15px 24px; border-radius: 999px; background: #f3f2f2; color: #075044; border: none; cursor: pointer; transition: transform 160ms, box-shadow 160ms; }
+  .tw-cta:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -10px rgba(0,0,0,.45); }
+  .tw-cta-outline { font-family: inherit; text-decoration: none; font-size: 15px; font-weight: 700; color: #f3f2f2; padding: 15px 22px; border-radius: 999px; border: 1px solid rgba(255,255,255,.28); transition: background 160ms; }
+  .tw-cta-outline:hover { background: rgba(255,255,255,.08); }
+  @keyframes twPulse { 0% { transform: scale(.6); opacity: .8; } 100% { transform: scale(2); opacity: 0; } }
+  .tw-pulse { animation: twPulse 2.2s ease-out infinite; }
+  @keyframes twFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .tw-fade { animation: twFadeIn 420ms cubic-bezier(.2,.7,.2,1); }
+  @media (prefers-reduced-motion: reduce) { .tw-pulse { animation: none; opacity: .25; } .tw-fade { animation: none; } }
+
+  /* ---- Tarjeta de presentación NFC (ported verbatim from tarjeta-nfc.html's stage; the
+     narration column was dropped, only the physical card + phone scene is embedded) ---- */
+  #tw-tarjeta-stage, #tw-tarjeta-stage * { box-sizing: border-box; }
+  .tj-stagebox { container-type: size; width: 430px; height: 513px; flex: none; }
+  .tj-stage { position: relative; width: 600px; height: 716px; perspective: 1500px; overflow: hidden; transform-origin: top left; transform: scale(calc(100cqh / 716px)); }
+  .tj-desk { position: absolute; inset: 0; background: radial-gradient(120% 80% at 30% 30%, #fbfbfb 0%, #ececea 55%, #dedbd8 100%); }
+  .tj-desk::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: #ec3013; }
+  .tj-cardwrap { position: absolute; left: 6px; bottom: 58px; width: 344px; height: 217px; z-index: 3; transform-style: preserve-3d; transform: rotateX(26deg) rotateZ(-8deg); transition: transform 1.25s cubic-bezier(.4,0,.2,1); }
+  #tw-tarjeta-stage[data-state="lectura"] .tj-cardwrap { transform: translate(236px,-306px) rotateX(15deg) rotateZ(-5deg); }
+  #tw-tarjeta-stage[data-state="web"] .tj-cardwrap, #tw-tarjeta-stage[data-state="guardar"] .tj-cardwrap { transform: rotateX(30deg) rotateZ(-10deg) translateY(12px); }
+  .tj-biz { position: absolute; inset: 0; background: linear-gradient(140deg,#232326 0%,#101012 46%,#1c1c1f 100%); box-shadow: 0 34px 46px -18px rgba(20,18,16,.55); overflow: hidden; }
+  .tj-biz::before { content: ""; position: absolute; left: -6%; top: -30%; width: 34%; height: 170%; background: linear-gradient(100deg,rgba(217,182,103,0),rgba(217,182,103,.13),rgba(217,182,103,0)); transform: rotate(18deg); }
+  .tj-biz .tj-nfcmark { position: absolute; left: 20px; top: 18px; display: flex; flex-direction: column; align-items: center; gap: 3px; color: #cbb27a; font-family: "Archivo", sans-serif; font-size: 9px; letter-spacing: .14em; z-index: 2; }
+  .tj-biz .tj-tel { position: absolute; left: 22px; bottom: 18px; display: flex; align-items: center; gap: 9px; z-index: 2; font-family: "Archivo", sans-serif; font-size: 12px; letter-spacing: .08em; color: rgba(236,226,201,.86); }
+  .tj-biz .tj-tel u { width: 17px; height: 17px; border: 1px solid rgba(203,178,122,.75); border-radius: 50%; display: grid; place-items: center; text-decoration: none; }
+  .tj-biz .tj-row { position: absolute; inset: 52px 18px 46px 20px; display: flex; align-items: center; gap: 14px; }
+  .tj-biz .tj-mono { flex: none; font-family: "Cormorant Garamond", serif; font-size: 64px; line-height: .78; background: linear-gradient(160deg,#f0dca6,#b8933f 60%,#8d6d27); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -.06em; }
+  .tj-biz .tj-divider { flex: none; align-self: stretch; width: 1px; background: rgba(224,206,160,.42); }
+  .tj-biz .tj-idblock { flex: 1 1 auto; min-width: 0; }
+  .tj-biz .tj-name { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 26px; line-height: 1; white-space: nowrap; background: linear-gradient(160deg,#f4e3b4,#c6a250); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tj-biz .tj-role { margin-top: 7px; font-family: "Archivo", sans-serif; font-size: 8px; letter-spacing: .22em; color: rgba(233,222,196,.72); white-space: nowrap; }
+  .tj-biz .tj-qrcol { flex: none; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .tj-biz .tj-qr { width: 60px; height: 60px; background: #fff; padding: 5px; }
+  .tj-biz .tj-qr svg { display: block; width: 100%; height: 100%; }
+  .tj-biz .tj-qrcap { font-family: "Archivo", sans-serif; font-size: 5.5px; letter-spacing: .12em; color: rgba(226,214,186,.6); text-align: center; }
+  .tj-glint { position: absolute; inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: screen; background: linear-gradient(112deg,rgba(255,255,255,0) 38%,rgba(255,240,205,.5) 50%,rgba(255,255,255,0) 62%); transition: opacity .4s ease; }
+  #tw-tarjeta-stage[data-state="lectura"] .tj-glint { opacity: 1; }
+  .tj-field { position: absolute; left: 48px; bottom: 244px; width: 0; height: 0; pointer-events: none; z-index: 8; transition: left 1.25s cubic-bezier(.4,0,.2,1), bottom 1.25s cubic-bezier(.4,0,.2,1); }
+  #tw-tarjeta-stage[data-state="lectura"] .tj-field { left: 302px; bottom: 566px; }
+  .tj-field i { position: absolute; left: 0; top: 0; border: 2.5px solid #ec3013; border-radius: 50%; transform: translate(-50%,-50%) rotateX(26deg) rotateZ(-8deg); opacity: 0; }
+  .tj-pin { position: absolute; left: 34px; bottom: 292px; z-index: 5; display: flex; align-items: center; transform: translate(0,0); opacity: 1; transition: opacity .45s ease; pointer-events: none; }
+  #tw-tarjeta-stage:not([data-state="acerca"]) .tj-pin { opacity: 0; }
+  .tj-pin span { background: #201e1d; color: #fff; font-family: "Archivo", sans-serif; font-weight: 700; font-size: 10px; letter-spacing: .14em; padding: 5px 9px; white-space: nowrap; }
+  .tj-pin b { width: 26px; height: 2px; background: #201e1d; display: block; order: -1; }
+  .tj-device { position: absolute; left: 290px; top: 48px; width: 296px; height: 606px; background: #131211; border-radius: 40px; padding: 10px; box-shadow: 0 40px 60px -22px rgba(20,18,16,.6); transition: transform 1.25s cubic-bezier(.4,0,.2,1); z-index: 6; transform: translate(26px,44px) rotate(7deg) scale(.86); }
+  #tw-tarjeta-stage[data-state="lectura"] .tj-device { transform: translate(0,26px) rotate(-3deg) scale(.9); }
+  #tw-tarjeta-stage[data-state="web"] .tj-device, #tw-tarjeta-stage[data-state="guardar"] .tj-device { transform: translate(0,0) rotate(0deg) scale(1); }
+  .tj-device::after { content: ""; position: absolute; inset: 3px; border-radius: 38px; border: 1px solid rgba(255,255,255,.10); pointer-events: none; }
+  .tj-screen { position: relative; width: 100%; height: 100%; border-radius: 31px; overflow: hidden; background: #0b0b0d; }
+  .tj-island { position: absolute; left: 50%; top: 11px; transform: translateX(-50%); width: 86px; height: 23px; background: #000; border-radius: 12px; z-index: 9; }
+  .tj-home { position: absolute; left: 50%; bottom: 7px; transform: translateX(-50%); width: 98px; height: 4px; border-radius: 3px; background: rgba(255,255,255,.5); z-index: 9; }
+  .tj-home.tj-dark { background: rgba(20,19,18,.32); }
+  .tj-bar { position: absolute; left: 0; right: 0; top: 0; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; font-size: 12px; font-weight: 600; z-index: 8; font-family: "Archivo", sans-serif; letter-spacing: .02em; }
+  .tj-bar .tj-r { display: flex; align-items: center; gap: 6px; }
+  .tj-bar em { font-style: normal; font-size: 9px; letter-spacing: .14em; }
+  .tj-bar s { width: 20px; height: 10px; border: 1.5px solid currentColor; border-radius: 3px; position: relative; text-decoration: none; display: block; opacity: .9; }
+  .tj-bar s::after { content: ""; position: absolute; inset: 1.5px; right: 6px; background: currentColor; }
+  .tj-view { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+  .tj-view.tj-on { opacity: 1; }
+  #tw-tarjeta-v-lock { background: linear-gradient(180deg,#1b1a1d,#0c0c0e 62%,#08080a); color: #fff; }
+  #tw-tarjeta-v-lock .tj-clock { position: absolute; left: 0; right: 0; top: 112px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  #tw-tarjeta-v-lock .tj-clock b { display: block; font-family: "Archivo", sans-serif; font-size: 64px; line-height: 1; margin: 0; font-weight: 700; }
+  #tw-tarjeta-v-lock .tj-clock span { display: block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.6); margin: 0; }
+  #tw-tarjeta-v-lock .tj-hint { position: absolute; left: 18px; right: 18px; bottom: 64px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); padding: 12px 14px; display: flex; gap: 11px; align-items: center; }
+  #tw-tarjeta-v-lock .tj-hint b { font-family: "Archivo", sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; display: block; }
+  #tw-tarjeta-v-lock .tj-hint p { margin: 3px 0 0; font-size: 11px; color: rgba(255,255,255,.62); }
+  #tw-tarjeta-v-nfc { background: rgba(6,6,8,.6); }
+  .tj-sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; padding: 22px 20px 28px; transform: translateY(102%); transition: transform .55s cubic-bezier(.22,1,.28,1); }
+  .tj-view.tj-on .tj-sheet { transform: none; }
+  .tj-sheet .tj-grab { width: 40px; height: 4px; background: #d8d3d0; margin: 0 auto 18px; }
+  .tj-waves { position: relative; height: 104px; margin: 0 0 16px; }
+  .tj-waves i { position: absolute; left: 50%; top: 50%; border: 3px solid #ec3013; border-radius: 50%; transform: translate(-50%,-50%); opacity: 0; }
+  .tj-waves u { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 34px; height: 34px; background: #201e1d; border-radius: 50%; display: grid; place-items: center; color: #fff; font-family: "Archivo", sans-serif; font-size: 9px; letter-spacing: .06em; font-weight: 700; }
+  .tj-sheet h2 { font-family: "Archivo", sans-serif; font-size: 20px; margin: 0 0 5px; text-align: center; }
+  .tj-sheet p { margin: 0 0 18px; font-size: 12px; color: #6f6a67; text-align: center; }
+  .tj-prog { height: 4px; background: #eae6e4; overflow: hidden; }
+  .tj-prog i { display: block; height: 100%; width: 0; background: #ec3013; }
+  #tw-tarjeta-v-web { background: #fff; overflow: hidden; }
+  .tj-site-hero { position: relative; height: 238px; background: linear-gradient(150deg,#232326,#0e0e10 60%,#1a1a1d); padding: 58px 22px 0; color: #fff; }
+  .tj-site-hero::before { content: ""; position: absolute; left: -10%; top: -40%; width: 52%; height: 190%; background: linear-gradient(100deg,rgba(217,182,103,0),rgba(217,182,103,.30),rgba(217,182,103,0)); transform: rotate(18deg); }
+  .tj-site-hero .tj-m { position: relative; font-family: "Cormorant Garamond", serif; font-size: 52px; line-height: .8; background: linear-gradient(160deg,#f0dca6,#b8933f); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -.05em; margin: 0 0 14px; }
+  .tj-site-hero h2 { position: relative; font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 600; font-size: 32px; line-height: 1; margin: 0 0 8px; }
+  .tj-site-hero .tj-role { position: relative; font-family: "Archivo", sans-serif; font-size: 9px; letter-spacing: .26em; color: rgba(233,222,196,.72); }
+  .tj-site-hero .tj-url { position: absolute; right: 20px; top: 56px; font-family: "Archivo", sans-serif; font-size: 9px; letter-spacing: .12em; color: rgba(226,214,186,.6); }
+  .tj-site-body { padding: 16px 22px 0; }
+  .tj-sec { font-family: "Archivo", sans-serif; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #8d8580; margin: 0 0 8px; }
+  .tj-srv { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 2px solid #e2ded9; opacity: 0; transform: translateY(7px); transition: opacity .38s ease, transform .38s ease; }
+  .tj-srv.tj-in { opacity: 1; transform: none; }
+  .tj-srv b { font-family: "Archivo", sans-serif; font-size: 14px; }
+  .tj-srv span { font-family: "Archivo", sans-serif; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #8d8580; }
+  .tj-quote { background: #ec3013; color: #fff; padding: 12px 14px; margin: 14px 0 0; }
+  .tj-quote b { display: block; font-family: "Archivo", sans-serif; font-size: 8px; letter-spacing: .16em; opacity: .85; margin-bottom: 3px; }
+  .tj-quote span { font-family: "Archivo", sans-serif; font-size: 14px; font-weight: 700; }
+  .tj-cta { position: absolute; left: 20px; right: 20px; bottom: 26px; background: #201e1d; color: #fff; font-family: "Archivo", sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; padding: 14px 15px; display: flex; justify-content: space-between; align-items: center; }
+  .tj-cta.tj-accent { background: #ec3013; }
+  .tj-cta i { font-style: normal; opacity: .8; }
+  #tw-tarjeta-v-save { background: #fff; }
+  .tj-navbar { display: flex; align-items: center; gap: 10px; padding: 56px 20px 12px; font-family: "Archivo", sans-serif; font-weight: 700; font-size: 14px; }
+  .tj-navbar u { width: 9px; height: 9px; border-left: 2px solid #201e1d; border-bottom: 2px solid #201e1d; transform: rotate(45deg); display: block; }
+  .tj-vcard { margin: 0 20px; border: 2px solid #e2ded9; }
+  .tj-vcard .tj-top { display: flex; gap: 14px; align-items: center; padding: 16px; }
+  .tj-vcard .tj-av { width: 56px; height: 56px; flex: none; background: #0e0e10; display: grid; place-items: center; font-family: "Cormorant Garamond", serif; font-size: 26px; letter-spacing: -.05em; background-image: linear-gradient(150deg,#232326,#0e0e10); color: #d9b667; }
+  .tj-vcard .tj-top b { display: block; font-family: "Archivo", sans-serif; font-size: 18px; line-height: 1.1; white-space: nowrap; }
+  .tj-vcard .tj-top span { display: block; font-size: 11px; color: #6f6a67; margin-top: 3px; }
+  .tj-vrow { display: flex; justify-content: space-between; gap: 10px; padding: 11px 16px; border-top: 2px solid #e2ded9; font-size: 12px; }
+  .tj-vrow b { font-family: "Archivo", sans-serif; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #8d8580; }
+  .tj-pair { display: flex; gap: 9px; position: absolute; left: 20px; right: 20px; bottom: 26px; }
+  .tj-pair .tj-cta { position: static; flex: 1; }
+  @media (prefers-reduced-motion: reduce) { #tw-tarjeta-stage .tj-view, #tw-tarjeta-stage .tj-srv, #tw-tarjeta-stage .tj-sheet, #tw-tarjeta-stage .tj-device, #tw-tarjeta-stage .tj-cardwrap { transition: none; } }
+
+</style>
+</head>
+<body>
+<div id="badge-wrap" style="position:relative;width:600px;height:700px;">
+<div style="{{ lab.tarjetaStageStyle }}">
+          <div class="tj-stagebox">
+            <div class="tj-stage" id="tw-tarjeta-stage" data-state="acerca">
+              <div class="tj-desk"></div>
+
+              <div class="tj-cardwrap">
+                <div class="tj-biz">
+                  <div class="tj-nfcmark">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                      <path d="M6 8.5a9 9 0 0 1 0 7"></path><path d="M10 6.5a13 13 0 0 1 0 11"></path><path d="M14 4.5a17 17 0 0 1 0 15"></path>
+                    </svg>
+                    NFC
+                  </div>
+                  <div class="tj-row">
+                    <div class="tj-mono">TS</div>
+                    <div class="tj-divider"></div>
+                    <div class="tj-idblock">
+                      <div class="tj-name">Tania Sanchez</div>
+                      <div class="tj-role">ASESORA DE SEGURO</div>
+                    </div>
+                    <div class="tj-qrcol">
+                      <div class="tj-qr">
+                        <svg viewBox="0 0 21 21" shape-rendering="crispEdges">
+                          <rect width="21" height="21" fill="#fff"></rect>
+                          <g fill="#111">
+                            <path d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0z"></path>
+                          </g>
+                          <g fill="#fff">
+                            <path d="M1 1h5v5H1zM15 1h5v5h-5zM1 15h5v5H1z"></path>
+                          </g>
+                          <g fill="#111">
+                            <path d="M2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2z"></path>
+                            <path d="M9 0h1v1H9zM11 0h1v2h-1zM8 2h2v1H8zM12 3h1v1h-1zM9 4h1v1H9zM10 5h2v1h-2zM8 6h1v1H8z"></path>
+                            <path d="M0 9h1v1H0zM2 9h2v1H2zM5 9h1v2H5zM1 11h2v1H1zM4 12h1v1H4zM0 12h2v1H0zM6 10h1v1H6z"></path>
+                            <path d="M9 8h1v1H9zM11 8h2v1h-2zM8 9h1v2H8zM10 10h1v1h-1zM12 10h1v2h-1zM9 12h2v1H9zM13 9h1v1h-1z"></path>
+                            <path d="M15 8h1v1h-1zM17 8h1v2h-1zM19 8h2v1h-2zM15 10h2v1h-2zM18 11h1v1h-1zM20 10h1v2h-1zM16 12h2v1h-2z"></path>
+                            <path d="M9 14h1v2H9zM11 14h1v1h-1zM8 16h2v1H8zM12 16h1v2h-1zM9 18h1v1H9zM11 19h2v1h-2zM8 19h1v1H8z"></path>
+                            <path d="M14 14h1v1h-1zM16 14h2v1h-2zM19 14h1v2h-1zM14 16h2v1h-2zM17 16h1v2h-1zM15 18h2v1h-2zM19 18h2v1h-2zM14 19h1v2h-1z"></path>
+                          </g>
+                        </svg>
+                      </div>
+                      <div class="tj-qrcap">ESCANEA Y CONECTATE</div>
+                    </div>
+                  </div>
+                  <div class="tj-tel">
+                    <u>
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#cbb27a" stroke-width="2.4" stroke-linecap="round">
+                        <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1.1 1A16 16 0 0 1 4 5.1 1 1 0 0 1 5 4z"></path>
+                      </svg>
+                    </u>
+                    0999612533
+                  </div>
+                  <div class="tj-glint"></div>
+                </div>
+              </div>
+
+              <div class="tj-field" id="tw-tarjeta-field"><i></i><i></i><i></i></div>
+              <div class="tj-pin"><span>CHIP NFC EN LA TARJETA</span><b></b></div>
+
+              <div class="tj-device">
+                <div class="tj-screen">
+                  <div class="tj-island"></div>
+
+                  <div class="tj-view tj-on" id="tw-tarjeta-v-lock">
+                    <div class="tj-bar" style="color:#fff"><span class="tj-t">7:42</span><span class="tj-r"><em>NFC</em><s></s></span></div>
+                    <div class="tj-clock"><b id="tw-tarjeta-clock">7:42</b><span id="tw-tarjeta-date">martes 1 de septiembre</span></div>
+                    <div class="tj-hint">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+                        <path d="M5 8.5a9 9 0 0 1 0 7"></path><path d="M9 6.5a13 13 0 0 1 0 11"></path><rect x="13" y="4" width="7" height="16" rx="2"></rect>
+                      </svg>
+                      <div><b>NFC activado</b><p>Acerca el celular a la tarjeta</p></div>
+                    </div>
+                    <div class="tj-home"></div>
+                  </div>
+
+                  <div class="tj-view" id="tw-tarjeta-v-nfc">
+                    <div class="tj-bar" style="color:#fff"><span class="tj-t">7:42</span><span class="tj-r"><em>NFC</em><s></s></span></div>
+                    <div class="tj-sheet">
+                      <div class="tj-grab"></div>
+                      <div class="tj-waves" id="tw-tarjeta-waves"><i></i><i></i><i></i><u>NFC</u></div>
+                      <h2>Tarjeta detectada</h2>
+                      <p>Abriendo taniasanchez.com…</p>
+                      <div class="tj-prog"><i id="tw-tarjeta-prog"></i></div>
+                    </div>
+                  </div>
+
+                  <div class="tj-view" id="tw-tarjeta-v-web">
+                    <div class="tj-bar" style="color:#fff"><span class="tj-t">7:42</span><span class="tj-r"><em>NFC</em><s></s></span></div>
+                    <div class="tj-site-hero">
+                      <span class="tj-url">TANIASANCHEZ.COM</span>
+                      <p class="tj-m">TS</p>
+                      <h2>Tania Sanchez</h2>
+                      <p class="tj-role">ASESORA DE SEGURO</p>
+                    </div>
+                    <div class="tj-site-body">
+                      <p class="tj-sec">En qué te acompaño</p>
+                      <div class="tj-srv"><b>Seguro de vida</b><span>Familiar</span></div>
+                      <div class="tj-srv"><b>Salud y medicina</b><span>Individual</span></div>
+                      <div class="tj-srv"><b>Vehículos</b><span>Todo riesgo</span></div>
+                      <div class="tj-srv"><b>Asesoría sin costo</b><span>15 min</span></div>
+                      <div class="tj-quote"><b>RESPUESTA HOY MISMO</b><span>WhatsApp 099 961 2533</span></div>
+                    </div>
+                    <div class="tj-cta">Agendar asesoría <i>→</i></div>
+                    <div class="tj-home tj-dark"></div>
+                  </div>
+
+                  <div class="tj-view" id="tw-tarjeta-v-save">
+                    <div class="tj-bar" style="color:#201e1d"><span class="tj-t">7:42</span><span class="tj-r"><em>NFC</em><s></s></span></div>
+                    <div class="tj-navbar"><u></u> Guardar contacto</div>
+                    <div class="tj-vcard">
+                      <div class="tj-top">
+                        <div class="tj-av">TS</div>
+                        <div><b>Tania Sánchez</b><span>Asesora de seguro</span></div>
+                      </div>
+                      <div class="tj-vrow"><b>Móvil</b><span>099 961 2533</span></div>
+                      <div class="tj-vrow"><b>Sitio</b><span>taniasanchez.com</span></div>
+                      <div class="tj-vrow"><b>Correo</b><span>hola@taniasanchez.com</span></div>
+                      <div class="tj-vrow"><b>Ciudad</b><span>Guayaquil</span></div>
+                    </div>
+                    <div class="tj-pair">
+                      <div class="tj-cta tj-accent">Guardar</div>
+                      <div class="tj-cta">WhatsApp</div>
+                    </div>
+                    <div class="tj-home tj-dark"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <img id="tw-tarjeta-fallback" src="hero-product.webp" alt="Tarjeta de presentación NFC" style="display:none;width:420px;height:auto;">
+        </div>
+        
+</div>
+<div id="status" style="position:fixed;top:0;left:0;color:red;font:14px monospace;background:#fff;">loading</div>
+<script>
+window.__mounted = false;
+try {
+  class DCLogic { constructor(){} setState(){} }
+  window.DCLogic = DCLogic;
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { selected: 0, mx: 0, my: 0 };
+  }
+  componentDidMount() {
+    this._onMove = (e) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      this.setState({ mx: nx, my: ny });
+    };
+    window.addEventListener("mousemove", this._onMove);
+    if (this._isBadgeSelected === undefined) this._isBadgeSelected = false;
+    if (this._isReviewSelected === undefined) this._isReviewSelected = false;
+    if (this._isMenuSelected === undefined) this._isMenuSelected = false;
+    if (this._isWifiSelected === undefined) this._isWifiSelected = false;
+    if (this._isGymSelected === undefined) this._isGymSelected = false;
+    if (this._isPagoSelected === undefined) this._isPagoSelected = false;
+    if (this._isStickerSelected === undefined) this._isStickerSelected = false;
+    if (this._isTarjetaSelected === undefined) this._isTarjetaSelected = false;
+    this._initThreeScene();
+    this._initResenasScene();
+    this._initMenuScene();
+    this._initWifiScene();
+    this._initGymScene();
+    this._initPagoScene();
+    this._initStickerScene();
+    this._initTarjetaScene();
+  }
+  _initThreeScene() {
+    const canvas = document.getElementById("tw-asistencia-canvas");
+    const fallback = document.getElementById("tw-asistencia-fallback");
+    if (!canvas) return;
+    let attempts = 0;
+    const tryInit = () => {
+      if (typeof THREE === "undefined") {
+        attempts++;
+        if (attempts > 40) {
+          console.error("[tw-asistencia] THREE never loaded from the CDN after ~6s — falling back to the static image.");
+          if (fallback) fallback.style.display = "block";
+          canvas.style.display = "none";
+          return;
+        }
+        this._threeRetryTimer = setTimeout(tryInit, 150);
+        return;
+      }
+      try {
+        this._buildThreeScene(canvas, fallback);
+      } catch (err) {
+        console.error("[tw-asistencia] scene build failed, falling back to the static image:", err);
+        if (fallback) fallback.style.display = "block";
+        canvas.style.display = "none";
+      }
+    };
+    tryInit();
+  }
+  _buildThreeScene(canvas, fallback) {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(440, 441.4, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 440 / 441.4, 0.01, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
+    fill.position.set(-5, 3, -4);
+    scene.add(fill);
+
+    // ---- helpers (ported verbatim from the design handoff's badge-model.js / asistencia.html) ----
+    function roundedRect(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function plate(w, h, r, d, mat, name, bevel) {
+      const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+        ? { depth: d, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 }
+        : { depth: d, bevelEnabled: false, curveSegments: 24 });
+      g.center();
+      const m = new THREE.Mesh(g, mat); m.name = name; return m;
+    }
+    function screenCanvas(w, h) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+      return { c, ctx: c.getContext("2d"), tex };
+    }
+
+    function buildBadge() {
+      const M = {
+        rubber: new THREE.MeshStandardMaterial({ name: "rubber_black", color: 0x1b1a1a, roughness: 0.82, metalness: 0.05 }),
+        webbing: new THREE.MeshStandardMaterial({ name: "webbing_black", color: 0x131313, roughness: 0.95, metalness: 0.0 }),
+        plastic: new THREE.MeshStandardMaterial({ name: "plastic_white", color: 0xe9e8e6, roughness: 0.45, metalness: 0.05 }),
+        printRed: new THREE.MeshStandardMaterial({ name: "print_red", color: 0xec3013, roughness: 0.35, metalness: 0.05 }),
+        printDark: new THREE.MeshStandardMaterial({ name: "print_dark", color: 0x201e1d, roughness: 0.4, metalness: 0.05 }),
+        printWhite: new THREE.MeshStandardMaterial({ name: "print_white", color: 0xf3f2f2, roughness: 0.4, metalness: 0.02 }),
+      };
+      const model = new THREE.Group();
+      model.name = "badge_holder";
+      const CW = 0.062, CH = 0.092, FW = 0.080, FH = 0.110, FD = 0.007;
+      const frameShape = roundedRect(FW, FH, 0.010);
+      frameShape.holes.push(roundedRect(CW + 0.013, CH + 0.013, 0.008));
+      const frameGeo = new THREE.ExtrudeGeometry(frameShape, {
+        depth: FD, bevelEnabled: true, bevelThickness: 0.0018, bevelSize: 0.0018, bevelSegments: 4, curveSegments: 24
+      });
+      frameGeo.center();
+      const frame = new THREE.Mesh(frameGeo, M.rubber); frame.name = "frame_rubber"; model.add(frame);
+      const back = plate(FW - 0.006, FH - 0.006, 0.008, 0.0018, M.rubber, "back_panel");
+      back.position.z = -FD / 2 + 0.0009; model.add(back);
+      const insert = plate(CW + 0.012, CH + 0.012, 0.007, 0.0014, M.plastic, "insert_white");
+      insert.position.z = 0.0002; model.add(insert);
+      const card = plate(CW, CH, 0.003, 0.0008, M.printRed, "card_print");
+      card.position.z = 0.0016; model.add(card);
+      const darkField = plate(CW - 0.001, CH * 0.46, 0.002, 0.0006, M.printDark, "card_field_dark");
+      darkField.position.set(0, -CH / 2 + CH * 0.23 + 0.0005, 0.0023); model.add(darkField);
+      const sweep = new THREE.Shape();
+      sweep.moveTo(-CW / 2, CH * 0.16); sweep.lineTo(CW / 2, CH * 0.40);
+      sweep.lineTo(CW / 2, CH * 0.48); sweep.lineTo(-CW / 2, CH * 0.24);
+      const sweepMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(sweep, { depth: 0.0005, bevelEnabled: false }), M.printDark);
+      sweepMesh.name = "card_sweep"; sweepMesh.position.z = 0.0021; model.add(sweepMesh);
+      const mark = plate(CW * 0.62, 0.0075, 0.001, 0.0005, M.printWhite, "card_wordmark");
+      mark.position.set(0, CH * 0.045, 0.0027); model.add(mark);
+      const banner = plate(CW * 0.80, 0.0115, 0.001, 0.0006, M.printRed, "card_banner");
+      banner.position.set(0, -CH * 0.155, 0.0029); model.add(banner);
+      for (let i = 0; i < 2; i++) {
+        const line = plate(CW * (i ? 0.58 : 0.46), 0.0026, 0.0006, 0.0004, M.printWhite, "banner_line_" + (i + 1));
+        line.position.set(0, -CH * 0.155 + (i ? -0.0032 : 0.0032), 0.0033); model.add(line);
+      }
+      for (let i = 0; i < 2; i++) {
+        const line = plate(CW * (i ? 0.60 : 0.66), 0.0028, 0.0006, 0.0004, M.printWhite, "role_line_" + (i + 1));
+        line.position.set(0, -CH * 0.29 - i * 0.0055, 0.0029); model.add(line);
+      }
+      const tab = plate(0.020, 0.014, 0.004, FD - 0.001, M.rubber, "neck_tab", 0.0012);
+      tab.position.set(0, FH / 2 + 0.005, 0); model.add(tab);
+      const clip = plate(0.017, 0.016, 0.003, 0.006, M.plastic, "clip_block", 0.0008);
+      clip.position.set(0, FH / 2 + 0.012, 0.0015); model.add(clip);
+      const STRAP_W = 0.019, STRAP_T = 0.0016;
+      const loop = new THREE.Mesh(new THREE.TorusGeometry(0.010, STRAP_T, 8, 40, Math.PI), M.webbing);
+      loop.name = "strap_loop";
+      loop.scale.set(1, 1, STRAP_W / (STRAP_T * 2));
+      loop.position.set(0, FH / 2 + 0.006, 0); loop.rotation.z = Math.PI; model.add(loop);
+      function riser(x, y0, y1, name) {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(STRAP_W * 0.5, y1 - y0, STRAP_T), M.webbing);
+        m.name = name; m.position.set(x, (y0 + y1) / 2, 0); return m;
+      }
+      model.add(riser(-0.0052, FH / 2 + 0.004, FH / 2 + 0.016, "strap_riser_left"));
+      model.add(riser(0.0052, FH / 2 + 0.004, FH / 2 + 0.016, "strap_riser_right"));
+      const strapH = 0.105;
+      const strap = new THREE.Mesh(new THREE.BoxGeometry(STRAP_W, strapH, STRAP_T), M.webbing);
+      strap.name = "lanyard_strap";
+      strap.position.set(0, FH / 2 + 0.016 + strapH / 2, 0); model.add(strap);
+      const fold = new THREE.Mesh(new THREE.BoxGeometry(STRAP_W + 0.0008, 0.005, STRAP_T * 2.2), M.webbing);
+      fold.name = "strap_fold";
+      fold.position.set(0, FH / 2 + 0.016 + strapH - 0.004, 0); model.add(fold);
+      return model;
+    }
+
+    // ---- scene assembly (ported verbatim from asistencia.html) ----
+    const ACCENT = 0xec3013;
+    const two = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
+    const hhmmss = (d) => hhmm(d) + ":" + two(d.getSeconds());
+
+    const MAT = {
+      caseDark: new THREE.MeshStandardMaterial({ name: "terminal_case", color: 0x2a2827, roughness: 0.55, metalness: 0.15 }),
+      caseLight: new THREE.MeshStandardMaterial({ name: "terminal_bezel", color: 0xdedbd8, roughness: 0.5, metalness: 0.1 }),
+      accent: new THREE.MeshStandardMaterial({ name: "accent_red", color: ACCENT, roughness: 0.4, metalness: 0.05 }),
+      phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.4, metalness: 0.3 }),
+      stand: new THREE.MeshStandardMaterial({ name: "phone_stand", color: 0xc9c6c2, roughness: 0.6, metalness: 0.1 }),
+      led: new THREE.MeshStandardMaterial({ name: "led", color: 0x333030, emissive: 0x000000, roughness: 0.3 }),
+    };
+
+    const root = new THREE.Group();
+    root.name = "attendance_scene";
+
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.022, 0.20), MAT.stand);
+    plinth.name = "counter_top";
+    plinth.position.set(0.03, 0.011, 0.01);
+    root.add(plinth);
+    const plinthEdge = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.004, 0.001), MAT.accent);
+    plinthEdge.name = "counter_edge";
+    plinthEdge.position.set(0.03, 0.020, 0.1105);
+    root.add(plinthEdge);
+
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.048, 0.130, 0.048), MAT.caseDark);
+    post.name = "reader_post";
+    post.position.set(-0.08, 0.087, -0.03);
+    root.add(post);
+
+    const reader = new THREE.Group(); reader.name = "reader_terminal";
+    reader.position.set(-0.08, 0.235, -0.012);
+    reader.rotation.x = -0.22;
+    root.add(reader);
+
+    const readerBody = plate(0.135, 0.200, 0.008, 0.038, MAT.caseDark, "reader_body", 0.002);
+    readerBody.position.z = -0.019; reader.add(readerBody);
+    const bezel = plate(0.118, 0.182, 0.006, 0.004, MAT.caseLight, "reader_bezel");
+    bezel.position.z = 0.0015; reader.add(bezel);
+
+    const rs = screenCanvas(512, 320);
+    const readerScreenMat = new THREE.MeshStandardMaterial({
+      name: "reader_screen", map: rs.tex, emissiveMap: rs.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.85, roughness: 0.25, metalness: 0.0
+    });
+    const readerScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.104, 0.062), readerScreenMat);
+    readerScreen.name = "reader_screen_glass";
+    readerScreen.position.set(0, 0.052, 0.0048); reader.add(readerScreen);
+
+    const ringMat = new THREE.MeshStandardMaterial({ name: "rfid_ring", color: 0x565250, roughness: 0.5, emissive: 0x000000 });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.030, 0.0022, 12, 64), ringMat);
+    ring.name = "rfid_ring"; ring.position.set(0, -0.030, 0.004); reader.add(ring);
+    const ringInner = new THREE.Mesh(new THREE.TorusGeometry(0.019, 0.0018, 12, 48), ringMat);
+    ringInner.name = "rfid_ring_inner"; ringInner.position.set(0, -0.030, 0.004); reader.add(ringInner);
+    const ringDot = new THREE.Mesh(new THREE.CircleGeometry(0.005, 32), ringMat);
+    ringDot.name = "rfid_dot"; ringDot.position.set(0, -0.030, 0.0042); reader.add(ringDot);
+
+    const led = new THREE.Mesh(new THREE.BoxGeometry(0.060, 0.005, 0.002), MAT.led);
+    led.name = "status_led"; led.position.set(0, -0.078, 0.0045); reader.add(led);
+
+    const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig";
+    phoneRig.position.set(0.155, 0.022, 0.035);
+    root.add(phoneRig);
+
+    const standBase = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.010, 0.075), MAT.stand);
+    standBase.name = "stand_base"; standBase.position.y = 0.005; phoneRig.add(standBase);
+    const standBack = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.085, 0.010), MAT.stand);
+    standBack.name = "stand_back";
+    standBack.position.set(0, 0.048, -0.026); standBack.rotation.x = -0.28; phoneRig.add(standBack);
+
+    const phone = new THREE.Group(); phone.name = "phone";
+    phone.position.set(0, 0.088, -0.010); phone.rotation.x = -0.28;
+    phoneRig.add(phone);
+
+    const phoneBody = plate(0.074, 0.152, 0.010, 0.008, MAT.phoneBody, "phone_body", 0.0012);
+    phone.add(phoneBody);
+    const ps = screenCanvas(512, 1040);
+    const phoneScreenMat = new THREE.MeshStandardMaterial({
+      name: "phone_screen", map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.95, roughness: 0.2, metalness: 0.0
+    });
+    const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.140), phoneScreenMat);
+    phoneScreen.name = "phone_screen_glass";
+    phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+    const badge = buildBadge();
+    const badgeRig = new THREE.Group(); badgeRig.name = "badge_rig";
+    badge.position.set(0, -0.163, 0);
+    badgeRig.add(badge);
+    badgeRig.position.set(-0.08, 0.365, 0.20);
+    root.add(badgeRig);
+
+    scene.add(root);
+
+    const box = new THREE.Box3().setFromObject(root);
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    const dist = (sphere.radius / Math.tan((camera.fov * Math.PI) / 360)) * 1.35;
+    const dir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+    camera.position.copy(sphere.center).add(dir.multiplyScalar(dist));
+    camera.lookAt(sphere.center);
+
+    // ---- screen painting (verbatim colors/fonts/layout) ----
+    let markedAt = null;
+    const paintReader = (state, now) => {
+      const { ctx, c, tex } = rs;
+      ctx.fillStyle = state === "ok" ? "#12351d" : "#151313";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = state === "ok" ? "#5be08a" : "#ec3013";
+      ctx.fillRect(0, 0, c.width, 10);
+      ctx.textAlign = "center";
+      if (state === "ok") {
+        ctx.fillStyle = "#8df0ae";
+        ctx.font = "700 44px Archivo, sans-serif";
+        ctx.fillText("ENTRADA", c.width / 2, 108);
+        ctx.fillText("REGISTRADA", c.width / 2, 156);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "700 84px Archivo, sans-serif";
+        ctx.fillText(markedAt ? hhmm(markedAt) : "--:--", c.width / 2, 250);
+      } else {
+        ctx.fillStyle = "#f3f2f2";
+        ctx.font = "700 40px Archivo, sans-serif";
+        ctx.fillText("ACERQUE SU", c.width / 2, 110);
+        ctx.fillText("CREDENCIAL", c.width / 2, 158);
+        ctx.fillStyle = "#8b8785";
+        ctx.font = "600 40px Archivo, sans-serif";
+        ctx.fillText(hhmmss(now), c.width / 2, 240);
+      }
+      tex.needsUpdate = true;
+    };
+    const paintPhone = (state, now) => {
+      const { ctx, c, tex } = ps;
+      ctx.fillStyle = "#100f0f"; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = "#6d6a68";
+      ctx.font = "600 24px Archivo, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("XPRINT ASISTENCIA", 40, 70);
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#f3f2f2";
+      ctx.font = "700 132px Archivo, sans-serif";
+      ctx.fillText(hhmm(now), c.width / 2, 250);
+      ctx.fillStyle = "#8b8785";
+      ctx.font = "600 30px Archivo, sans-serif";
+      ctx.fillText(now.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" }).toUpperCase(), c.width / 2, 300);
+      ctx.strokeStyle = "#2a2827"; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(40, 360); ctx.lineTo(c.width - 40, 360); ctx.stroke();
+      if (state === "ok") {
+        ctx.fillStyle = "#ec3013"; ctx.fillRect(40, 410, c.width - 80, 250);
+        ctx.textAlign = "left"; ctx.fillStyle = "#ffffff";
+        ctx.font = "700 30px Archivo, sans-serif";
+        ctx.fillText("ASISTENCIA REGISTRADA", 68, 470);
+        ctx.font = "700 92px Archivo, sans-serif";
+        ctx.fillText(markedAt ? hhmm(markedAt) : "--:--", 68, 570);
+        ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText("ENTRADA · PUERTA 1", 68, 620);
+        ctx.textAlign = "center"; ctx.fillStyle = "#6d6a68";
+        ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText("AYUDANTE / OPERADOR A", c.width / 2, 730);
+        ctx.fillText("EQUIPO DE INSTALACIÓN", c.width / 2, 772);
+      } else {
+        ctx.textAlign = "left"; ctx.fillStyle = "#8b8785";
+        ctx.font = "600 28px Archivo, sans-serif";
+        ctx.fillText("SIN MARCAR HOY", 68, 470);
+        ctx.strokeStyle = "#2a2827"; ctx.strokeRect(40, 410, c.width - 80, 130);
+        ctx.fillStyle = "#4a4746";
+        ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("Acerque la credencial al lector", 68, 512);
+      }
+      tex.needsUpdate = true;
+    };
+
+    // ---- animation timeline (verbatim timings/easing) ----
+    const CYCLE = 8.0, T_TAP = 2.0, T_HOLD_END = 4.6, T_BACK = 6.0;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+    const START_Z = 0.19, TAP_Z = 0.062;
+    let last = "idle", lastPaint = -1;
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      const now = new Date();
+      let z = START_Z, tilt = 0, state = "idle";
+      if (t < T_TAP) {
+        const k = ease(t / T_TAP);
+        z = START_Z + (TAP_Z - START_Z) * k;
+        tilt = -0.20 * k;
+      } else if (t < T_HOLD_END) {
+        z = TAP_Z; tilt = -0.20; state = "ok";
+      } else if (t < T_BACK) {
+        const k = ease((t - T_HOLD_END) / (T_BACK - T_HOLD_END));
+        z = TAP_Z + (START_Z - TAP_Z) * k;
+        tilt = -0.20 * (1 - k);
+        state = "ok";
+      }
+      if (state === "ok" && last !== "ok") markedAt = new Date();
+      if (state !== last) { paintReader(state, now); paintPhone(state, now); last = state; }
+      const sway = Math.sin(ms / 900) * 0.02 * (t < T_TAP || t > T_BACK ? 1 : 0.25);
+      badgeRig.position.set(-0.08 + Math.sin(ms / 1400) * 0.004, 0.365, z);
+      badgeRig.rotation.set(tilt, sway, Math.sin(ms / 1100) * 0.015);
+      const lit = state === "ok";
+      MAT.led.color.setHex(lit ? 0x3ddc7a : 0x4a2018);
+      MAT.led.emissive.setHex(lit ? 0x2fbf68 : 0x6b1b0c);
+      MAT.led.emissiveIntensity = lit ? 1.4 : 0.35;
+      ringMat.emissive.setHex(lit ? 0x1e6b3c : 0x000000);
+      ringMat.emissiveIntensity = lit ? 0.9 : 0;
+      const sec = Math.floor(ms / 250);
+      if (sec !== lastPaint) {
+        lastPaint = sec;
+        if (state !== "ok") { paintReader(state, now); paintPhone(state, now); }
+      }
+    };
+    // Redundant feed so the canvas textures keep repainting even if the
+    // outer rAF loop stalls for a moment — kept per the design handoff.
+    phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
+
+    paintReader("idle", new Date());
+    paintPhone("idle", new Date());
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { paintReader(last, new Date()); paintPhone(last, new Date()); });
+    }
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame(T_TAP * 1000 + 1);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const loop = (ms) => {
+      if (this._isBadgeSelected) {
+        frame(ms);
+        renderer.render(scene, camera);
+      }
+      this._threeRafId = requestAnimationFrame(loop);
+    };
+    this._threeRafId = requestAnimationFrame(loop);
+  }
+  _initResenasScene() {
+    const canvas = document.getElementById("tw-resenas-canvas");
+    const fallback = document.getElementById("tw-resenas-fallback");
+    if (!canvas) return;
+    let attempts = 0;
+    const tryInit = () => {
+      if (typeof THREE === "undefined") {
+        attempts++;
+        if (attempts > 40) {
+          console.error("[tw-resenas] THREE never loaded from the CDN after ~6s — falling back to the static image.");
+          if (fallback) fallback.style.display = "block";
+          canvas.style.display = "none";
+          return;
+        }
+        this._resenasRetryTimer = setTimeout(tryInit, 150);
+        return;
+      }
+      try {
+        this._buildResenasScene(canvas, fallback);
+      } catch (err) {
+        console.error("[tw-resenas] scene build failed, falling back to the static image:", err);
+        if (fallback) fallback.style.display = "block";
+        canvas.style.display = "none";
+      }
+    };
+    tryInit();
+  }
+  _buildResenasScene(canvas, fallback) {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(440, 441.4, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // The phone screen in the "review" state is a near-white Google Maps
+    // card (unlike the dark screens elsewhere in this scene and in the
+    // attendance scene) — without tone mapping, its lit + emissive white
+    // clips to pure white and the text washes out. ACES rolls the
+    // highlights off smoothly instead of hard-clipping.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 440 / 441.4, 0.01, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
+    fill.position.set(-5, 3, -4);
+    scene.add(fill);
+
+    // ---- helpers (ported verbatim from the design handoff's resenas-nfc.html) ----
+    function roundedRect(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function plate(w, h, r, d, mat, name, bevel) {
+      const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+        ? { depth: d, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 }
+        : { depth: d, bevelEnabled: false, curveSegments: 24 });
+      g.center();
+      const m = new THREE.Mesh(g, mat); m.name = name; return m;
+    }
+    function screenCanvas(w, h) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+      return { c, ctx: c.getContext("2d"), tex };
+    }
+    function rr(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+    function star(ctx, cx, cy, R, fill) {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? R * 0.46 : R;
+        ctx[i ? "lineTo" : "moveTo"](cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+      }
+      ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
+    }
+
+    // ---- scene assembly (ported verbatim from resenas-nfc.html) ----
+    const G = { blue: "#4285f4", red: "#ea4335", yellow: "#fbbc05", green: "#34a853" };
+    const two = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
+
+    const MAT = {
+      cardEdge: new THREE.MeshStandardMaterial({ name: "card_edge", color: 0xf4f3f1, roughness: 0.35, metalness: 0.05 }),
+      standDark: new THREE.MeshStandardMaterial({ name: "stand_dark", color: 0x2a2827, roughness: 0.55, metalness: 0.15 }),
+      counter: new THREE.MeshStandardMaterial({ name: "counter_top", color: 0xc9c6c2, roughness: 0.6, metalness: 0.1 }),
+      accent: new THREE.MeshStandardMaterial({ name: "accent_red", color: 0xec3013, roughness: 0.4, metalness: 0.05 }),
+      phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.4, metalness: 0.3 }),
+      glass: new THREE.MeshStandardMaterial({ name: "phone_back_glass", color: 0x24221f, roughness: 0.25, metalness: 0.4 }),
+      pulse: new THREE.MeshStandardMaterial({ name: "nfc_pulse", color: 0x4285f4, emissive: 0x4285f4, emissiveIntensity: 1.2, transparent: true, opacity: 0.0, roughness: 0.3 }),
+    };
+
+    const root = new THREE.Group();
+    root.name = "nfc_review_scene";
+
+    const counter = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.020, 0.24), MAT.counter);
+    counter.name = "counter_top"; counter.position.set(0.0, 0.010, 0.02); root.add(counter);
+    const edge = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.004, 0.001), MAT.accent);
+    edge.name = "counter_edge"; edge.position.set(0.0, 0.018, 0.1405); root.add(edge);
+
+    const standBase = new THREE.Mesh(new THREE.BoxGeometry(0.105, 0.012, 0.062), MAT.standDark);
+    standBase.name = "stand_base"; standBase.position.set(-0.05, 0.026, -0.03); root.add(standBase);
+    const standSpine = new THREE.Mesh(new THREE.BoxGeometry(0.095, 0.052, 0.010), MAT.standDark);
+    standSpine.name = "stand_spine";
+    standSpine.position.set(-0.05, 0.052, -0.046); standSpine.rotation.x = -0.22; root.add(standSpine);
+
+    const CW = 0.086, CH = 0.116, CT = 0.0032;
+    const cardRig = new THREE.Group(); cardRig.name = "card_rig";
+    cardRig.position.set(-0.05, 0.093, -0.032); cardRig.rotation.x = -0.22;
+    root.add(cardRig);
+
+    const cardBody = plate(CW, CH, 0.008, CT, MAT.cardEdge, "card_body", 0.0006);
+    cardRig.add(cardBody);
+
+    const cs = screenCanvas(688, 928);
+    const cardFaceMat = new THREE.MeshStandardMaterial({
+      name: "card_print", map: cs.tex, roughness: 0.32, metalness: 0.02
+    });
+    const cardFace = new THREE.Mesh(new THREE.PlaneGeometry(CW - 0.001, CH - 0.001), cardFaceMat);
+    cardFace.name = "card_face"; cardFace.position.z = CT / 2 + 0.0008; cardRig.add(cardFace);
+
+    const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.020, 0.0016, 10, 56), MAT.pulse);
+    pulse.name = "nfc_pulse_ring";
+    pulse.position.set(0, 0.004, CT / 2 + 0.004); cardRig.add(pulse);
+
+    const FAR = new THREE.Vector3(0.115, 0.135, 0.185);
+    const NEAR = new THREE.Vector3(-0.048, 0.100, 0.028);
+
+    const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig";
+    phoneRig.position.copy(FAR);
+    root.add(phoneRig);
+    const phone = new THREE.Group(); phone.name = "phone";
+    phoneRig.add(phone);
+
+    const phoneBody = plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, "phone_body", 0.0012);
+    phone.add(phoneBody);
+    const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+    phoneBack.name = "phone_back"; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+    const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, "camera_bump", 0.0006);
+    camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+    const ps = screenCanvas(560, 1150);
+    const phoneScreenMat = new THREE.MeshStandardMaterial({
+      name: "phone_screen", map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.6, roughness: 0.45, metalness: 0.0
+    });
+    const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), phoneScreenMat);
+    phoneScreen.name = "phone_screen_glass"; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+    scene.add(root);
+
+    const box = new THREE.Box3().setFromObject(root);
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    const dist = (sphere.radius / Math.tan((camera.fov * Math.PI) / 360)) * 1.35;
+    const viewDir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+    camera.position.copy(sphere.center).add(viewDir.clone().multiplyScalar(dist));
+    camera.lookAt(sphere.center);
+
+    // Establishing shot frames the whole counter, so the phone screen (a
+    // few cm across) reads as tiny in it. Since this embed has no orbit
+    // controls for the viewer to zoom in themselves (unlike the reference
+    // three-d-stage.js), the camera dollies in on the phone during the
+    // "review" state instead — purely a function of playback time, so it
+    // stays stateless like the rest of the timeline.
+    const camEstablishPos = camera.position.clone();
+    const camEstablishTarget = sphere.center.clone();
+    const closeCenter = new THREE.Vector3(0.05, 0.155, 0.10);
+    const closeDist = (0.115 / Math.tan((camera.fov * Math.PI) / 360)) * 1.15;
+    const camClosePos = closeCenter.clone().add(viewDir.clone().multiplyScalar(closeDist));
+
+    // ---- card artwork (verbatim colors/fonts/layout) ----
+    function paintCard() {
+      const { ctx, c, tex } = cs;
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+      const band = ctx.createLinearGradient(0, 0, c.width, 0);
+      band.addColorStop(0, G.blue); band.addColorStop(0.3, G.red);
+      band.addColorStop(0.62, G.yellow); band.addColorStop(1, G.green);
+      ctx.save();
+      ctx.globalAlpha = 0.95; ctx.fillStyle = band; ctx.fillRect(0, 0, c.width, 210);
+      const fade = ctx.createLinearGradient(0, 120, 0, 230);
+      fade.addColorStop(0, "rgba(255,255,255,0)"); fade.addColorStop(1, "#ffffff");
+      ctx.fillStyle = fade; ctx.fillRect(0, 120, c.width, 115);
+      ctx.restore();
+
+      for (let i = 0; i < 5; i++) star(ctx, 172 + i * 86, 46, 27, "#f5a623");
+
+      ctx.textAlign = "center"; ctx.fillStyle = "#ffffff";
+      ctx.font = "800 44px Archivo, sans-serif";
+      ctx.fillText("¡COMPARTE TU", c.width / 2, 118);
+      ctx.fillText("EXPERIENCIA EN GOOGLE!", c.width / 2, 166);
+
+      const gx = c.width / 2, gy = 300, R = 62;
+      ctx.lineWidth = 26; ctx.lineCap = "butt";
+      const arcs = [[G.red, -0.55, 0.62], [G.yellow, 0.62, 1.9], [G.green, 1.9, 3.25], [G.blue, 3.25, 5.05]];
+      for (const [col, a0, a1] of arcs) {
+        ctx.strokeStyle = col; ctx.beginPath(); ctx.arc(gx, gy, R, a0, a1); ctx.stroke();
+      }
+      ctx.fillStyle = G.blue; ctx.fillRect(gx, gy - 13, R + 6, 26);
+      ctx.fillStyle = "#ffffff"; ctx.font = "800 96px Archivo, sans-serif";
+      ctx.fillText("G", gx - 2, gy + 36);
+
+      ctx.strokeStyle = "#141c2b"; ctx.lineWidth = 7; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.ellipse(c.width / 2 - 20, 520, 200, 108, 0, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 4; i++) {
+        ctx.lineWidth = 15 - i * 1.5;
+        ctx.beginPath(); ctx.arc(230, 520, 22 + i * 30, -0.95, 0.95); ctx.stroke();
+      }
+      ctx.lineWidth = 7;
+      rr(ctx, 372, 462, 74, 118, 12); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(372, 552); ctx.quadraticCurveTo(345, 600, 392, 616);
+      ctx.lineTo(470, 616); ctx.quadraticCurveTo(500, 610, 486, 578);
+      ctx.lineTo(452, 540); ctx.stroke();
+
+      ctx.textAlign = "center"; ctx.fillStyle = "#141c2b";
+      ctx.font = "800 40px Archivo, sans-serif";
+      ctx.fillText("ACERCA TU CELULAR", c.width / 2, 700);
+      ctx.font = "700 32px Archivo, sans-serif";
+      ctx.fillText("(NFC)", c.width / 2, 744);
+
+      ctx.fillStyle = "#3b5bd9"; ctx.font = "800 27px Archivo, sans-serif";
+      ctx.fillText("¡TU RESEÑA NOS AYUDA A CRECER!", c.width / 2, 872);
+      tex.needsUpdate = true;
+    }
+
+    // ---- phone screens (verbatim colors/fonts/layout) ----
+    function paintPhone(state, now, k) {
+      const { ctx, c, tex } = ps;
+      if (state === "review") {
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = "#5f6368"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.textAlign = "left"; ctx.fillText(hhmm(now), 28, 40);
+        ctx.textAlign = "right"; ctx.fillText("NFC", c.width - 28, 40);
+        ctx.fillStyle = "#e8eee6"; ctx.fillRect(0, 58, c.width, 200);
+        ctx.strokeStyle = "#cfd8cd"; ctx.lineWidth = 10;
+        ctx.beginPath(); ctx.moveTo(-10, 150); ctx.lineTo(c.width + 10, 118); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-10, 216); ctx.lineTo(c.width + 10, 240); ctx.stroke();
+        ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 14;
+        ctx.beginPath(); ctx.moveTo(120, 58); ctx.lineTo(180, 258); ctx.stroke();
+        ctx.fillStyle = G.red;
+        ctx.beginPath(); ctx.arc(300, 150, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(280, 162); ctx.lineTo(320, 162); ctx.lineTo(300, 196); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(300, 150, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.textAlign = "left"; ctx.fillStyle = "#202124";
+        ctx.font = "800 34px Archivo, sans-serif";
+        ctx.fillText("Xprint Soluciones", 28, 320);
+        ctx.fillText("Digitales", 28, 360);
+        ctx.fillStyle = "#5f6368"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Rotulación digital · Abierto ahora", 28, 400);
+        ctx.strokeStyle = "#e0e0e0"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(28, 436); ctx.lineTo(c.width - 28, 436); ctx.stroke();
+        ctx.fillStyle = "#202124"; ctx.font = "700 26px Archivo, sans-serif";
+        ctx.fillText("Califica tu experiencia", 28, 490);
+        const filled = Math.min(5, Math.max(1, Math.round((k || 1) * 5)));
+        for (let i = 0; i < 5; i++) star(ctx, 60 + i * 92, 570, 38, i < filled ? "#f5a623" : "#dadce0");
+        ctx.strokeStyle = "#dadce0"; ctx.lineWidth = 3;
+        rr(ctx, 28, 640, c.width - 56, 190, 16); ctx.stroke();
+        ctx.fillStyle = "#80868b"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("Comparte los detalles de tu", 52, 690);
+        ctx.fillText("experiencia en este lugar", 52, 726);
+        ctx.fillStyle = G.blue; rr(ctx, 28, 872, c.width - 56, 82, 14); ctx.fill();
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 28px Archivo, sans-serif";
+        ctx.fillText("PUBLICAR RESEÑA", 56, 922);
+        ctx.fillStyle = "#5f6368"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Se abrió desde una etiqueta NFC", 28, 1010);
+        ctx.fillStyle = "#dadce0"; rr(ctx, c.width / 2 - 90, 1100, 180, 8, 4); ctx.fill();
+      } else if (state === "reading") {
+        ctx.fillStyle = "#0d0f14"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.textAlign = "center"; ctx.fillStyle = "#ffffff";
+        ctx.font = "700 30px Archivo, sans-serif";
+        ctx.fillText("NFC", c.width / 2, 460);
+        ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillStyle = "#9aa0a6";
+        ctx.fillText("Leyendo etiqueta…", c.width / 2, 620);
+        ctx.strokeStyle = G.blue; ctx.lineWidth = 8;
+        const r = 90 + Math.sin((k || 0) * Math.PI * 4) * 14;
+        ctx.beginPath(); ctx.arc(c.width / 2, 540, r, 0, Math.PI * 2); ctx.stroke();
+      } else {
+        ctx.fillStyle = "#0d0f14"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.textAlign = "center"; ctx.fillStyle = "#f3f2f2";
+        ctx.font = "700 132px Archivo, sans-serif";
+        ctx.fillText(hhmm(now), c.width / 2, 300);
+        ctx.fillStyle = "#8b8785"; ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText(now.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" }).toUpperCase(), c.width / 2, 350);
+        ctx.fillStyle = "#2a2827"; rr(ctx, 40, 940, c.width - 80, 120, 16); ctx.fill();
+        ctx.fillStyle = "#9aa0a6"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("NFC activado", c.width / 2, 1010);
+        ctx.fillStyle = "#dadce0"; rr(ctx, c.width / 2 - 90, 1100, 180, 8, 4); ctx.fill();
+      }
+      tex.needsUpdate = true;
+    }
+
+    // ---- animation timeline (verbatim timings/easing) ----
+    const CYCLE = 9.0, T_NEAR = 2.2, T_READ = 3.0, T_SHOW = 6.6, T_BACK = 7.8;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      const now = new Date();
+      let p, tiltX, tiltY, state, sub = 0, camBlend = 0;
+
+      if (t < T_NEAR) {
+        const k = ease(t / T_NEAR);
+        p = FAR.clone().lerp(NEAR, k);
+        tiltX = -0.55 + 0.33 * k; tiltY = 0.45 - 0.42 * k;
+        state = "idle"; camBlend = 0;
+      } else if (t < T_READ) {
+        const k = (t - T_NEAR) / (T_READ - T_NEAR);
+        p = NEAR.clone(); p.z += Math.sin(k * Math.PI) * 0.004;
+        tiltX = -0.22; tiltY = 0.03; state = "reading"; sub = k;
+        camBlend = ease(k) * 0.55;
+      } else if (t < T_SHOW) {
+        const k = (t - T_READ) / (T_SHOW - T_READ);
+        p = NEAR.clone().lerp(new THREE.Vector3(0.055, 0.145, 0.115), ease(Math.min(1, k * 1.6)));
+        tiltX = -0.22 - 0.20 * Math.min(1, k * 1.6); tiltY = 0.10 * Math.min(1, k * 1.6);
+        state = "review"; sub = Math.min(1, 0.4 + k * 1.4);
+        camBlend = 0.55 + 0.45 * ease(Math.min(1, k * 1.6));
+      } else if (t < T_BACK) {
+        const k = ease((t - T_SHOW) / (T_BACK - T_SHOW));
+        p = new THREE.Vector3(0.055, 0.145, 0.115).lerp(FAR, k);
+        tiltX = -0.42 - 0.13 * k; tiltY = 0.10 + 0.35 * k;
+        state = "review"; sub = 1;
+        camBlend = 1 - k;
+      } else {
+        p = FAR.clone(); tiltX = -0.55; tiltY = 0.45; state = "idle";
+        camBlend = 0;
+      }
+
+      phoneRig.position.copy(p);
+      phone.rotation.set(tiltX, tiltY, Math.sin(ms / 1300) * 0.02);
+
+      const glow = state === "reading" ? 0.55 + 0.45 * Math.sin(sub * Math.PI * 4) : 0;
+      MAT.pulse.opacity = glow;
+      pulse.scale.setScalar(1 + (state === "reading" ? sub * 0.5 : 0));
+
+      camera.position.copy(camEstablishPos).lerp(camClosePos, camBlend);
+      camera.lookAt(camEstablishTarget.clone().lerp(closeCenter, camBlend));
+
+      paintPhone(state, now, sub);
+    };
+    // Redundant feed so the canvas textures keep repainting even if the
+    // outer rAF loop stalls for a moment — kept per the design handoff.
+    phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
+
+    paintCard();
+    paintPhone("idle", new Date(), 0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { paintCard(); });
+    }
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame(T_READ * 1000 + 200);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const loop = (ms) => {
+      if (this._isReviewSelected) {
+        frame(ms);
+        renderer.render(scene, camera);
+      }
+      this._resenasRafId = requestAnimationFrame(loop);
+    };
+    this._resenasRafId = requestAnimationFrame(loop);
+  }
+  _initMenuScene() {
+    const canvas = document.getElementById("tw-menu-canvas");
+    const fallback = document.getElementById("tw-menu-fallback");
+    if (!canvas) return;
+    let attempts = 0;
+    const tryInit = () => {
+      if (typeof THREE === "undefined") {
+        attempts++;
+        if (attempts > 40) {
+          console.error("[tw-menu] THREE never loaded from the CDN after ~6s — falling back to the static image.");
+          if (fallback) fallback.style.display = "block";
+          canvas.style.display = "none";
+          return;
+        }
+        this._menuRetryTimer = setTimeout(tryInit, 150);
+        return;
+      }
+      try {
+        this._buildMenuScene(canvas, fallback);
+      } catch (err) {
+        console.error("[tw-menu] scene build failed, falling back to the static image:", err);
+        if (fallback) fallback.style.display = "block";
+        canvas.style.display = "none";
+      }
+    };
+    tryInit();
+  }
+  _buildMenuScene(canvas, fallback) {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(440, 441.4, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Same overexposure fix as the reviews scene: the menu screen has a
+    // mostly-white body under the orange header, so it needs tone mapping
+    // to keep from clipping to pure white once lit + emissive stack up.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 440 / 441.4, 0.01, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
+    fill.position.set(-5, 3, -4);
+    scene.add(fill);
+
+    // ---- helpers (ported verbatim from the design handoff's menu-qr-pedido.html) ----
+    function roundedRect(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function plate(w, h, r, d, mat, name, bevel) {
+      const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+        ? { depth: d, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 }
+        : { depth: d, bevelEnabled: false, curveSegments: 24 });
+      g.center();
+      const m = new THREE.Mesh(g, mat); m.name = name; return m;
+    }
+    function screenCanvas(w, h) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+      return { c, ctx: c.getContext("2d"), tex };
+    }
+    function rr(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+
+    // ---- scene assembly (ported verbatim from menu-qr-pedido.html) ----
+    const BRAND = { orange: "#f26722", deep: "#d64a12", paper: "#fbd9c0", ink: "#2b1a12" };
+    const two = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
+
+    const MAT = {
+      acrylic: new THREE.MeshStandardMaterial({ name: "acrylic_clear", color: 0xdfe3e2, roughness: 0.15, metalness: 0.05, transparent: true, opacity: 0.42 }),
+      cardEdge: new THREE.MeshStandardMaterial({ name: "card_stock", color: 0xf7dcc5, roughness: 0.55, metalness: 0.0 }),
+      table: new THREE.MeshStandardMaterial({ name: "table_walnut", color: 0x4a2f21, roughness: 0.55, metalness: 0.05 }),
+      accent: new THREE.MeshStandardMaterial({ name: "accent_red", color: 0xec3013, roughness: 0.4, metalness: 0.05 }),
+      phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.4, metalness: 0.3 }),
+      glass: new THREE.MeshStandardMaterial({ name: "phone_back_glass", color: 0x24221f, roughness: 0.25, metalness: 0.4 }),
+      pulse: new THREE.MeshStandardMaterial({ name: "nfc_pulse", color: 0xf26722, emissive: 0xf26722, emissiveIntensity: 1.2, transparent: true, opacity: 0.0, roughness: 0.3 }),
+    };
+
+    const root = new THREE.Group();
+    root.name = "menu_qr_scene";
+
+    const table = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.022, 0.26), MAT.table);
+    table.name = "table_top"; table.position.set(0, 0.011, 0.02); root.add(table);
+    const tableEdge = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.004, 0.001), MAT.accent);
+    tableEdge.name = "table_edge"; tableEdge.position.set(0, 0.020, 0.1505); root.add(tableEdge);
+
+    const standFoot = new THREE.Mesh(new THREE.BoxGeometry(0.098, 0.004, 0.070), MAT.acrylic);
+    standFoot.name = "stand_foot"; standFoot.position.set(-0.055, 0.024, -0.012); root.add(standFoot);
+    const standPanel = new THREE.Mesh(new THREE.BoxGeometry(0.098, 0.146, 0.003), MAT.acrylic);
+    standPanel.name = "stand_panel";
+    standPanel.position.set(-0.055, 0.096, -0.043); standPanel.rotation.x = -0.10; root.add(standPanel);
+    const standLip = new THREE.Mesh(new THREE.BoxGeometry(0.098, 0.010, 0.006), MAT.acrylic);
+    standLip.name = "stand_lip"; standLip.position.set(-0.055, 0.028, -0.030); root.add(standLip);
+
+    const CW = 0.090, CH = 0.140, CT = 0.0018;
+    const cardRig = new THREE.Group(); cardRig.name = "card_rig";
+    cardRig.position.set(-0.055, 0.098, -0.039); cardRig.rotation.x = -0.10;
+    root.add(cardRig);
+    cardRig.add(plate(CW, CH, 0.002, CT, MAT.cardEdge, "card_stock"));
+
+    const cs = screenCanvas(700, 1090);
+    const cardFaceMat = new THREE.MeshStandardMaterial({ name: "card_print", map: cs.tex, roughness: 0.6, metalness: 0.0 });
+    const cardFace = new THREE.Mesh(new THREE.PlaneGeometry(CW - 0.0008, CH - 0.0008), cardFaceMat);
+    cardFace.name = "card_face"; cardFace.position.z = CT / 2 + 0.0006; cardRig.add(cardFace);
+
+    const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.020, 0.0014, 10, 56), MAT.pulse);
+    pulse.name = "nfc_pulse_ring";
+    pulse.position.set(0, 0.006, CT / 2 + 0.004); cardRig.add(pulse);
+
+    const FAR = new THREE.Vector3(0.125, 0.140, 0.190);
+    const TAP = new THREE.Vector3(-0.050, 0.104, 0.028);
+    const READ = new THREE.Vector3(0.050, 0.150, 0.130);
+
+    const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig";
+    phoneRig.position.copy(FAR);
+    root.add(phoneRig);
+    const phone = new THREE.Group(); phone.name = "phone";
+    phoneRig.add(phone);
+    phone.add(plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, "phone_body", 0.0012));
+    const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+    phoneBack.name = "phone_back"; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+    const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, "camera_bump", 0.0006);
+    camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+    const ps = screenCanvas(560, 1150);
+    const phoneScreenMat = new THREE.MeshStandardMaterial({
+      name: "phone_screen", map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.6, roughness: 0.45, metalness: 0.0
+    });
+    const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), phoneScreenMat);
+    phoneScreen.name = "phone_screen_glass"; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+    scene.add(root);
+
+    const box = new THREE.Box3().setFromObject(root);
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    const dist = (sphere.radius / Math.tan((camera.fov * Math.PI) / 360)) * 1.35;
+    const viewDir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+    camera.position.copy(sphere.center).add(viewDir.clone().multiplyScalar(dist));
+    camera.lookAt(sphere.center);
+
+    // Same dolly-in fix as the reviews scene — the establishing shot frames
+    // the whole table, so the menu on the phone screen would otherwise read
+    // as tiny with no orbit controls for the viewer to zoom in themselves.
+    const camEstablishPos = camera.position.clone();
+    const camEstablishTarget = sphere.center.clone();
+    const closeCenter = new THREE.Vector3(0.05, 0.165, 0.115);
+    const closeDist = (0.115 / Math.tan((camera.fov * Math.PI) / 360)) * 1.15;
+    const camClosePos = closeCenter.clone().add(viewDir.clone().multiplyScalar(closeDist));
+
+    // ---- card artwork (verbatim colors/fonts/layout) ----
+    function nfcGlyph(ctx, cx, cy, w) {
+      ctx.save();
+      ctx.strokeStyle = BRAND.ink; ctx.lineWidth = w * 0.030; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.ellipse(cx, cy, w * 0.50, w * 0.30, 0, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 4; i++) {
+        ctx.lineWidth = w * (0.048 - i * 0.006);
+        ctx.beginPath(); ctx.arc(cx - w * 0.30, cy, w * 0.07 + i * w * 0.085, -0.95, 0.95); ctx.stroke();
+      }
+      ctx.lineWidth = w * 0.028;
+      const px = cx + w * 0.16, py = cy - w * 0.19, pw = w * 0.20, ph = w * 0.34;
+      rr(ctx, px, py, pw, ph, w * 0.035); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(px, py + ph * 0.72); ctx.quadraticCurveTo(px - w * 0.08, py + ph * 1.05, px + w * 0.05, py + ph * 1.14);
+      ctx.lineTo(px + pw + w * 0.06, py + ph * 1.14);
+      ctx.quadraticCurveTo(px + pw + w * 0.15, py + ph * 1.08, px + pw + w * 0.10, py + ph * 0.92);
+      ctx.lineTo(px + pw * 0.9, py + ph * 0.78); ctx.stroke();
+      ctx.restore();
+    }
+    function paintCard() {
+      const { ctx, c, tex } = cs;
+      ctx.fillStyle = BRAND.paper; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.textAlign = "right"; ctx.fillStyle = BRAND.orange;
+      ctx.font = "800 96px Archivo, sans-serif";
+      ctx.fillText("20", c.width - 46, 118);
+      ctx.textAlign = "left";
+      ctx.font = "800 92px Archivo, sans-serif";
+      ctx.fillText("DÖBER", 60, 210);
+      ctx.fillStyle = BRAND.ink; ctx.font = "700 30px Archivo, sans-serif";
+      ctx.fillText("SANDWICHS & BOWLS", 62, 254);
+
+      ctx.strokeStyle = BRAND.orange; ctx.lineWidth = 8;
+      ctx.strokeRect(70, 310, c.width - 140, 350);
+      nfcGlyph(ctx, c.width / 2, 486, 460);
+
+      ctx.textAlign = "left"; ctx.fillStyle = BRAND.ink;
+      ctx.font = "800 40px Archivo, sans-serif";
+      ctx.fillText("Acerca tu celular (NFC)", 60, 742);
+      ctx.fillStyle = "#7b6a60"; ctx.font = "700 28px Archivo, sans-serif";
+      ctx.fillText("y se abre el menú al instante", 60, 784);
+      ctx.fillStyle = BRAND.deep; ctx.font = "800 54px Archivo, sans-serif";
+      ctx.fillText("#FielAlSabor", 60, 866);
+
+      ctx.fillStyle = BRAND.orange;
+      for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.ellipse(500 + i * 38, 900 + (i % 2 ? 14 : 0), 15, 20, 0, 0, Math.PI * 2); ctx.fill(); }
+      ctx.beginPath(); ctx.ellipse(556, 962, 52, 38, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = BRAND.paper;
+      ctx.fillRect(500, 1010, 120, 16);
+      ctx.beginPath(); ctx.arc(500, 1018, 16, 0, Math.PI * 2); ctx.arc(620, 1018, 16, 0, Math.PI * 2); ctx.fill();
+      tex.needsUpdate = true;
+    }
+
+    // ---- phone screens (verbatim colors/fonts/layout) ----
+    const MENU = [
+      ["Döber Clásico", "Pierna, queso, salsa de la casa", "95"],
+      ["Bowl Fiel", "Arroz, pollo BBQ, aguacate", "110"],
+      ["Sandwich Rottw", "Pastrami, pepinillo, mostaza", "120"],
+      ["Papas Döber", "Con queso y tocino", "65"],
+    ];
+    function statusBar(ctx, c, now, right) {
+      ctx.fillStyle = "#8a8a8a"; ctx.font = "600 22px Archivo, sans-serif";
+      ctx.textAlign = "left"; ctx.fillText(hhmm(now), 28, 40);
+      ctx.textAlign = "right"; ctx.fillText(right, c.width - 28, 40);
+    }
+    function paintPhone(state, now, k) {
+      const { ctx, c, tex } = ps;
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+
+      if (state === "nfc") {
+        ctx.fillStyle = "#0d0f14"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "NFC");
+        ctx.textAlign = "center";
+        ctx.strokeStyle = BRAND.orange; ctx.lineWidth = 8;
+        for (let i = 0; i < 3; i++) {
+          const r = 70 + i * 46 + Math.sin(k * Math.PI * 3) * 12;
+          ctx.globalAlpha = 0.9 - i * 0.25;
+          ctx.beginPath(); ctx.arc(c.width / 2, 470, r, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 34px Archivo, sans-serif";
+        ctx.fillText("NFC", c.width / 2, 484);
+        ctx.font = "700 28px Archivo, sans-serif";
+        ctx.fillText("Conectando con la mesa…", c.width / 2, 700);
+        ctx.fillStyle = "#8b8785"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("DÖBER · MESA 20", c.width / 2, 744);
+        ctx.strokeStyle = "#2a2827"; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(c.width - 120, 820); ctx.stroke();
+        ctx.strokeStyle = BRAND.orange;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(120 + (c.width - 240) * Math.min(1, k), 820); ctx.stroke();
+      } else if (state === "menu") {
+        ctx.fillStyle = BRAND.orange; ctx.fillRect(0, 0, c.width, 190);
+        statusBar(ctx, c, now, "MESA 20");
+        ctx.textAlign = "left"; ctx.fillStyle = "#ffffff";
+        ctx.font = "800 52px Archivo, sans-serif"; ctx.fillText("DÖBER", 28, 120);
+        ctx.font = "700 22px Archivo, sans-serif"; ctx.fillText("SANDWICHS & BOWLS · MENÚ", 28, 160);
+        let y = 250;
+        const shown = Math.min(MENU.length, Math.max(1, Math.ceil(k * MENU.length * 1.4)));
+        for (let i = 0; i < shown; i++) {
+          const [n, d, p] = MENU[i];
+          ctx.fillStyle = BRAND.ink; ctx.font = "800 30px Archivo, sans-serif";
+          ctx.fillText(n, 28, y);
+          ctx.fillStyle = "#7b6a60"; ctx.font = "600 22px Archivo, sans-serif";
+          ctx.fillText(d, 28, y + 34);
+          ctx.textAlign = "right"; ctx.fillStyle = BRAND.deep; ctx.font = "800 30px Archivo, sans-serif";
+          ctx.fillText("$" + p, c.width - 28, y);
+          ctx.textAlign = "left";
+          ctx.strokeStyle = "#eadfd7"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(28, y + 62); ctx.lineTo(c.width - 28, y + 62); ctx.stroke();
+          y += 128;
+        }
+        ctx.fillStyle = BRAND.ink; rr(ctx, 28, 900, c.width - 56, 84, 0); ctx.fill();
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 28px Archivo, sans-serif";
+        ctx.fillText("VER MENÚ COMPLETO", 52, 950);
+        ctx.fillStyle = "#9aa0a6"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Abierto por NFC desde la mesa", 28, 1030);
+      } else {
+        ctx.fillStyle = "#0d0f14"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.textAlign = "center"; ctx.fillStyle = "#f3f2f2";
+        ctx.font = "700 132px Archivo, sans-serif"; ctx.fillText(hhmm(now), c.width / 2, 300);
+        ctx.fillStyle = "#8b8785"; ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText(now.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" }).toUpperCase(), c.width / 2, 350);
+        ctx.fillStyle = "#2a2827"; ctx.fillRect(40, 940, c.width - 80, 120);
+        ctx.fillStyle = "#9aa0a6"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("NFC activado", c.width / 2, 1010);
+      }
+      tex.needsUpdate = true;
+    }
+
+    // ---- animation timeline (verbatim timings/easing) ----
+    const CYCLE = 11.0, T_IN = 2.2, T_NFC = 4.0, T_MENU = 9.4, T_OUT = 10.4;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      const now = new Date();
+      let p, rx, ry, state, k = 0, camBlend = 0;
+
+      if (t < T_IN) {
+        k = ease(t / T_IN);
+        p = FAR.clone().lerp(TAP, k);
+        rx = -0.55 + 0.45 * k; ry = 0.45 - 0.44 * k; state = "idle";
+        camBlend = 0;
+      } else if (t < T_NFC) {
+        k = (t - T_IN) / (T_NFC - T_IN);
+        p = TAP.clone(); p.z += Math.sin(k * Math.PI) * 0.004;
+        rx = -0.10; ry = 0.01; state = "nfc";
+        camBlend = ease(k) * 0.55;
+      } else if (t < T_MENU) {
+        k = (t - T_NFC) / (T_MENU - T_NFC);
+        const e = ease(Math.min(1, k * 2.2));
+        p = TAP.clone().lerp(READ, e);
+        rx = -0.10 - 0.33 * e; ry = 0.14 * e; state = "menu";
+        camBlend = 0.55 + 0.45 * e;
+      } else if (t < T_OUT) {
+        k = ease((t - T_MENU) / (T_OUT - T_MENU));
+        p = READ.clone().lerp(FAR, k);
+        rx = -0.43 - 0.12 * k; ry = 0.14 + 0.31 * k; state = "menu"; k = 1;
+        camBlend = 1 - ease((t - T_MENU) / (T_OUT - T_MENU));
+      } else {
+        p = FAR.clone(); rx = -0.55; ry = 0.45; state = "idle";
+        camBlend = 0;
+      }
+
+      phoneRig.position.copy(p);
+      phone.rotation.set(rx, ry, Math.sin(ms / 1300) * 0.02);
+      paintPhone(state, now, k);
+
+      const glow = state === "nfc" ? 0.55 + 0.45 * Math.sin(k * Math.PI * 4) : 0;
+      MAT.pulse.opacity = glow;
+      pulse.scale.setScalar(1 + (state === "nfc" ? k * 0.5 : 0));
+
+      camera.position.copy(camEstablishPos).lerp(camClosePos, camBlend);
+      camera.lookAt(camEstablishTarget.clone().lerp(closeCenter, camBlend));
+    };
+    // Redundant feed so the canvas textures keep repainting even if the
+    // outer rAF loop stalls for a moment — kept per the design handoff.
+    phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
+
+    paintCard();
+    paintPhone("idle", new Date(), 0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { paintCard(); });
+    }
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame((T_MENU - 0.6) * 1000);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const loop = (ms) => {
+      if (this._isMenuSelected) {
+        frame(ms);
+        renderer.render(scene, camera);
+      }
+      this._menuRafId = requestAnimationFrame(loop);
+    };
+    this._menuRafId = requestAnimationFrame(loop);
+  }
+  _initWifiScene() {
+    const canvas = document.getElementById("tw-wifi-canvas");
+    const fallback = document.getElementById("tw-wifi-fallback");
+    if (!canvas) return;
+    let attempts = 0;
+    const tryInit = () => {
+      if (typeof THREE === "undefined") {
+        attempts++;
+        if (attempts > 40) {
+          console.error("[tw-wifi] THREE never loaded from the CDN after ~6s — falling back to the static image.");
+          if (fallback) fallback.style.display = "block";
+          canvas.style.display = "none";
+          return;
+        }
+        this._wifiRetryTimer = setTimeout(tryInit, 150);
+        return;
+      }
+      try {
+        this._buildWifiScene(canvas, fallback);
+      } catch (err) {
+        console.error("[tw-wifi] scene build failed, falling back to the static image:", err);
+        if (fallback) fallback.style.display = "block";
+        canvas.style.display = "none";
+      }
+    };
+    tryInit();
+  }
+  _buildWifiScene(canvas, fallback) {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(440, 441.4, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Same overexposure fix as reviews/menu: the "done" (connected) screen
+    // is mostly white, so it needs tone mapping to avoid clipping to pure white.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 440 / 441.4, 0.01, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
+    fill.position.set(-5, 3, -4);
+    scene.add(fill);
+
+    // ---- helpers (ported verbatim from the design handoff's wifi-nfc.html) ----
+    function roundedRect(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function plate(w, h, r, d, mat, name, bevel) {
+      const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+        ? { depth: d, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 }
+        : { depth: d, bevelEnabled: false, curveSegments: 24 });
+      g.center();
+      const m = new THREE.Mesh(g, mat); m.name = name; return m;
+    }
+    function screenCanvas(w, h) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+      return { c, ctx: c.getContext("2d"), tex };
+    }
+    function rr(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+    function wifiGlyph(ctx, cx, cy, r0, lw, color, arcs, dot) {
+      if (arcs === undefined) arcs = 3;
+      if (dot === undefined) dot = true;
+      ctx.strokeStyle = color; ctx.lineCap = "round";
+      for (let i = 0; i < arcs; i++) {
+        ctx.lineWidth = lw - i * (lw * 0.14);
+        ctx.beginPath();
+        ctx.arc(cx, cy, r0 + i * r0 * 0.78, Math.PI * 1.22, Math.PI * 1.78);
+        ctx.stroke();
+      }
+      if (dot) { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(cx, cy, lw * 0.62, 0, Math.PI * 2); ctx.fill(); }
+    }
+
+    // ---- scene assembly (ported verbatim from wifi-nfc.html) ----
+    const B = { cyan: "#17c3e0", deep: "#0b6d80", ink: "#0f1c20", paper: "#eef7f9", dim: "#8a9296", ok: "#1f9d55" };
+    const SSID = "XPRINT_INVITADOS";
+    const two = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
+
+    const MAT = {
+      desk: new THREE.MeshStandardMaterial({ name: "desk_top", color: 0xc9c6c2, roughness: 0.60, metalness: 0.10 }),
+      accent: new THREE.MeshStandardMaterial({ name: "accent_red", color: 0xec3013, roughness: 0.40, metalness: 0.05 }),
+      acrylic: new THREE.MeshStandardMaterial({ name: "acrylic_clear", color: 0xdfe3e2, roughness: 0.15, metalness: 0.05, transparent: true, opacity: 0.42 }),
+      cardEdge: new THREE.MeshStandardMaterial({ name: "card_stock", color: 0xf4f3f1, roughness: 0.42, metalness: 0.03 }),
+      routerBody: new THREE.MeshStandardMaterial({ name: "router_body", color: 0x24262a, roughness: 0.55, metalness: 0.15 }),
+      routerTop: new THREE.MeshStandardMaterial({ name: "router_top", color: 0x2f3237, roughness: 0.40, metalness: 0.20 }),
+      led: new THREE.MeshStandardMaterial({ name: "router_led", color: 0x17c3e0, emissive: 0x17c3e0, emissiveIntensity: 1.1, roughness: 0.3 }),
+      phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.40, metalness: 0.30 }),
+      glass: new THREE.MeshStandardMaterial({ name: "phone_back_glass", color: 0x24221f, roughness: 0.25, metalness: 0.40 }),
+      pulse: new THREE.MeshStandardMaterial({ name: "nfc_pulse", color: 0x17c3e0, emissive: 0x17c3e0, emissiveIntensity: 1.2, transparent: true, opacity: 0.0, roughness: 0.3 }),
+    };
+
+    const root = new THREE.Group();
+    root.name = "wifi_nfc_scene";
+
+    const desk = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.020, 0.26), MAT.desk);
+    desk.name = "desk_top"; desk.position.set(0, 0.010, 0.02); root.add(desk);
+    const deskEdge = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.004, 0.001), MAT.accent);
+    deskEdge.name = "desk_edge"; deskEdge.position.set(0, 0.018, 0.1505); root.add(deskEdge);
+
+    const router = new THREE.Group(); router.name = "router";
+    router.position.set(0.115, 0.020, -0.070); root.add(router);
+    const routerBase = new THREE.Mesh(new THREE.BoxGeometry(0.086, 0.014, 0.086), MAT.routerBody);
+    routerBase.name = "router_base"; routerBase.position.set(0, 0.007, 0); router.add(routerBase);
+    const routerSlab = new THREE.Mesh(new THREE.BoxGeometry(0.078, 0.052, 0.026), MAT.routerTop);
+    routerSlab.name = "router_slab"; routerSlab.position.set(0, 0.040, 0); router.add(routerSlab);
+    [[-0.044, 0.30], [0.044, -0.30]].forEach(([x, rz]) => {
+      const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, 0.075, 12), MAT.routerBody);
+      ant.name = "router_antenna_" + (x < 0 ? "l" : "r");
+      ant.position.set(x, 0.058, -0.006); ant.rotation.z = rz; router.add(ant);
+    });
+    const routerLed = new THREE.Mesh(new THREE.CircleGeometry(0.004, 24), MAT.led);
+    routerLed.name = "router_led"; routerLed.position.set(0, 0.040, 0.0132); router.add(routerLed);
+
+    const standFoot = new THREE.Mesh(new THREE.BoxGeometry(0.094, 0.004, 0.062), MAT.acrylic);
+    standFoot.name = "stand_foot"; standFoot.position.set(-0.062, 0.024, -0.008); root.add(standFoot);
+    const standPanel = new THREE.Mesh(new THREE.BoxGeometry(0.094, 0.128, 0.003), MAT.acrylic);
+    standPanel.name = "stand_panel";
+    standPanel.position.set(-0.062, 0.086, -0.036); standPanel.rotation.x = -0.12; root.add(standPanel);
+    const standLip = new THREE.Mesh(new THREE.BoxGeometry(0.094, 0.010, 0.006), MAT.acrylic);
+    standLip.name = "stand_lip"; standLip.position.set(-0.062, 0.028, -0.024); root.add(standLip);
+
+    const CW = 0.086, CH = 0.122, CT = 0.0022;
+    const cardRig = new THREE.Group(); cardRig.name = "card_rig";
+    cardRig.position.set(-0.062, 0.088, -0.0315); cardRig.rotation.x = -0.12;
+    root.add(cardRig);
+    cardRig.add(plate(CW, CH, 0.006, CT, MAT.cardEdge, "card_stock", 0.0005));
+
+    const cs = screenCanvas(688, 976);
+    const cardFaceMat = new THREE.MeshStandardMaterial({ name: "card_print", map: cs.tex, roughness: 0.38, metalness: 0.02 });
+    const cardFace = new THREE.Mesh(new THREE.PlaneGeometry(CW - 0.001, CH - 0.001), cardFaceMat);
+    cardFace.name = "card_face"; cardFace.position.z = CT / 2 + 0.0006; cardRig.add(cardFace);
+
+    const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.019, 0.0014, 10, 56), MAT.pulse);
+    pulse.name = "nfc_pulse_ring"; pulse.position.set(0, 0.004, CT / 2 + 0.004); cardRig.add(pulse);
+
+    const FAR = new THREE.Vector3(0.115, 0.140, 0.200);
+    const TAP = new THREE.Vector3(-0.062, 0.112, -0.0218);
+    const READ = new THREE.Vector3(0.045, 0.150, 0.130);
+
+    const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig";
+    phoneRig.position.copy(FAR);
+    root.add(phoneRig);
+    const phone = new THREE.Group(); phone.name = "phone";
+    phoneRig.add(phone);
+    phone.add(plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, "phone_body", 0.0012));
+    const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+    phoneBack.name = "phone_back"; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+    const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, "camera_bump", 0.0006);
+    camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+    const ps = screenCanvas(560, 1150);
+    const phoneScreenMat = new THREE.MeshStandardMaterial({
+      name: "phone_screen", map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.6, roughness: 0.45, metalness: 0.0
+    });
+    const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), phoneScreenMat);
+    phoneScreen.name = "phone_screen_glass"; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+    scene.add(root);
+
+    // This scene fixes its own camera on the card/phone pair instead of
+    // auto-framing the whole desk — per the design handoff, the desk is
+    // wide enough that an auto-fit would leave the phone screen too small
+    // to read. Values (center/radius/factor) are the handoff's spec.
+    const camCenter = new THREE.Vector3(-0.030, 0.135, 0.045);
+    const camDir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+    const camDist = (0.150 / Math.tan((camera.fov * Math.PI) / 360)) * 1.06;
+    camera.position.copy(camCenter).add(camDir.clone().multiplyScalar(camDist));
+    camera.lookAt(camCenter);
+
+    // ---- card artwork (verbatim colors/fonts/layout) ----
+    function paintCard() {
+      const { ctx, c, tex } = cs;
+      ctx.fillStyle = B.paper; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = B.ink; ctx.fillRect(0, 0, c.width, 214);
+      ctx.fillStyle = B.cyan; ctx.fillRect(0, 214, c.width, 10);
+
+      ctx.textAlign = "left"; ctx.fillStyle = B.cyan;
+      ctx.font = "800 26px Archivo, sans-serif";
+      ctx.fillText("WI-FI CON NFC", 48, 76);
+      ctx.fillStyle = "#ffffff"; ctx.font = "800 54px Archivo, sans-serif";
+      ctx.fillText("Conéctate", 48, 140);
+      ctx.fillText("sin contraseña", 48, 194);
+
+      wifiGlyph(ctx, c.width / 2, 470, 62, 30, B.deep, 3);
+
+      ctx.textAlign = "center"; ctx.fillStyle = B.ink;
+      ctx.font = "800 40px Archivo, sans-serif";
+      ctx.fillText("ACERCA TU CELULAR", c.width / 2, 610);
+      ctx.fillStyle = "#5c6a6e"; ctx.font = "700 28px Archivo, sans-serif";
+      ctx.fillText("a esta tarjeta y listo", c.width / 2, 654);
+
+      ctx.strokeStyle = B.cyan; ctx.lineWidth = 6;
+      ctx.strokeRect(48, 716, c.width - 96, 120);
+      ctx.fillStyle = "#5c6a6e"; ctx.font = "700 24px Archivo, sans-serif";
+      ctx.textAlign = "left"; ctx.fillText("RED", 74, 764);
+      ctx.fillStyle = B.ink; ctx.font = "800 36px Archivo, sans-serif";
+      ctx.fillText(SSID, 74, 810);
+
+      ctx.textAlign = "center"; ctx.fillStyle = B.deep;
+      ctx.font = "800 24px Archivo, sans-serif";
+      ctx.fillText("SIN ESCRIBIR NADA · SIN QR", c.width / 2, 908);
+      tex.needsUpdate = true;
+    }
+
+    // ---- phone screens (verbatim colors/fonts/layout) ----
+    function statusBar(ctx, c, now, right, color) {
+      ctx.fillStyle = color || B.dim; ctx.font = "600 22px Archivo, sans-serif";
+      ctx.textAlign = "left"; ctx.fillText(hhmm(now), 28, 40);
+      ctx.textAlign = "right"; ctx.fillText(right, c.width - 28, 40);
+    }
+    function checkMark(ctx, cx, cy, r, ring, tick) {
+      ctx.strokeStyle = ring; ctx.lineWidth = 9;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = tick; ctx.lineWidth = 12; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx - r * 0.42, cy + r * 0.02);
+      ctx.lineTo(cx - r * 0.10, cy + r * 0.38);
+      ctx.lineTo(cx + r * 0.46, cy - r * 0.34);
+      ctx.stroke();
+    }
+    function lockIcon(ctx, cx, cy, s, color) {
+      ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineJoin = "round";
+      ctx.beginPath(); ctx.arc(cx, cy - s * 0.42, s * 0.42, Math.PI, 0); ctx.stroke();
+      rr(ctx, cx - s * 0.66, cy - s * 0.06, s * 1.32, s * 0.94, s * 0.16);
+      ctx.fillStyle = color; ctx.fill();
+    }
+    function paintPhone(state, now, k) {
+      const { ctx, c, tex } = ps;
+
+      if (state === "nfc") {
+        ctx.fillStyle = "#0a1418"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "NFC");
+        ctx.textAlign = "center";
+        ctx.strokeStyle = B.cyan; ctx.lineWidth = 8;
+        for (let i = 0; i < 3; i++) {
+          const r = 74 + i * 46 + Math.sin(k * Math.PI * 3) * 12;
+          ctx.globalAlpha = 0.9 - i * 0.25;
+          ctx.beginPath(); ctx.arc(c.width / 2, 470, r, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        wifiGlyph(ctx, c.width / 2, 500, 26, 13, "#ffffff", 3);
+        ctx.fillStyle = "#ffffff"; ctx.font = "700 28px Archivo, sans-serif";
+        ctx.fillText("Leyendo la tarjeta…", c.width / 2, 700);
+        ctx.fillStyle = B.dim; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("CONFIGURACIÓN WI-FI", c.width / 2, 744);
+        ctx.strokeStyle = "#1e2a2e"; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(c.width - 120, 820); ctx.stroke();
+        ctx.strokeStyle = B.cyan;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(120 + (c.width - 240) * Math.min(1, k), 820); ctx.stroke();
+
+      } else if (state === "joining") {
+        ctx.fillStyle = "#0a1418"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "WI-FI");
+        ctx.textAlign = "center";
+        const arcs = 1 + Math.floor(Math.min(0.999, k) * 3);
+        wifiGlyph(ctx, c.width / 2, 520, 46, 22, B.cyan, arcs);
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 34px Archivo, sans-serif";
+        ctx.fillText(SSID, c.width / 2, 700);
+        ctx.fillStyle = B.dim; ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText("Conectando…", c.width / 2, 748);
+        ctx.strokeStyle = "#1e2a2e"; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(c.width - 120, 820); ctx.stroke();
+        ctx.strokeStyle = B.cyan;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(120 + (c.width - 240) * Math.min(1, k), 820); ctx.stroke();
+
+      } else if (state === "done") {
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = B.ink; ctx.fillRect(0, 0, c.width, 150);
+        statusBar(ctx, c, now, "WI-FI", "#8a9296");
+        ctx.textAlign = "left"; ctx.fillStyle = "#ffffff";
+        ctx.font = "800 38px Archivo, sans-serif";
+        ctx.fillText("Wi-Fi", 28, 118);
+
+        ctx.textAlign = "center";
+        checkMark(ctx, c.width / 2, 330, 78, "#d8ecef", B.ok);
+        ctx.fillStyle = B.ink; ctx.font = "800 40px Archivo, sans-serif";
+        ctx.fillText("¡Conectado!", c.width / 2, 470);
+        ctx.fillStyle = "#5c6a6e"; ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText("Sin escribir la contraseña", c.width / 2, 512);
+
+        ctx.strokeStyle = "#e2e8e9"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(28, 578); ctx.lineTo(c.width - 28, 578); ctx.stroke();
+        wifiGlyph(ctx, 64, 646, 15, 8, B.ok, 3);
+        ctx.textAlign = "left"; ctx.fillStyle = B.ink; ctx.font = "800 30px Archivo, sans-serif";
+        ctx.fillText(SSID, 112, 634);
+        ctx.fillStyle = B.ok; ctx.font = "700 23px Archivo, sans-serif";
+        ctx.fillText("Conectado · señal excelente", 112, 668);
+        lockIcon(ctx, c.width - 52, 646, 17, "#9aa6a9");
+        ctx.strokeStyle = "#e2e8e9"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(28, 706); ctx.lineTo(c.width - 28, 706); ctx.stroke();
+
+        let y = 780;
+        ["CAFE_VECINO", "INFINITUM_4G21", "OFICINA_2"].forEach((n) => {
+          wifiGlyph(ctx, 64, y + 4, 13, 7, "#b6c0c3", 2, false);
+          ctx.fillStyle = "#8a9296"; ctx.font = "600 27px Archivo, sans-serif";
+          ctx.fillText(n, 112, y + 12);
+          lockIcon(ctx, c.width - 52, y + 6, 15, "#c3cbcd");
+          y += 82;
+        });
+        ctx.fillStyle = "#b6c0c3"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Configurado por NFC desde la tarjeta", 28, 1058);
+
+      } else {
+        ctx.fillStyle = "#0a1418"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.textAlign = "center"; ctx.fillStyle = "#f3f2f2";
+        ctx.font = "700 132px Archivo, sans-serif"; ctx.fillText(hhmm(now), c.width / 2, 300);
+        ctx.fillStyle = B.dim; ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText(now.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" }).toUpperCase(), c.width / 2, 350);
+        ctx.fillStyle = "#16232a"; ctx.fillRect(40, 940, c.width - 80, 120);
+        ctx.fillStyle = "#9aa0a6"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("NFC activado · Wi-Fi buscando", c.width / 2, 1010);
+      }
+      tex.needsUpdate = true;
+    }
+
+    // ---- animation timeline (verbatim timings/easing) ----
+    const CYCLE = 12.0, T_IN = 2.0, T_NFC = 3.6, T_JOIN = 5.2, T_DONE = 10.8, T_OUT = 11.6;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      const now = new Date();
+      let p, rx, ry, state, k = 0;
+
+      if (t < T_IN) {
+        k = ease(t / T_IN);
+        p = FAR.clone().lerp(TAP, k);
+        rx = -0.55 + 0.43 * k; ry = 0.45 - 0.44 * k; state = "idle";
+      } else if (t < T_NFC) {
+        k = (t - T_IN) / (T_NFC - T_IN);
+        p = TAP.clone(); p.z += Math.sin(k * Math.PI) * 0.004;
+        rx = -0.12; ry = 0.01; state = "nfc";
+      } else if (t < T_JOIN) {
+        k = (t - T_NFC) / (T_JOIN - T_NFC);
+        const e = ease(Math.min(1, k * 1.5));
+        p = TAP.clone().lerp(READ, e);
+        rx = -0.12 - 0.30 * e; ry = 0.14 * e; state = "joining";
+      } else if (t < T_DONE) {
+        k = (t - T_JOIN) / (T_DONE - T_JOIN);
+        p = READ.clone(); p.y += Math.sin(k * Math.PI) * 0.004;
+        rx = -0.42; ry = 0.14; state = "done";
+      } else if (t < T_OUT) {
+        k = ease((t - T_DONE) / (T_OUT - T_DONE));
+        p = READ.clone().lerp(FAR, k);
+        rx = -0.42 - 0.13 * k; ry = 0.14 + 0.31 * k; state = "done"; k = 1;
+      } else {
+        p = FAR.clone(); rx = -0.55; ry = 0.45; state = "idle";
+      }
+
+      phoneRig.position.copy(p);
+      phone.rotation.set(rx, ry, Math.sin(ms / 1300) * 0.02);
+      paintPhone(state, now, k);
+
+      const glow = state === "nfc" ? 0.55 + 0.45 * Math.sin(k * Math.PI * 4) : 0;
+      MAT.pulse.opacity = glow;
+      pulse.scale.setScalar(1 + (state === "nfc" ? k * 0.5 : 0));
+
+      const linked = state === "joining" || state === "done";
+      MAT.led.emissiveIntensity = linked ? 1.6 : 0.5 + 0.3 * Math.sin(ms / 700);
+    };
+    // Redundant feed so the canvas textures keep repainting even if the
+    // outer rAF loop stalls for a moment — kept per the design handoff.
+    phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
+
+    paintCard();
+    paintPhone("idle", new Date(), 0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { paintCard(); });
+    }
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame((T_DONE - 0.3) * 1000);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const loop = (ms) => {
+      if (this._isWifiSelected) {
+        frame(ms);
+        renderer.render(scene, camera);
+      }
+      this._wifiRafId = requestAnimationFrame(loop);
+    };
+    this._wifiRafId = requestAnimationFrame(loop);
+  }
+  _initGymScene() {
+    const canvas = document.getElementById("tw-gym-canvas");
+    const fallback = document.getElementById("tw-gym-fallback");
+    if (!canvas) return;
+    let attempts = 0;
+    const tryInit = () => {
+      if (typeof THREE === "undefined") {
+        attempts++;
+        if (attempts > 40) {
+          console.error("[tw-gym] THREE never loaded from the CDN after ~6s — falling back to the static image.");
+          if (fallback) fallback.style.display = "block";
+          canvas.style.display = "none";
+          return;
+        }
+        this._gymRetryTimer = setTimeout(tryInit, 150);
+        return;
+      }
+      try {
+        this._buildGymScene(canvas, fallback);
+      } catch (err) {
+        console.error("[tw-gym] scene build failed, falling back to the static image:", err);
+        if (fallback) fallback.style.display = "block";
+        canvas.style.display = "none";
+      }
+    };
+    tryInit();
+  }
+  _buildGymScene(canvas, fallback) {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(440, 441.4, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Same overexposure fix as reviews/menu/wifi: the "exercise" screen is
+    // mostly white, so it needs tone mapping to avoid clipping to pure white.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 440 / 441.4, 0.01, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
+    fill.position.set(-5, 3, -4);
+    scene.add(fill);
+
+    // ---- helpers (ported verbatim from the design handoff's gym-nfc.html) ----
+    function roundedRect(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function plate(w, h, r, d, mat, name, bevel) {
+      const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+        ? { depth: d, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 }
+        : { depth: d, bevelEnabled: false, curveSegments: 24 });
+      g.center();
+      const m = new THREE.Mesh(g, mat); m.name = name; return m;
+    }
+    function screenCanvas(w, h) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+      return { c, ctx: c.getContext("2d"), tex };
+    }
+    function rr(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+
+    // ---- scene assembly (ported verbatim from gym-nfc.html) ----
+    const B = { lime: "#c8f04a", ink: "#141414", mid: "#2a2a2a", dim: "#8a8a8a", pink: "#fe2c55", insta: "#e1306c" };
+    const two = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
+
+    const MAT = {
+      steel: new THREE.MeshStandardMaterial({ name: "machine_steel", color: 0x3a3a3c, roughness: 0.42, metalness: 0.55 }),
+      chrome: new THREE.MeshStandardMaterial({ name: "machine_chrome", color: 0xb9bcc0, roughness: 0.18, metalness: 0.85 }),
+      pad: new THREE.MeshStandardMaterial({ name: "machine_pad", color: 0x1b1b1c, roughness: 0.72, metalness: 0.05 }),
+      plate: new THREE.MeshStandardMaterial({ name: "weight_plate", color: 0x2a2a2c, roughness: 0.55, metalness: 0.30 }),
+      floor: new THREE.MeshStandardMaterial({ name: "rubber_floor", color: 0x2f2f30, roughness: 0.92, metalness: 0.02 }),
+      accent: new THREE.MeshStandardMaterial({ name: "accent_red", color: 0xec3013, roughness: 0.40, metalness: 0.05 }),
+      tagBody: new THREE.MeshStandardMaterial({ name: "nfc_tag_body", color: 0xf4f3f1, roughness: 0.40, metalness: 0.05 }),
+      phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.40, metalness: 0.30 }),
+      glass: new THREE.MeshStandardMaterial({ name: "phone_back_glass", color: 0x24221f, roughness: 0.25, metalness: 0.40 }),
+      pulse: new THREE.MeshStandardMaterial({ name: "nfc_pulse", color: 0xc8f04a, emissive: 0xc8f04a, emissiveIntensity: 1.2, transparent: true, opacity: 0.0, roughness: 0.3 }),
+    };
+
+    const root = new THREE.Group();
+    root.name = "gym_nfc_scene";
+
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.016, 0.42), MAT.floor);
+    floor.name = "rubber_floor"; floor.position.set(0, 0.008, 0.02); root.add(floor);
+    const floorEdge = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.004, 0.001), MAT.accent);
+    floorEdge.name = "floor_edge"; floorEdge.position.set(0, 0.016, 0.2305); root.add(floorEdge);
+
+    const machine = new THREE.Group(); machine.name = "machine";
+    machine.position.set(-0.075, 0, -0.045); root.add(machine);
+
+    [-0.055, 0.055].forEach((x) => {
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.020, 0.230), MAT.steel);
+      rail.name = "base_rail_" + (x < 0 ? "l" : "r");
+      rail.position.set(x, 0.026, 0.0); machine.add(rail);
+    });
+    const crossBar = new THREE.Mesh(new THREE.BoxGeometry(0.136, 0.018, 0.026), MAT.steel);
+    crossBar.name = "base_cross"; crossBar.position.set(0, 0.026, -0.098); machine.add(crossBar);
+
+    const column = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.240, 0.038), MAT.steel);
+    column.name = "upright_column"; column.position.set(0, 0.156, -0.086); machine.add(column);
+    const columnCap = new THREE.Mesh(new THREE.BoxGeometry(0.046, 0.010, 0.046), MAT.chrome);
+    columnCap.name = "column_cap"; columnCap.position.set(0, 0.281, -0.086); machine.add(columnCap);
+
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.190, 0.022), MAT.chrome);
+    arm.name = "sled_arm"; arm.position.set(0, 0.140, 0.010); arm.rotation.x = 0.62; machine.add(arm);
+    const platform = new THREE.Mesh(new THREE.BoxGeometry(0.120, 0.010, 0.078), MAT.steel);
+    platform.name = "foot_platform";
+    platform.position.set(0, 0.210, -0.028); platform.rotation.x = 0.62; machine.add(platform);
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.104, 0.020, 0.086), MAT.pad);
+    seat.name = "seat_pad"; seat.position.set(0, 0.086, 0.062); machine.add(seat);
+    const backPad = new THREE.Mesh(new THREE.BoxGeometry(0.104, 0.088, 0.020), MAT.pad);
+    backPad.name = "back_pad";
+    backPad.position.set(0, 0.130, 0.104); backPad.rotation.x = 0.22; machine.add(backPad);
+    [-0.062, 0.062].forEach((x) => {
+      const h = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.070, 16), MAT.chrome);
+      h.name = "handle_" + (x < 0 ? "l" : "r");
+      h.position.set(x, 0.128, 0.070); h.rotation.z = Math.PI / 2; machine.add(h);
+    });
+    for (let i = 0; i < 5; i++) {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.086, 0.014, 0.052), MAT.plate);
+      p.name = "weight_plate_" + (i + 1);
+      p.position.set(0, 0.048 + i * 0.017, -0.150); machine.add(p);
+    }
+    const stackRod = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.150, 12), MAT.chrome);
+    stackRod.name = "stack_rod"; stackRod.position.set(0, 0.110, -0.150); machine.add(stackRod);
+
+    const signPost = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.200, 0.026), MAT.steel);
+    signPost.name = "sign_post"; signPost.position.set(-0.195, 0.100, 0.020); root.add(signPost);
+    const signFoot = new THREE.Mesh(new THREE.BoxGeometry(0.070, 0.012, 0.070), MAT.steel);
+    signFoot.name = "sign_post_foot"; signFoot.position.set(-0.195, 0.022, 0.020); root.add(signFoot);
+    const signBracket = new THREE.Mesh(new THREE.BoxGeometry(0.062, 0.014, 0.014), MAT.chrome);
+    signBracket.name = "sign_bracket"; signBracket.position.set(-0.162, 0.070, 0.020); root.add(signBracket);
+
+    const tagRig = new THREE.Group(); tagRig.name = "nfc_tag_rig";
+    tagRig.position.set(-0.195, 0.176, 0.0355);
+    root.add(tagRig);
+
+    const TW = 0.072, TH = 0.072, TT = 0.0024;
+    tagRig.add(plate(TW, TH, 0.006, TT, MAT.tagBody, "nfc_tag_body", 0.0005));
+    const ts = screenCanvas(420, 420);
+    const tagFaceMat = new THREE.MeshStandardMaterial({ name: "nfc_tag_print", map: ts.tex, roughness: 0.35, metalness: 0.03 });
+    const tagFace = new THREE.Mesh(new THREE.PlaneGeometry(TW - 0.001, TH - 0.001), tagFaceMat);
+    tagFace.name = "nfc_tag_face"; tagFace.position.z = TT / 2 + 0.0005; tagRig.add(tagFace);
+
+    const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.016, 0.0013, 10, 56), MAT.pulse);
+    pulse.name = "nfc_pulse_ring"; pulse.position.z = TT / 2 + 0.004; tagRig.add(pulse);
+
+    const FAR = new THREE.Vector3(0.130, 0.150, 0.215);
+    const TAP = new THREE.Vector3(-0.195, 0.176, 0.0475);
+    const READ = new THREE.Vector3(0.060, 0.185, 0.140);
+
+    const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig";
+    phoneRig.position.copy(FAR);
+    root.add(phoneRig);
+    const phone = new THREE.Group(); phone.name = "phone";
+    phoneRig.add(phone);
+    phone.add(plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, "phone_body", 0.0012));
+    const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+    phoneBack.name = "phone_back"; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+    const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, "camera_bump", 0.0006);
+    camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+    const ps = screenCanvas(560, 1150);
+    const phoneScreenMat = new THREE.MeshStandardMaterial({
+      name: "phone_screen", map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.6, roughness: 0.45, metalness: 0.0
+    });
+    const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), phoneScreenMat);
+    phoneScreen.name = "phone_screen_glass"; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+    scene.add(root);
+
+    // This scene fixes its own camera on the tag/phone pair instead of
+    // auto-framing the whole machine — per the design handoff, the machine
+    // is bulky enough that an auto-fit would leave the phone screen too
+    // small to read. Values (center/radius/factor) are the handoff's spec.
+    const camCenter = new THREE.Vector3(-0.062, 0.185, 0.096);
+    const camDir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+    const camDist = (0.165 / Math.tan((camera.fov * Math.PI) / 360)) * 1.06;
+    camera.position.copy(camCenter).add(camDir.clone().multiplyScalar(camDist));
+    camera.near = Math.max(camDist / 100, 0.005);
+    camera.far = camDist * 100;
+    camera.updateProjectionMatrix();
+    camera.lookAt(camCenter);
+
+    // ---- NFC tag artwork (verbatim colors/fonts/layout) ----
+    function nfcWaves(ctx, cx, cy, r0, n, lw, color) {
+      ctx.strokeStyle = color; ctx.lineCap = "round";
+      for (let i = 0; i < n; i++) {
+        ctx.lineWidth = lw - i * (lw * 0.18);
+        ctx.beginPath(); ctx.arc(cx, cy, r0 + i * r0 * 0.62, -0.85, 0.85); ctx.stroke();
+      }
+    }
+    function paintTag() {
+      const { ctx, c, tex } = ts;
+      ctx.fillStyle = B.ink; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = B.lime; ctx.fillRect(0, 0, c.width, 12);
+      ctx.textAlign = "left"; ctx.fillStyle = B.lime;
+      ctx.font = "800 96px Archivo, sans-serif";
+      ctx.fillText("07", 34, 108);
+      ctx.textAlign = "right"; ctx.fillStyle = "#ffffff";
+      ctx.font = "800 40px Archivo, sans-serif";
+      ctx.fillText("PRENSA", c.width - 30, 64);
+      ctx.fillText("DE PIERNA", c.width - 30, 108);
+      nfcWaves(ctx, 150, 250, 34, 4, 22, B.lime);
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 15;
+      rr(ctx, 232, 178, 112, 168, 18); ctx.stroke();
+      ctx.textAlign = "center"; ctx.fillStyle = "#ffffff";
+      ctx.font = "800 46px Archivo, sans-serif";
+      ctx.fillText("ACERCA TU", c.width / 2, 372);
+      ctx.fillText("CELULAR", c.width / 2, 402);
+      tex.needsUpdate = true;
+    }
+
+    // ---- phone screens (verbatim colors/fonts/layout) ----
+    const SETS = [["1", "12 reps", "40 kg"], ["2", "10 reps", "50 kg"], ["3", "8 reps", "60 kg"]];
+
+    function statusBar(ctx, c, now, right, color) {
+      ctx.fillStyle = color || B.dim; ctx.font = "600 22px Archivo, sans-serif";
+      ctx.textAlign = "left"; ctx.fillText(hhmm(now), 28, 40);
+      ctx.textAlign = "right"; ctx.fillText(right, c.width - 28, 40);
+    }
+    function playIcon(ctx, cx, cy, r) {
+      ctx.fillStyle = "rgba(255,255,255,0.22)";
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.moveTo(cx - r * 0.28, cy - r * 0.40); ctx.lineTo(cx + r * 0.44, cy);
+      ctx.lineTo(cx - r * 0.28, cy + r * 0.40); ctx.closePath(); ctx.fill();
+    }
+    function heartIcon(ctx, cx, cy, s, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + s * 0.72);
+      ctx.bezierCurveTo(cx - s * 1.35, cy - s * 0.18, cx - s * 0.62, cy - s * 1.10, cx, cy - s * 0.42);
+      ctx.bezierCurveTo(cx + s * 0.62, cy - s * 1.10, cx + s * 1.35, cy - s * 0.18, cx, cy + s * 0.72);
+      ctx.closePath(); ctx.fill();
+    }
+    function bubbleIcon(ctx, cx, cy, s, color) {
+      ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineJoin = "round";
+      rr(ctx, cx - s, cy - s * 0.82, s * 2, s * 1.42, s * 0.34); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - s * 0.34, cy + s * 0.60); ctx.lineTo(cx - s * 0.52, cy + s * 1.06);
+      ctx.lineTo(cx + s * 0.06, cy + s * 0.60); ctx.stroke();
+    }
+    function shareIcon(ctx, cx, cy, s, color) {
+      ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.lineJoin = "round"; ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx - s * 0.92, cy + s * 0.62); ctx.lineTo(cx + s * 0.92, cy - s * 0.30);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + s * 0.24, cy - s * 0.86); ctx.lineTo(cx + s * 0.92, cy - s * 0.30);
+      ctx.lineTo(cx + s * 0.34, cy + s * 0.26); ctx.stroke();
+    }
+    function paintPhone(state, now, k) {
+      const { ctx, c, tex } = ps;
+
+      if (state === "nfc") {
+        ctx.fillStyle = "#0d0f14"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "NFC");
+        ctx.textAlign = "center";
+        ctx.strokeStyle = B.lime; ctx.lineWidth = 8;
+        for (let i = 0; i < 3; i++) {
+          const r = 70 + i * 46 + Math.sin(k * Math.PI * 3) * 12;
+          ctx.globalAlpha = 0.9 - i * 0.25;
+          ctx.beginPath(); ctx.arc(c.width / 2, 470, r, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 34px Archivo, sans-serif";
+        ctx.fillText("NFC", c.width / 2, 484);
+        ctx.font = "700 28px Archivo, sans-serif";
+        ctx.fillText("Leyendo la máquina…", c.width / 2, 700);
+        ctx.fillStyle = B.dim; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("ESTACIÓN 07", c.width / 2, 744);
+        ctx.strokeStyle = "#2a2827"; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(c.width - 120, 820); ctx.stroke();
+        ctx.strokeStyle = B.lime;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(120 + (c.width - 240) * Math.min(1, k), 820); ctx.stroke();
+
+      } else if (state === "exercise") {
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = B.ink; ctx.fillRect(0, 0, c.width, 230);
+        statusBar(ctx, c, now, "ESTACIÓN 07", "#8a8a8a");
+        ctx.textAlign = "left";
+        ctx.fillStyle = B.lime; ctx.font = "800 22px Archivo, sans-serif";
+        ctx.fillText("EJERCICIO 07 · PIERNA", 28, 96);
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 44px Archivo, sans-serif";
+        ctx.fillText("Prensa de", 28, 152);
+        ctx.fillText("pierna", 28, 200);
+
+        ctx.fillStyle = B.ink; ctx.font = "800 24px Archivo, sans-serif";
+        ctx.fillText("TU SERIE DE HOY", 28, 296);
+        let y = 350;
+        const shown = Math.min(SETS.length, Math.max(1, Math.ceil(k * SETS.length * 1.5)));
+        for (let i = 0; i < shown; i++) {
+          const [n, reps, kg] = SETS[i];
+          ctx.fillStyle = B.lime; ctx.fillRect(28, y - 30, 46, 46);
+          ctx.fillStyle = B.ink; ctx.font = "800 26px Archivo, sans-serif";
+          ctx.textAlign = "center"; ctx.fillText(n, 51, y + 3);
+          ctx.textAlign = "left"; ctx.font = "800 30px Archivo, sans-serif";
+          ctx.fillText(reps, 98, y + 4);
+          ctx.textAlign = "right"; ctx.fillStyle = "#5a5a5a";
+          ctx.fillText(kg, c.width - 28, y + 4);
+          ctx.textAlign = "left";
+          ctx.strokeStyle = "#e6e6e6"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(28, y + 38); ctx.lineTo(c.width - 28, y + 38); ctx.stroke();
+          y += 100;
+        }
+        ctx.fillStyle = "#5a5a5a"; ctx.font = "600 23px Archivo, sans-serif";
+        ctx.fillText("Descanso 90 s · Espalda pegada al respaldo", 28, y + 34);
+
+        ctx.fillStyle = B.pink; ctx.fillRect(28, 880, c.width - 56, 96);
+        playIcon(ctx, 82, 928, 26);
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 27px Archivo, sans-serif";
+        ctx.fillText("VER CÓMO SE HACE", 126, 938);
+        ctx.fillStyle = "#8a8a8a"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Abierto por NFC desde la máquina", 28, 1030);
+
+      } else if (state === "video") {
+        ctx.fillStyle = "#000000"; ctx.fillRect(0, 0, c.width, c.height);
+        const g = ctx.createLinearGradient(0, 0, c.width, c.height);
+        g.addColorStop(0, "#1d2126"); g.addColorStop(0.55, "#2c3238"); g.addColorStop(1, "#14171a");
+        ctx.fillStyle = g; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillRect(0, 760, c.width, c.height - 760);
+        ctx.fillStyle = "rgba(0,0,0,0.45)";
+        ctx.beginPath();
+        ctx.moveTo(120, 760); ctx.lineTo(210, 430); ctx.lineTo(330, 430);
+        ctx.lineTo(420, 760); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.fillRect(150, 560, 260, 26);
+
+        statusBar(ctx, c, now, "REELS", "rgba(255,255,255,0.75)");
+
+        if (k < 0.22) playIcon(ctx, c.width / 2, 560, 54);
+
+        const railX = c.width - 62;
+        heartIcon(ctx, railX, 640, 26, k > 0.55 ? B.pink : "#ffffff");
+        ctx.textAlign = "center"; ctx.fillStyle = "#ffffff";
+        ctx.font = "700 20px Archivo, sans-serif";
+        ctx.fillText(k > 0.55 ? "4.3 k" : "4.2 k", railX, 692);
+        bubbleIcon(ctx, railX, 742, 24, "#ffffff");
+        ctx.font = "700 20px Archivo, sans-serif"; ctx.fillStyle = "#ffffff";
+        ctx.fillText("218", railX, 792);
+        shareIcon(ctx, railX, 848, 24, "#ffffff");
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 26px Archivo, sans-serif";
+        ctx.fillText("@coach.rivas", 28, 900);
+        ctx.font = "600 23px Archivo, sans-serif";
+        ctx.fillText("Prensa de pierna — pies a la altura", 28, 940);
+        ctx.fillText("de los hombros, no bloquees rodilla", 28, 972);
+        ctx.fillStyle = B.lime; ctx.font = "700 22px Archivo, sans-serif";
+        ctx.fillText("#tecnica  #pierna  #gym", 28, 1010);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.25)"; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(28, 1060); ctx.lineTo(c.width - 28, 1060); ctx.stroke();
+        ctx.strokeStyle = "#ffffff";
+        ctx.beginPath(); ctx.moveTo(28, 1060);
+        ctx.lineTo(28 + (c.width - 56) * Math.min(1, k), 1060); ctx.stroke();
+
+      } else {
+        ctx.fillStyle = "#0d0f14"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.textAlign = "center"; ctx.fillStyle = "#f3f2f2";
+        ctx.font = "700 132px Archivo, sans-serif"; ctx.fillText(hhmm(now), c.width / 2, 300);
+        ctx.fillStyle = B.dim; ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText(now.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" }).toUpperCase(), c.width / 2, 350);
+        ctx.fillStyle = "#2a2827"; ctx.fillRect(40, 940, c.width - 80, 120);
+        ctx.fillStyle = "#9aa0a6"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("NFC activado", c.width / 2, 1010);
+      }
+      tex.needsUpdate = true;
+    }
+
+    // ---- animation timeline (verbatim timings/easing) ----
+    const CYCLE = 16.0, T_IN = 2.2, T_NFC = 4.0, T_EX = 8.6, T_VID = 14.6, T_OUT = 15.4;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      const now = new Date();
+      let p, rx, ry, state, k = 0;
+
+      if (t < T_IN) {
+        k = ease(t / T_IN);
+        p = FAR.clone().lerp(TAP, k);
+        rx = -0.50 + 0.50 * k; ry = 0.50 - 0.50 * k; state = "idle";
+      } else if (t < T_NFC) {
+        k = (t - T_IN) / (T_NFC - T_IN);
+        p = TAP.clone(); p.z += Math.sin(k * Math.PI) * 0.004;
+        rx = 0.0; ry = 0.0; state = "nfc";
+      } else if (t < T_EX) {
+        k = (t - T_NFC) / (T_EX - T_NFC);
+        const e = ease(Math.min(1, k * 2.2));
+        p = TAP.clone().lerp(READ, e);
+        rx = -0.40 * e; ry = 0.16 * e; state = "exercise";
+      } else if (t < T_VID) {
+        k = (t - T_EX) / (T_VID - T_EX);
+        p = READ.clone(); p.y += Math.sin(k * Math.PI) * 0.005;
+        rx = -0.40; ry = 0.16; state = "video";
+      } else if (t < T_OUT) {
+        k = ease((t - T_VID) / (T_OUT - T_VID));
+        p = READ.clone().lerp(FAR, k);
+        rx = -0.40 - 0.15 * k; ry = 0.16 + 0.29 * k; state = "video"; k = 1;
+      } else {
+        p = FAR.clone(); rx = -0.55; ry = 0.45; state = "idle";
+      }
+
+      phoneRig.position.copy(p);
+      phone.rotation.set(rx, ry, Math.sin(ms / 1300) * 0.02);
+      paintPhone(state, now, k);
+
+      const glow = state === "nfc" ? 0.55 + 0.45 * Math.sin(k * Math.PI * 4) : 0;
+      MAT.pulse.opacity = glow;
+      pulse.scale.setScalar(1 + (state === "nfc" ? k * 0.5 : 0));
+    };
+    // Redundant feed so the canvas textures keep repainting even if the
+    // outer rAF loop stalls for a moment — kept per the design handoff.
+    phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
+
+    paintTag();
+    paintPhone("idle", new Date(), 0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { paintTag(); });
+    }
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame((T_EX - 0.3) * 1000);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const loop = (ms) => {
+      if (this._isGymSelected) {
+        frame(ms);
+        renderer.render(scene, camera);
+      }
+      this._gymRafId = requestAnimationFrame(loop);
+    };
+    this._gymRafId = requestAnimationFrame(loop);
+  }
+  _initPagoScene() {
+    const canvas = document.getElementById("tw-pago-canvas");
+    const fallback = document.getElementById("tw-pago-fallback");
+    if (!canvas) return;
+    let attempts = 0;
+    const tryInit = () => {
+      if (typeof THREE === "undefined") {
+        attempts++;
+        if (attempts > 40) {
+          console.error("[tw-pago] THREE never loaded from the CDN after ~6s — falling back to the static image.");
+          if (fallback) fallback.style.display = "block";
+          canvas.style.display = "none";
+          return;
+        }
+        this._pagoRetryTimer = setTimeout(tryInit, 150);
+        return;
+      }
+      try {
+        this._buildPagoScene(canvas, fallback);
+      } catch (err) {
+        console.error("[tw-pago] scene build failed, falling back to the static image:", err);
+        if (fallback) fallback.style.display = "block";
+        canvas.style.display = "none";
+      }
+    };
+    tryInit();
+  }
+  _buildPagoScene(canvas, fallback) {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(440, 441.4, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Same overexposure fix as the other white-screen states: the "pay"
+    // and "done" screens are mostly white, so they need tone mapping to
+    // avoid clipping to pure white.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 440 / 441.4, 0.01, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
+    fill.position.set(-5, 3, -4);
+    scene.add(fill);
+
+    // ---- helpers (ported verbatim from the design handoff's pago-nfc.html) ----
+    function roundedRect(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function plate(w, h, r, d, mat, name, bevel) {
+      const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+        ? { depth: d, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 }
+        : { depth: d, bevelEnabled: false, curveSegments: 24 });
+      g.center();
+      const m = new THREE.Mesh(g, mat); m.name = name; return m;
+    }
+    function screenCanvas(w, h) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+      return { c, ctx: c.getContext("2d"), tex };
+    }
+    function rr(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+    function nfcWaves(ctx, cx, cy, r0, n, lw, color) {
+      ctx.strokeStyle = color; ctx.lineCap = "round";
+      for (let i = 0; i < n; i++) {
+        ctx.lineWidth = lw - i * (lw * 0.17);
+        ctx.beginPath(); ctx.arc(cx, cy, r0 + i * r0 * 0.66, -0.88, 0.88); ctx.stroke();
+      }
+    }
+
+    // ---- scene assembly (ported verbatim from pago-nfc.html) ----
+    const B = {
+      magenta: "#e5007e", deep: "#a8005d", dark: "#5c0033",
+      ink: "#1a0d15", paper: "#fdf4f9", dim: "#8a7a83", ok: "#1f9d55"
+    };
+    const ACCOUNT = "2100 4487 91";
+    const HOLDER = "XPRINT SOLUCIONES S.A.";
+    const AMOUNT = "48,90";
+    const two = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
+
+    const MAT = {
+      desk: new THREE.MeshStandardMaterial({ name: "counter_top", color: 0xc9c6c2, roughness: 0.60, metalness: 0.10 }),
+      accent: new THREE.MeshStandardMaterial({ name: "accent_red", color: 0xec3013, roughness: 0.40, metalness: 0.05 }),
+      acrylic: new THREE.MeshStandardMaterial({ name: "acrylic_clear", color: 0xe7dfe4, roughness: 0.14, metalness: 0.05, transparent: true, opacity: 0.40 }),
+      acrylicBase: new THREE.MeshStandardMaterial({ name: "acrylic_base", color: 0xe7dfe4, roughness: 0.14, metalness: 0.05, transparent: true, opacity: 0.40 }),
+      panelEdge: new THREE.MeshStandardMaterial({ name: "panel_stock", color: 0xf6eef3, roughness: 0.42, metalness: 0.03 }),
+      phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.40, metalness: 0.30 }),
+      glass: new THREE.MeshStandardMaterial({ name: "phone_back_glass", color: 0x24221f, roughness: 0.25, metalness: 0.40 }),
+      pulse: new THREE.MeshStandardMaterial({ name: "nfc_pulse", color: 0xe5007e, emissive: 0xe5007e, emissiveIntensity: 1.2, transparent: true, opacity: 0.0, roughness: 0.3 }),
+    };
+
+    const root = new THREE.Group();
+    root.name = "pago_nfc_scene";
+
+    const desk = new THREE.Mesh(new THREE.BoxGeometry(0.340, 0.016, 0.170), MAT.desk);
+    desk.name = "counter_top"; desk.position.set(-0.020, 0.008, 0.045); root.add(desk);
+    const deskEdge = new THREE.Mesh(new THREE.BoxGeometry(0.340, 0.004, 0.001), MAT.accent);
+    deskEdge.name = "counter_edge"; deskEdge.position.set(-0.020, 0.014, 0.1305); root.add(deskEdge);
+
+    const blockBase = new THREE.Mesh(new THREE.BoxGeometry(0.112, 0.012, 0.056), MAT.acrylicBase);
+    blockBase.name = "acrylic_base"; blockBase.position.set(-0.125, 0.024, 0.057); root.add(blockBase);
+    const blockLip = new THREE.Mesh(new THREE.BoxGeometry(0.112, 0.012, 0.007), MAT.acrylic);
+    blockLip.name = "acrylic_lip"; blockLip.position.set(-0.125, 0.036, 0.045); root.add(blockLip);
+
+    const PW = 0.100, PH = 0.140, PT = 0.006;
+    const panelRig = new THREE.Group(); panelRig.name = "panel_rig";
+    panelRig.position.set(-0.125, 0.100, 0.035); panelRig.rotation.x = -0.10;
+    root.add(panelRig);
+    panelRig.add(plate(PW, PH, 0.005, PT, MAT.panelEdge, "panel_stock", 0.0008));
+
+    const cs = screenCanvas(700, 980);
+    const panelFaceMat = new THREE.MeshStandardMaterial({ name: "panel_print", map: cs.tex, roughness: 0.30, metalness: 0.04 });
+    const panelFace = new THREE.Mesh(new THREE.PlaneGeometry(PW - 0.0012, PH - 0.0012), panelFaceMat);
+    panelFace.name = "panel_face"; panelFace.position.z = PT / 2 + 0.0008; panelRig.add(panelFace);
+
+    const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.021, 0.0015, 10, 56), MAT.pulse);
+    pulse.name = "nfc_pulse_ring"; pulse.position.set(0, 0.006, PT / 2 + 0.005); panelRig.add(pulse);
+
+    const FAR = new THREE.Vector3(0.140, 0.150, 0.020);
+    const TAP = new THREE.Vector3(-0.125, 0.1234, 0.0473);
+    const READ = new THREE.Vector3(0.058, 0.150, 0.045);
+
+    const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig";
+    phoneRig.position.copy(FAR);
+    root.add(phoneRig);
+    const phone = new THREE.Group(); phone.name = "phone";
+    phoneRig.add(phone);
+    phone.add(plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, "phone_body", 0.0012));
+    const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+    phoneBack.name = "phone_back"; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+    const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, "camera_bump", 0.0006);
+    camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+    const ps = screenCanvas(560, 1150);
+    const phoneScreenMat = new THREE.MeshStandardMaterial({
+      name: "phone_screen", map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.6, roughness: 0.45, metalness: 0.0
+    });
+    const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), phoneScreenMat);
+    phoneScreen.name = "phone_screen_glass"; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+    scene.add(root);
+
+    // This scene fixes its own camera on the panel/phone pair instead of
+    // auto-framing the whole counter — per the design handoff, the counter
+    // is wide enough that an auto-fit would leave the phone screen too
+    // small to read. Values (center/radius/factor) are the handoff's spec.
+    const camCenter = new THREE.Vector3(-0.03, 0.135, 0.045);
+    const camDir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+    const camDist = (0.15 / Math.tan((camera.fov * Math.PI) / 360)) * 1.06;
+    camera.position.copy(camCenter).add(camDir.clone().multiplyScalar(camDist));
+    camera.near = Math.max(camDist / 100, 0.005);
+    camera.far = camDist * 100;
+    camera.updateProjectionMatrix();
+    camera.lookAt(camCenter);
+
+    // ---- acrylic panel artwork (verbatim colors/fonts/layout) ----
+    function paintPanel() {
+      const { ctx, c, tex } = cs;
+      ctx.fillStyle = B.magenta; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = B.deep; ctx.fillRect(0, 0, c.width, 176);
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 176, c.width, 8);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.55)"; ctx.lineWidth = 4;
+      ctx.setLineDash([14, 10]);
+      ctx.strokeRect(48, 44, 300, 92);
+      ctx.setLineDash([]);
+      ctx.textAlign = "left"; ctx.fillStyle = "rgba(255,255,255,0.75)";
+      ctx.font = "700 22px Archivo, sans-serif";
+      ctx.fillText("LOGO DEL BANCO", 68, 98);
+
+      ctx.textAlign = "right"; ctx.fillStyle = "#ffffff";
+      ctx.font = "800 26px Archivo, sans-serif";
+      ctx.fillText("PAGOS NFC", c.width - 48, 100);
+
+      ctx.textAlign = "left"; ctx.fillStyle = "#ffffff";
+      ctx.font = "800 62px Archivo, sans-serif";
+      ctx.fillText("Paga aquí", 48, 290);
+      ctx.font = "700 32px Archivo, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.88)";
+      ctx.fillText("acercando tu celular", 48, 340);
+
+      nfcWaves(ctx, 190, 500, 40, 4, 22, "#ffffff");
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 13;
+      rr(ctx, 320, 418, 106, 164, 18); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(320, 540); ctx.quadraticCurveTo(288, 604, 348, 622);
+      ctx.lineTo(452, 622); ctx.quadraticCurveTo(490, 614, 474, 578);
+      ctx.lineTo(436, 536); ctx.stroke();
+
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(48, 700, c.width - 96, 168);
+      ctx.fillStyle = B.dim; ctx.font = "700 22px Archivo, sans-serif";
+      ctx.fillText("CUENTA DE AHORROS", 76, 748);
+      ctx.fillStyle = B.ink; ctx.font = "800 44px Archivo, sans-serif";
+      ctx.fillText(ACCOUNT, 76, 800);
+      ctx.fillStyle = B.deep; ctx.font = "700 22px Archivo, sans-serif";
+      ctx.fillText(HOLDER, 76, 840);
+
+      ctx.textAlign = "center"; ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.font = "800 24px Archivo, sans-serif";
+      ctx.fillText("SIN DIGITAR LA CUENTA · SIN QR", c.width / 2, 930);
+      tex.needsUpdate = true;
+    }
+
+    // ---- phone screens (verbatim colors/fonts/layout) ----
+    function statusBar(ctx, c, now, right, color) {
+      ctx.fillStyle = color || B.dim; ctx.font = "600 22px Archivo, sans-serif";
+      ctx.textAlign = "left"; ctx.fillText(hhmm(now), 28, 40);
+      ctx.textAlign = "right"; ctx.fillText(right, c.width - 28, 40);
+    }
+    function checkMark(ctx, cx, cy, r, ring, tick) {
+      ctx.strokeStyle = ring; ctx.lineWidth = 9;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = tick; ctx.lineWidth = 12; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx - r * 0.42, cy + r * 0.02);
+      ctx.lineTo(cx - r * 0.10, cy + r * 0.38);
+      ctx.lineTo(cx + r * 0.46, cy - r * 0.34);
+      ctx.stroke();
+    }
+    function shieldIcon(ctx, cx, cy, s, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - s);
+      ctx.lineTo(cx + s * 0.78, cy - s * 0.62);
+      ctx.quadraticCurveTo(cx + s * 0.78, cy + s * 0.62, cx, cy + s);
+      ctx.quadraticCurveTo(cx - s * 0.78, cy + s * 0.62, cx - s * 0.78, cy - s * 0.62);
+      ctx.closePath(); ctx.fill();
+    }
+    function paintPhone(state, now, k) {
+      const { ctx, c, tex } = ps;
+
+      if (state === "nfc") {
+        ctx.fillStyle = "#140a10"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "NFC");
+        ctx.textAlign = "center";
+        ctx.strokeStyle = B.magenta; ctx.lineWidth = 8;
+        for (let i = 0; i < 3; i++) {
+          const r = 74 + i * 46 + Math.sin(k * Math.PI * 3) * 12;
+          ctx.globalAlpha = 0.9 - i * 0.25;
+          ctx.beginPath(); ctx.arc(c.width / 2, 470, r, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 34px Archivo, sans-serif";
+        ctx.fillText("NFC", c.width / 2, 484);
+        ctx.font = "700 28px Archivo, sans-serif";
+        ctx.fillText("Leyendo datos de pago…", c.width / 2, 700);
+        ctx.fillStyle = B.dim; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("CUENTA DE AHORROS", c.width / 2, 744);
+        ctx.strokeStyle = "#2a1a22"; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(c.width - 120, 820); ctx.stroke();
+        ctx.strokeStyle = B.magenta;
+        ctx.beginPath(); ctx.moveTo(120, 820); ctx.lineTo(120 + (c.width - 240) * Math.min(1, k), 820); ctx.stroke();
+
+      } else if (state === "pay") {
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = B.magenta; ctx.fillRect(0, 0, c.width, 240);
+        statusBar(ctx, c, now, "BANCA MÓVIL", "rgba(255,255,255,0.8)");
+        ctx.textAlign = "left"; ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.font = "700 22px Archivo, sans-serif";
+        ctx.fillText("TRANSFERIR / PAGAR", 28, 96);
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 42px Archivo, sans-serif";
+        ctx.fillText("Cuenta cargada", 28, 152);
+        ctx.font = "700 24px Archivo, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.fillText("Datos recibidos por NFC", 28, 196);
+
+        ctx.fillStyle = B.dim; ctx.font = "700 22px Archivo, sans-serif";
+        ctx.fillText("DESTINO", 28, 300);
+        ctx.fillStyle = B.ink; ctx.font = "800 36px Archivo, sans-serif";
+        ctx.fillText(ACCOUNT, 28, 348);
+        ctx.fillStyle = B.deep; ctx.font = "700 23px Archivo, sans-serif";
+        ctx.fillText(HOLDER, 28, 386);
+        ctx.strokeStyle = "#eee2e9"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(28, 424); ctx.lineTo(c.width - 28, 424); ctx.stroke();
+
+        ctx.fillStyle = B.dim; ctx.font = "700 22px Archivo, sans-serif";
+        ctx.fillText("MONTO A PAGAR", 28, 486);
+        ctx.fillStyle = B.ink; ctx.font = "800 76px Archivo, sans-serif";
+        ctx.fillText("$ " + AMOUNT, 28, 566);
+        ctx.strokeStyle = "#eee2e9"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(28, 606); ctx.lineTo(c.width - 28, 606); ctx.stroke();
+
+        ctx.fillStyle = B.dim; ctx.font = "700 22px Archivo, sans-serif";
+        ctx.fillText("DESDE", 28, 664);
+        ctx.fillStyle = B.ink; ctx.font = "700 28px Archivo, sans-serif";
+        ctx.fillText("Ahorros ····8102", 28, 704);
+
+        shieldIcon(ctx, 44, 776, 16, "#c9b6c1");
+        ctx.fillStyle = "#8a7a83"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Confirma con tu huella", 70, 784);
+
+        const held = k > 0.60;
+        ctx.fillStyle = held ? B.deep : B.magenta;
+        ctx.fillRect(28, 872, c.width - 56, 96);
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 30px Archivo, sans-serif";
+        ctx.fillText(held ? "AUTORIZANDO…" : "PAGAR AHORA", 56, 930);
+        ctx.strokeStyle = "#eee2e9"; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(28, 1010); ctx.lineTo(c.width - 28, 1010); ctx.stroke();
+        if (held) {
+          ctx.strokeStyle = B.magenta;
+          ctx.beginPath(); ctx.moveTo(28, 1010);
+          ctx.lineTo(28 + (c.width - 56) * Math.min(1, (k - 0.60) / 0.40), 1010); ctx.stroke();
+        }
+
+      } else if (state === "done") {
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = B.magenta; ctx.fillRect(0, 0, c.width, 150);
+        statusBar(ctx, c, now, "BANCA MÓVIL", "rgba(255,255,255,0.8)");
+        ctx.textAlign = "left"; ctx.fillStyle = "#ffffff"; ctx.font = "800 38px Archivo, sans-serif";
+        ctx.fillText("Comprobante", 28, 118);
+
+        ctx.textAlign = "center";
+        checkMark(ctx, c.width / 2, 320, 76, "#f5dbe8", B.ok);
+        ctx.fillStyle = B.ink; ctx.font = "800 42px Archivo, sans-serif";
+        ctx.fillText("Pago enviado", c.width / 2, 458);
+        ctx.fillStyle = B.ink; ctx.font = "800 62px Archivo, sans-serif";
+        ctx.fillText("$ " + AMOUNT, c.width / 2, 542);
+
+        ctx.textAlign = "left";
+        let y = 636;
+        const rows = [["A", HOLDER], ["CUENTA", ACCOUNT], ["HORA", hhmm(now)], ["COMPROBANTE", "NFC-77401326"]];
+        rows.forEach(([label, val]) => {
+          ctx.fillStyle = B.dim; ctx.font = "700 21px Archivo, sans-serif";
+          ctx.fillText(label, 28, y);
+          ctx.textAlign = "right"; ctx.fillStyle = B.ink; ctx.font = "700 25px Archivo, sans-serif";
+          ctx.fillText(val, c.width - 28, y);
+          ctx.textAlign = "left";
+          ctx.strokeStyle = "#eee2e9"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(28, y + 26); ctx.lineTo(c.width - 28, y + 26); ctx.stroke();
+          y += 78;
+        });
+        ctx.fillStyle = B.magenta; ctx.fillRect(28, 968, c.width - 56, 88);
+        ctx.fillStyle = "#ffffff"; ctx.font = "800 28px Archivo, sans-serif";
+        ctx.fillText("COMPARTIR COMPROBANTE", 56, 1022);
+
+      } else {
+        ctx.fillStyle = "#140a10"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.textAlign = "center"; ctx.fillStyle = "#f3f2f2";
+        ctx.font = "700 132px Archivo, sans-serif"; ctx.fillText(hhmm(now), c.width / 2, 300);
+        ctx.fillStyle = B.dim; ctx.font = "600 26px Archivo, sans-serif";
+        ctx.fillText(now.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" }).toUpperCase(), c.width / 2, 350);
+        ctx.fillStyle = "#2a1a22"; ctx.fillRect(40, 940, c.width - 80, 120);
+        ctx.fillStyle = "#9aa0a6"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText("NFC activado", c.width / 2, 1010);
+      }
+      tex.needsUpdate = true;
+    }
+
+    // ---- animation timeline (verbatim timings/easing) ----
+    const CYCLE = 15.0, T_IN = 2.2, T_NFC = 3.9, T_PAY = 9.6, T_DONE = 13.8, T_OUT = 14.5;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      const now = new Date();
+      let p, rx, ry, state, k = 0;
+
+      if (t < T_IN) {
+        k = ease(t / T_IN);
+        p = FAR.clone().lerp(TAP, k);
+        rx = -0.55 + 0.45 * k; ry = 0.45 - 0.44 * k; state = "idle";
+      } else if (t < T_NFC) {
+        k = (t - T_IN) / (T_NFC - T_IN);
+        p = TAP.clone(); p.z += Math.sin(k * Math.PI) * 0.004;
+        rx = -0.10; ry = 0.01; state = "nfc";
+      } else if (t < T_PAY) {
+        k = (t - T_NFC) / (T_PAY - T_NFC);
+        const e = ease(Math.min(1, k * 1.9));
+        p = TAP.clone().lerp(READ, e);
+        rx = -0.10 - 0.32 * e; ry = 0.14 * e; state = "pay";
+      } else if (t < T_DONE) {
+        k = (t - T_PAY) / (T_DONE - T_PAY);
+        p = READ.clone(); p.y += Math.sin(k * Math.PI) * 0.004;
+        rx = -0.42; ry = 0.14; state = "done";
+      } else if (t < T_OUT) {
+        k = ease((t - T_DONE) / (T_OUT - T_DONE));
+        p = READ.clone().lerp(FAR, k);
+        rx = -0.42 - 0.13 * k; ry = 0.14 + 0.31 * k; state = "done"; k = 1;
+      } else {
+        p = FAR.clone(); rx = -0.55; ry = 0.45; state = "idle";
+      }
+
+      phoneRig.position.copy(p);
+      phone.rotation.set(rx, ry, Math.sin(ms / 1300) * 0.02);
+      paintPhone(state, now, k);
+
+      const glow = state === "nfc" ? 0.55 + 0.45 * Math.sin(k * Math.PI * 4) : 0;
+      MAT.pulse.opacity = glow;
+      pulse.scale.setScalar(1 + (state === "nfc" ? k * 0.5 : 0));
+    };
+    // Redundant feed so the canvas textures keep repainting even if the
+    // outer rAF loop stalls for a moment — kept per the design handoff.
+    phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
+
+    paintPanel();
+    paintPhone("idle", new Date(), 0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { paintPanel(); });
+    }
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame((T_DONE - 0.3) * 1000);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const loop = (ms) => {
+      if (this._isPagoSelected) {
+        frame(ms);
+        renderer.render(scene, camera);
+      }
+      this._pagoRafId = requestAnimationFrame(loop);
+    };
+    this._pagoRafId = requestAnimationFrame(loop);
+  }
+  _initStickerScene() {
+    const canvas = document.getElementById("tw-sticker-canvas");
+    const fallback = document.getElementById("tw-sticker-fallback");
+    if (!canvas) return;
+    let attempts = 0;
+    const tryInit = () => {
+      if (typeof THREE === "undefined") {
+        attempts++;
+        if (attempts > 40) {
+          console.error("[tw-sticker] THREE never loaded from the CDN after ~6s — falling back to the static image.");
+          if (fallback) fallback.style.display = "block";
+          canvas.style.display = "none";
+          return;
+        }
+        this._stickerRetryTimer = setTimeout(tryInit, 150);
+        return;
+      }
+      try {
+        this._buildStickerScene(canvas, fallback);
+      } catch (err) {
+        console.error("[tw-sticker] scene build failed, falling back to the static image:", err);
+        if (fallback) fallback.style.display = "block";
+        canvas.style.display = "none";
+      }
+    };
+    tryInit();
+  }
+  _buildStickerScene(canvas, fallback) {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(440, 441.4, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Same overexposure fix as the other white-screen states: the "tienda"
+    // screen is mostly white, so it needs tone mapping to avoid clipping.
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 440 / 441.4, 0.01, 500);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
+    fill.position.set(-5, 3, -4);
+    scene.add(fill);
+
+    // ---- tolerant image loading (ported verbatim: never breaks the scene if a PNG is missing) ----
+    function loadImg(src) {
+      return new Promise((res) => {
+        const i = new Image();
+        i.onload = () => res(i); i.onerror = () => res(null); i.src = src;
+      });
+    }
+    let feedImg = null, avaImg = null;
+    loadImg("enemy-feed.webp").then((img) => { feedImg = img; });
+    loadImg("enemy-avatar.webp").then((img) => { avaImg = img; });
+
+    // ---- helpers (ported verbatim from the design handoff's tomatodo-sticker-3d.html) ----
+    function canvasTex(w, h) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+      return { c, ctx: c.getContext("2d"), tex };
+    }
+    function roundedRect(w, h, r) {
+      const s = new THREE.Shape(), x = -w / 2, y = -h / 2;
+      s.moveTo(x + r, y);
+      s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+      s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+      s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+      return s;
+    }
+    function plate(w, h, r, d, mat, name, bevel) {
+      const g = new THREE.ExtrudeGeometry(roundedRect(w, h, r), bevel
+        ? { depth: d, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 4, curveSegments: 24 }
+        : { depth: d, bevelEnabled: false, curveSegments: 24 });
+      g.center();
+      const m = new THREE.Mesh(g, mat); m.name = name; return m;
+    }
+    function rr(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+
+    // brushed aluminium for the bottle wall
+    function brushedTex() {
+      const c = document.createElement("canvas"); c.width = 1024; c.height = 256;
+      const x = c.getContext("2d");
+      x.fillStyle = "#20343a"; x.fillRect(0, 0, c.width, c.height);
+      let seed = 91;
+      const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+      for (let i = 0; i < 12000; i++) {
+        const py = rnd() * c.height;
+        x.strokeStyle = rnd() > 0.5 ? "rgba(255,255,255,0.030)" : "rgba(0,0,0,0.035)";
+        x.lineWidth = 0.35 + rnd() * 0.5;
+        x.beginPath(); x.moveTo(0, py); x.lineTo(c.width, py + (rnd() - 0.5) * 1.5); x.stroke();
+      }
+      const hl = x.createLinearGradient(0, 0, c.width, 0);
+      hl.addColorStop(0, "rgba(255,255,255,0)"); hl.addColorStop(0.30, "rgba(255,255,255,0.16)");
+      hl.addColorStop(0.42, "rgba(255,255,255,0)"); hl.addColorStop(1, "rgba(0,0,0,0.10)");
+      x.fillStyle = hl; x.fillRect(0, 0, c.width, c.height);
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 4); t.anisotropy = 8;
+      return t;
+    }
+
+    // ---- scene assembly (ported verbatim from tomatodo-sticker-3d.html) ----
+    const ACC = "@enemy___";
+    const two = (n) => String(n).padStart(2, "0");
+    const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
+    const C = { accent: "#ec3013", ink: "#201e1d", dim: "#8d8580", ig: "#3f5bf6" };
+
+    const MAT = {
+      bottle: new THREE.MeshStandardMaterial({ name: "bottle_wall", color: 0xffffff, map: brushedTex(), roughness: 0.30, metalness: 0.34 }),
+      collar: new THREE.MeshStandardMaterial({ name: "bottle_collar", color: 0xb9bec2, roughness: 0.28, metalness: 0.60 }),
+      cap: new THREE.MeshStandardMaterial({ name: "bottle_cap", color: 0x1d1e20, roughness: 0.62, metalness: 0.08 }),
+      loop: new THREE.MeshStandardMaterial({ name: "cap_loop", color: 0x2a2c2f, roughness: 0.70, metalness: 0.06 }),
+      desk: new THREE.MeshStandardMaterial({ name: "desk_top", color: 0xc9c6c2, roughness: 0.60, metalness: 0.10 }),
+      accent: new THREE.MeshStandardMaterial({ name: "desk_edge", color: 0xec3013, roughness: 0.40, metalness: 0.05 }),
+      phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.40, metalness: 0.30 }),
+      glass: new THREE.MeshStandardMaterial({ name: "phone_back_glass", color: 0x24221f, roughness: 0.25, metalness: 0.40 }),
+      pulse: new THREE.MeshStandardMaterial({ name: "nfc_pulse", color: 0xec3013, emissive: 0xec3013, emissiveIntensity: 1.2, transparent: true, opacity: 0, roughness: 0.3 }),
+    };
+
+    const root = new THREE.Group();
+    root.name = "tomatodo_nfc_scene";
+
+    const desk = new THREE.Mesh(new THREE.BoxGeometry(0.320, 0.016, 0.180), MAT.desk);
+    desk.name = "desk_top"; desk.position.set(0.014, 0.008, 0.020); root.add(desk);
+    const deskEdge = new THREE.Mesh(new THREE.BoxGeometry(0.320, 0.004, 0.001), MAT.accent);
+    deskEdge.name = "desk_edge"; deskEdge.position.set(0.014, 0.014, 0.1105); root.add(deskEdge);
+
+    const BR = 0.0385, BH = 0.212;
+    const bottle = new THREE.Group(); bottle.name = "tomatodo";
+    bottle.position.set(-0.062, 0.016, 0.004);
+    root.add(bottle);
+
+    const wall = new THREE.Mesh(new THREE.CylinderGeometry(BR, BR * 0.985, BH, 64, 1, false), MAT.bottle);
+    wall.name = "bottle_wall"; wall.position.y = BH / 2; bottle.add(wall);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.985, BR * 0.94, 0.006, 64), MAT.cap);
+    base.name = "bottle_base"; base.position.y = 0.003; bottle.add(base);
+
+    const shoulder = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.60, BR, 0.030, 64), MAT.bottle);
+    shoulder.name = "bottle_shoulder"; shoulder.position.y = BH + 0.015; bottle.add(shoulder);
+    const neck = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.55, BR * 0.58, 0.016, 48), MAT.collar);
+    neck.name = "bottle_neck"; neck.position.y = BH + 0.038; bottle.add(neck);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.60, BR * 0.60, 0.028, 48), MAT.cap);
+    cap.name = "bottle_cap"; cap.position.y = BH + 0.060; bottle.add(cap);
+    const capTop = new THREE.Mesh(new THREE.CylinderGeometry(BR * 0.58, BR * 0.60, 0.004, 48), MAT.loop);
+    capTop.name = "cap_top"; capTop.position.y = BH + 0.076; bottle.add(capTop);
+    const loop = new THREE.Mesh(new THREE.TorusGeometry(0.0130, 0.0030, 12, 40), MAT.loop);
+    loop.name = "cap_loop";
+    loop.position.set(0, BH + 0.080, -BR * 0.30); loop.rotation.x = 0.28; bottle.add(loop);
+
+    const STICK_D = 0.062;
+    const stickRig = new THREE.Group(); stickRig.name = "sticker_rig";
+    stickRig.rotation.y = 0.62;
+    bottle.add(stickRig);
+
+    const ss = canvasTex(640, 640);
+    const stickerMat = new THREE.MeshStandardMaterial({
+      name: "sticker_593", map: ss.tex, emissiveMap: ss.tex, emissive: 0xffffff, emissiveIntensity: 0.30,
+      transparent: true, roughness: 0.28, metalness: 0.06, side: THREE.DoubleSide
+    });
+    const theta = STICK_D / BR;
+    const stickerGeo = new THREE.CylinderGeometry(BR + 0.0008, BR + 0.0008, STICK_D, 48, 1, true, -theta / 2, theta);
+    const sticker = new THREE.Mesh(stickerGeo, stickerMat);
+    sticker.name = "sticker_593"; sticker.position.y = 0.128; stickRig.add(sticker);
+
+    const NORMAL = new THREE.Vector3(Math.sin(0.62), 0, Math.cos(0.62));
+    const STICK_C = new THREE.Vector3(
+      bottle.position.x + NORMAL.x * BR, 0.016 + 0.128, bottle.position.z + NORMAL.z * BR);
+
+    const chip = new THREE.Mesh(new THREE.TorusGeometry(0.0135, 0.0009, 10, 44), MAT.pulse);
+    chip.name = "nfc_chip_marker";
+    chip.position.copy(STICK_C).addScaledVector(NORMAL, 0.0016);
+    chip.lookAt(chip.position.clone().add(NORMAL)); root.add(chip);
+
+    const pulse = new THREE.Mesh(new THREE.TorusGeometry(0.026, 0.0012, 10, 56), MAT.pulse);
+    pulse.name = "nfc_pulse_ring";
+    pulse.position.copy(STICK_C).addScaledVector(NORMAL, 0.004);
+    pulse.lookAt(pulse.position.clone().add(NORMAL)); root.add(pulse);
+
+    const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig"; root.add(phoneRig);
+    const phone = new THREE.Group(); phone.name = "phone"; phoneRig.add(phone);
+    phone.add(plate(0.074, 0.152, 0.010, 0.0085, MAT.phoneBody, "phone_body", 0.0012));
+    const phoneBack = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.144), MAT.glass);
+    phoneBack.name = "phone_back"; phoneBack.position.z = -0.0048; phoneBack.rotation.y = Math.PI; phone.add(phoneBack);
+    const camBump = plate(0.024, 0.024, 0.004, 0.002, MAT.glass, "camera_bump", 0.0006);
+    camBump.position.set(-0.020, 0.055, -0.0055); phone.add(camBump);
+
+    const ps = canvasTex(560, 1150);
+    const screenMat = new THREE.MeshStandardMaterial({
+      name: "phone_screen", map: ps.tex, emissiveMap: ps.tex, emissive: 0xffffff,
+      emissiveIntensity: 0.6, roughness: 0.45, metalness: 0.0
+    });
+    const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.067, 0.142), screenMat);
+    phoneScreen.name = "phone_screen_glass"; phoneScreen.position.z = 0.0055; phone.add(phoneScreen);
+
+    scene.add(root);
+
+    // This scene fixes its own camera on the bottle/phone pair instead of
+    // auto-framing the whole desk — per the design handoff, the desk is
+    // wide enough that an auto-fit would leave the phone screen too small
+    // to read. Values (center/radius/factor/dir) are the handoff's spec.
+    const camCenter = new THREE.Vector3(0.018, 0.140, 0.030);
+    const camDir = new THREE.Vector3(0.86, 0.34, 1).normalize();
+    const camDist = (0.226 / Math.tan((camera.fov * Math.PI) / 360)) * 1.04;
+    camera.position.copy(camCenter).add(camDir.clone().multiplyScalar(camDist));
+    camera.near = Math.max(camDist / 100, 0.005);
+    camera.far = camDist * 100;
+    camera.updateProjectionMatrix();
+    camera.lookAt(camCenter);
+
+    // ---- sticker artwork (verbatim colors/fonts/layout) ----
+    function paintSticker() {
+      const { ctx, c, tex } = ss;
+      ctx.clearRect(0, 0, c.width, c.height);
+      const R = c.width / 2, cx = R, cy = R;
+
+      const g = ctx.createRadialGradient(R * 0.70, R * 0.56, 12, cx, cy, R);
+      g.addColorStop(0, "#4a4d52"); g.addColorStop(0.56, "#26282c"); g.addColorStop(1, "#121316");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(cx, cy, R - 18, 0, Math.PI * 2); ctx.fill();
+
+      const holo = ["#9ef0d2", "#d9c9ff", "#ffd9a8", "#a8e6ff", "#ffc7e6", "#c9ffd8", "#9ef0d2"];
+      ctx.lineWidth = 20; ctx.lineCap = "butt";
+      for (let i = 0; i < holo.length - 1; i++) {
+        const a0 = -Math.PI / 2 + (i / (holo.length - 1)) * Math.PI * 2;
+        const a1 = -Math.PI / 2 + ((i + 1) / (holo.length - 1)) * Math.PI * 2;
+        const gr = ctx.createLinearGradient(
+          cx + Math.cos(a0) * R, cy + Math.sin(a0) * R, cx + Math.cos(a1) * R, cy + Math.sin(a1) * R);
+        gr.addColorStop(0, holo[i]); gr.addColorStop(1, holo[i + 1]);
+        ctx.strokeStyle = gr;
+        ctx.beginPath(); ctx.arc(cx, cy, R - 11, a0 - 0.02, a1 + 0.02); ctx.stroke();
+      }
+
+      ctx.textAlign = "center";
+
+      const num = ctx.createLinearGradient(0, R * 0.28, 0, R * 1.02);
+      num.addColorStop(0, "#ffffff"); num.addColorStop(0.48, "#cfd4d8"); num.addColorStop(1, "#83888d");
+      ctx.fillStyle = num;
+      ctx.font = '700 224px "Cormorant Garamond", Georgia, serif';
+      ctx.fillText("593", cx, R * 1.06);
+
+      ctx.fillStyle = "#eef2f5";
+      ctx.font = "700 32px Archivo, sans-serif";
+      ctx.fillText("FROM THE MIDDLE OF THE EARTH", cx, R * 1.20);
+
+      const ec = ctx.createLinearGradient(0, R * 1.24, 0, R * 1.52);
+      ec.addColorStop(0, "#ffffff"); ec.addColorStop(1, "#c2c7cb");
+      ctx.fillStyle = ec;
+      ctx.font = '400 104px "Pinyon Script", cursive';
+      ctx.fillText("Ecuador", cx, R * 1.50);
+
+      ctx.fillStyle = "rgba(226,232,236,0.80)";
+      ctx.font = "700 22px Archivo, sans-serif";
+      ctx.fillText("POWERED BY ENEMY COMPANY™", cx, R * 1.66);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.62)"; ctx.lineWidth = 6; ctx.lineCap = "round";
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath(); ctx.arc(cx - 18, R * 1.76, 10 + i * 11, -0.85, 0.85); ctx.stroke();
+      }
+      tex.needsUpdate = true;
+    }
+
+    // ---- phone screens (verbatim colors/fonts/layout) ----
+    function statusBar(ctx, c, now, right, color) {
+      ctx.fillStyle = color || C.dim; ctx.font = "600 22px Archivo, sans-serif";
+      ctx.textAlign = "left"; ctx.fillText(hhmm(now), 28, 40);
+      ctx.textAlign = "right"; ctx.fillText(right, c.width - 28, 40);
+    }
+    function paintPhone(state, now, k) {
+      const { ctx, c, tex } = ps;
+
+      if (state === "nfc") {
+        ctx.fillStyle = "#08080a"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "NFC", "rgba(255,255,255,0.7)");
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 636, c.width, 514);
+        ctx.fillStyle = "#d8d3d0"; ctx.fillRect(c.width / 2 - 40, 668, 80, 8);
+        ctx.textAlign = "center";
+        ctx.strokeStyle = C.accent;
+        for (let i = 0; i < 3; i++) {
+          const u = ((k * 3.2) + i / 3) % 1;
+          ctx.lineWidth = 7; ctx.globalAlpha = 0.9 * (1 - u) * (1 - u);
+          ctx.beginPath(); ctx.arc(c.width / 2, 786, 42 + u * 110, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = C.ink;
+        ctx.beginPath(); ctx.arc(c.width / 2, 786, 34, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.font = "800 20px Archivo, sans-serif";
+        ctx.fillText("NFC", c.width / 2, 794);
+        ctx.fillStyle = C.ink; ctx.font = "800 38px Archivo, sans-serif";
+        ctx.fillText("Sticker detectado", c.width / 2, 916);
+        ctx.fillStyle = C.dim; ctx.font = "600 23px Archivo, sans-serif";
+        ctx.fillText("Abriendo instagram.com/enemy___…", c.width / 2, 958);
+        ctx.fillStyle = "#eae6e4"; ctx.fillRect(40, 1008, c.width - 80, 8);
+        ctx.fillStyle = C.accent; ctx.fillRect(40, 1008, (c.width - 80) * Math.min(1, k * 1.3), 8);
+
+      } else if (state === "perfil") {
+        ctx.fillStyle = "#000"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "INSTAGRAM", "rgba(255,255,255,0.62)");
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#fff"; ctx.font = "800 34px Archivo, sans-serif";
+        ctx.fillText("enemy___", 28, 108);
+
+        if (avaImg) {
+          ctx.save();
+          ctx.beginPath(); ctx.arc(84, 200, 48, 0, Math.PI * 2); ctx.clip();
+          ctx.fillStyle = "#fff"; ctx.fillRect(36, 152, 96, 96);
+          ctx.drawImage(avaImg, 44, 160, 80, 80);
+          ctx.restore();
+          ctx.strokeStyle = "#f0397a"; ctx.lineWidth = 5;
+          ctx.beginPath(); ctx.arc(84, 200, 52, 0, Math.PI * 2); ctx.stroke();
+        }
+        let x = 178;
+        [["317", "PUBLIC."], ["47,1 k", "SEGUID."], ["3", "SIGUE"]].forEach(([n, l]) => {
+          ctx.fillStyle = "#fff"; ctx.font = "800 30px Archivo, sans-serif"; ctx.fillText(n, x, 190);
+          ctx.fillStyle = "rgba(255,255,255,0.58)"; ctx.font = "700 18px Archivo, sans-serif"; ctx.fillText(l, x, 220);
+          x += 128;
+        });
+        ctx.fillStyle = "#fff"; ctx.font = "800 26px Archivo, sans-serif";
+        ctx.fillText("enemy®", 28, 296);
+        ctx.fillStyle = "rgba(255,255,255,0.52)"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Ropa (marca)", 28, 328);
+        ctx.fillStyle = "rgba(255,255,255,0.86)";
+        ctx.fillText("Santo Domingo – Santiago", 28, 362);
+        ctx.fillText("Worldwide Shipping", 28, 394);
+        ctx.fillStyle = "#7cb0ff"; ctx.fillText("www.enemyrd.com", 28, 428);
+
+        const followed = k > 0.55;
+        ctx.fillStyle = followed ? "#26262a" : C.ig;
+        ctx.fillRect(28, 456, 236, 68);
+        ctx.fillStyle = "#fff"; ctx.font = "800 23px Archivo, sans-serif";
+        ctx.fillText(followed ? "SIGUIENDO" : "SEGUIR", 50, 498);
+        ctx.fillStyle = "#26262a"; ctx.fillRect(278, 456, 184, 68);
+        ctx.fillText("MENSAJE", 300, 498);
+
+        if (feedImg) {
+          const top = 560;
+          const scroll = Math.max(0, Math.min(1, (k - 0.3) / 0.6));
+          const w = c.width, h = feedImg.height * (w / feedImg.width);
+          ctx.save();
+          ctx.beginPath(); ctx.rect(0, top, w, c.height - top); ctx.clip();
+          ctx.drawImage(feedImg, 0, top - scroll * Math.max(0, h - (c.height - top) + 120), w, h);
+          ctx.restore();
+          const gd = ctx.createLinearGradient(0, c.height - 90, 0, c.height);
+          gd.addColorStop(0, "rgba(0,0,0,0)"); gd.addColorStop(1, "rgba(0,0,0,0.9)");
+          ctx.fillStyle = gd; ctx.fillRect(0, c.height - 90, c.width, 90);
+        }
+
+      } else if (state === "tienda") {
+        ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "ENEMYRD.COM");
+        ctx.fillStyle = "#f1eeec"; ctx.fillRect(28, 62, c.width - 56, 54);
+        ctx.textAlign = "left";
+        ctx.fillStyle = C.dim; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("www.enemyrd.com", 46, 96);
+
+        ctx.fillStyle = "#131315"; ctx.fillRect(0, 138, c.width, 250);
+        ctx.fillStyle = "#fff"; ctx.font = "800 52px Archivo, sans-serif";
+        ctx.fillText("enemy®", 34, 256);
+        ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "700 22px Archivo, sans-serif";
+        ctx.fillText("WORLDWIDE SHIPPING", 34, 300);
+        if (avaImg) {
+          ctx.save();
+          ctx.beginPath(); ctx.arc(c.width - 92, 232, 44, 0, Math.PI * 2); ctx.clip();
+          ctx.fillStyle = "#fff"; ctx.fillRect(c.width - 136, 188, 88, 88);
+          ctx.drawImage(avaImg, c.width - 129, 195, 74, 74);
+          ctx.restore();
+        }
+
+        const rows = [["Camisetas", "NUEVO"], ["Gorras", "RESTOCK"], ["Lentes", "CÁPSULA"], ["Summer essentials", "0026"]];
+        let y = 456;
+        const shown = Math.min(rows.length, Math.floor(k * rows.length * 2.6) + 1);
+        for (let i = 0; i < shown; i++) {
+          ctx.fillStyle = C.ink; ctx.font = "800 30px Archivo, sans-serif";
+          ctx.fillText(rows[i][0], 34, y);
+          ctx.textAlign = "right";
+          ctx.fillStyle = C.dim; ctx.font = "700 19px Archivo, sans-serif";
+          ctx.fillText(rows[i][1], c.width - 34, y);
+          ctx.textAlign = "left";
+          ctx.fillStyle = "#e6e2df"; ctx.fillRect(34, y + 22, c.width - 68, 4);
+          y += 92;
+        }
+        ctx.fillStyle = C.ink; ctx.fillRect(34, 1000, c.width - 68, 84);
+        ctx.fillStyle = "#fff"; ctx.font = "800 24px Archivo, sans-serif";
+        ctx.fillText("VER LA TIENDA", 56, 1050);
+
+      } else {
+        ctx.fillStyle = "#0c0c0e"; ctx.fillRect(0, 0, c.width, c.height);
+        statusBar(ctx, c, now, "NFC", "rgba(255,255,255,0.6)");
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#f3f2f2"; ctx.font = "700 132px Archivo, sans-serif";
+        ctx.fillText(hhmm(now), c.width / 2, 320);
+        ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.font = "600 24px Archivo, sans-serif";
+        ctx.fillText(now.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" }).toUpperCase(), c.width / 2, 372);
+        ctx.fillStyle = "rgba(255,255,255,0.09)"; ctx.fillRect(36, 926, c.width - 72, 132);
+        ctx.strokeStyle = "rgba(255,255,255,0.18)"; ctx.lineWidth = 3;
+        ctx.strokeRect(36, 926, c.width - 72, 132);
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#fff"; ctx.font = "800 24px Archivo, sans-serif";
+        ctx.fillText("NFC ACTIVADO", 68, 982);
+        ctx.fillStyle = "rgba(255,255,255,0.62)"; ctx.font = "600 22px Archivo, sans-serif";
+        ctx.fillText("Acerca el celular al sticker", 68, 1020);
+      }
+      tex.needsUpdate = true;
+    }
+
+    // ---- animation timeline (verbatim timings/easing) ----
+    const CYCLE = 18.0, T_IN = 2.6, T_NFC = 4.6, T_PERFIL = 11.4, T_TIENDA = 16.2, T_OUT = 17.2;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    const FAR = new THREE.Vector3(0.152, 0.204, 0.118);
+    const TAP = STICK_C.clone().addScaledVector(NORMAL, 0.034);
+    TAP.y += 0.090;
+    const READ = new THREE.Vector3(0.112, 0.136, 0.080);
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      const now = new Date();
+      let p, rx, ry, state, k = 0;
+
+      if (t < T_IN) {
+        k = ease(t / T_IN);
+        p = FAR.clone().lerp(TAP, k);
+        rx = -0.30 - 0.14 * k; ry = -0.30 + 0.92 * k; state = "idle";
+      } else if (t < T_NFC) {
+        k = (t - T_IN) / (T_NFC - T_IN);
+        p = TAP.clone().addScaledVector(NORMAL, -Math.sin(k * Math.PI) * 0.005);
+        rx = -0.16; ry = 0.62; state = "nfc";
+      } else if (t < T_PERFIL) {
+        k = (t - T_NFC) / (T_PERFIL - T_NFC);
+        const e = ease(Math.min(1, k * 2.2));
+        p = TAP.clone().lerp(READ, e);
+        rx = -0.16 - 0.18 * e; ry = 0.62 - 0.96 * e; state = "perfil";
+      } else if (t < T_TIENDA) {
+        k = (t - T_PERFIL) / (T_TIENDA - T_PERFIL);
+        p = READ.clone(); p.y += Math.sin(k * Math.PI) * 0.004;
+        rx = -0.34; ry = -0.34; state = "tienda";
+      } else if (t < T_OUT) {
+        k = ease((t - T_TIENDA) / (T_OUT - T_TIENDA));
+        p = READ.clone().lerp(FAR, Math.min(1, k));
+        rx = -0.34 + 0.04 * k; ry = -0.34 + 0.04 * k; state = "tienda"; k = 1;
+      } else {
+        // The design handoff's own timeline text calls for a separate
+        // "reposo" phase here (17.2-18s) distinct from the retreat just
+        // above it, but the reference code let the retreat's easing run
+        // unbounded past T_OUT instead of resetting — extrapolating past
+        // t=1 and producing a brief reverse-direction glitch each cycle.
+        // Ported as a static rest pose instead, matching every other
+        // scene's idle-tail pattern and the README's written intent.
+        p = FAR.clone(); rx = -0.30; ry = -0.30; state = "idle";
+      }
+
+      phoneRig.position.copy(p);
+      phone.rotation.set(rx, ry, Math.sin(ms / 1400) * 0.02);
+      paintPhone(state, now, k);
+
+      const active = state === "nfc";
+      MAT.pulse.opacity = active ? 0.55 + 0.45 * Math.sin(k * Math.PI * 4) : 0.26;
+      pulse.scale.setScalar(active ? 1 + k * 0.5 : 1);
+      pulse.visible = active;
+    };
+    // Redundant feed so the canvas textures keep repainting even if the
+    // outer rAF loop stalls for a moment — kept per the design handoff.
+    phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
+
+    paintSticker();
+    paintPhone("idle", new Date(), 0);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { paintSticker(); });
+    }
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame((T_PERFIL - 0.3) * 1000);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const renderLoop = (ms) => {
+      if (this._isStickerSelected) {
+        frame(ms);
+        renderer.render(scene, camera);
+      }
+      this._stickerRafId = requestAnimationFrame(renderLoop);
+    };
+    this._stickerRafId = requestAnimationFrame(renderLoop);
+  }
+  _initTarjetaScene() {
+    const stage = document.getElementById("tw-tarjeta-stage");
+    const fallback = document.getElementById("tw-tarjeta-fallback");
+    if (!stage) return;
+    try {
+      this._buildTarjetaScene(stage, fallback);
+    } catch (err) {
+      console.error("[tw-tarjeta] scene build failed, falling back to the static image:", err);
+      if (fallback) fallback.style.display = "block";
+      const stagebox = stage.closest(".tj-stagebox");
+      if (stagebox) stagebox.style.display = "none";
+    }
+  }
+  // No three.js here — this scene is pure CSS/HTML (ported verbatim from
+  // the design handoff's tarjeta-nfc.html), driven by a data-state
+  // attribute the CSS reacts to, exactly like the source.
+  _buildTarjetaScene(stage, fallback) {
+    const field = document.getElementById("tw-tarjeta-field");
+    const waves = document.getElementById("tw-tarjeta-waves");
+    const prog = document.getElementById("tw-tarjeta-prog");
+    const rings = field ? Array.from(field.querySelectorAll("i")) : [];
+    const waveEls = waves ? Array.from(waves.querySelectorAll("i")) : [];
+    const rows = Array.from(stage.querySelectorAll(".tj-srv"));
+    const views = {
+      acerca: document.getElementById("tw-tarjeta-v-lock"),
+      lectura: document.getElementById("tw-tarjeta-v-nfc"),
+      web: document.getElementById("tw-tarjeta-v-web"),
+      guardar: document.getElementById("tw-tarjeta-v-save"),
+    };
+
+    const two = (n) => String(n).padStart(2, "0");
+    const now0 = new Date();
+    const hhmm0 = now0.getHours() + ":" + two(now0.getMinutes());
+    stage.querySelectorAll(".tj-bar .tj-t").forEach((el) => { el.textContent = hhmm0; });
+    const clockEl = document.getElementById("tw-tarjeta-clock");
+    const dateEl = document.getElementById("tw-tarjeta-date");
+    if (clockEl) clockEl.textContent = hhmm0;
+    if (dateEl) dateEl.textContent = now0.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+
+    const CYCLE = 17, T_LECT = 3.6, T_WEB = 6.0, T_SAVE = 11.8, T_END = 16.0;
+    let last = "";
+
+    const setState = (s) => {
+      if (s === last) return;
+      last = s;
+      stage.dataset.state = s;
+      for (const k in views) { if (views[k]) views[k].classList.toggle("tj-on", k === s); }
+      if (s !== "web") rows.forEach((r) => r.classList.remove("tj-in"));
+      if (s !== "lectura" && prog) prog.style.width = "0%";
+    };
+
+    const frame = (ms) => {
+      const t = (ms / 1000) % CYCLE;
+      let s, k = 0;
+      if (t < T_LECT) { s = "acerca"; k = t / T_LECT; }
+      else if (t < T_WEB) { s = "lectura"; k = (t - T_LECT) / (T_WEB - T_LECT); }
+      else if (t < T_SAVE) { s = "web"; k = (t - T_WEB) / (T_SAVE - T_WEB); }
+      else if (t < T_END) { s = "guardar"; k = (t - T_SAVE) / (T_END - T_SAVE); }
+      else { s = "acerca"; k = 1; }
+      setState(s);
+
+      const fast = s === "lectura";
+      rings.forEach((r, i) => {
+        const u = ((ms / (fast ? 700 : 1900)) + i / rings.length) % 1;
+        const d = (fast ? 44 : 36) + u * (fast ? 178 : 116);
+        r.style.width = d + "px"; r.style.height = d + "px";
+        r.style.borderWidth = (fast ? 3 : 2) + "px";
+        r.style.opacity = String((fast ? 0.95 : 0.4) * (1 - u) * (1 - u));
+      });
+      waveEls.forEach((r, i) => {
+        const u = ((ms / 780) + i / waveEls.length) % 1;
+        const d = 38 + u * 104;
+        r.style.width = d + "px"; r.style.height = d + "px";
+        r.style.opacity = String(0.9 * (1 - u) * (1 - u));
+      });
+
+      if (s === "lectura" && prog) prog.style.width = Math.min(100, k * 132) + "%";
+      if (s === "web") {
+        const shown = Math.min(rows.length, Math.floor(k * rows.length * 2.8) + 1);
+        rows.forEach((r, i) => r.classList.toggle("tj-in", i < shown));
+      }
+    };
+
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      frame(T_WEB * 1000 + 200);
+      rows.forEach((r) => r.classList.add("tj-in"));
+      return;
+    }
+
+    const renderLoop = (ms) => {
+      if (this._isTarjetaSelected) frame(ms);
+      this._tarjetaRafId = requestAnimationFrame(renderLoop);
+    };
+    this._tarjetaRafId = requestAnimationFrame(renderLoop);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("mousemove", this._onMove);
+    if (this._threeRetryTimer) clearTimeout(this._threeRetryTimer);
+    if (this._threeRafId) cancelAnimationFrame(this._threeRafId);
+    if (this._resenasRetryTimer) clearTimeout(this._resenasRetryTimer);
+    if (this._resenasRafId) cancelAnimationFrame(this._resenasRafId);
+    if (this._menuRetryTimer) clearTimeout(this._menuRetryTimer);
+    if (this._menuRafId) cancelAnimationFrame(this._menuRafId);
+    if (this._wifiRetryTimer) clearTimeout(this._wifiRetryTimer);
+    if (this._wifiRafId) cancelAnimationFrame(this._wifiRafId);
+    if (this._gymRetryTimer) clearTimeout(this._gymRetryTimer);
+    if (this._gymRafId) cancelAnimationFrame(this._gymRafId);
+    if (this._pagoRetryTimer) clearTimeout(this._pagoRetryTimer);
+    if (this._pagoRafId) cancelAnimationFrame(this._pagoRafId);
+    if (this._stickerRetryTimer) clearTimeout(this._stickerRetryTimer);
+    if (this._stickerRafId) cancelAnimationFrame(this._stickerRafId);
+    if (this._tarjetaRafId) cancelAnimationFrame(this._tarjetaRafId);
+  }
+  renderVals() {
+    const solutions = [
+      { label: "Menú digital", image: "menu-3d.webp", productName: "Hablador NFC para mesa", client: "Restaurantes y cafeterías", headline: "Un menú que se actualiza sin reimprimir nada.", benefit: "El cliente ve el menú actualizado sin pedir la carta. Tú cambias precios y platos desde tu celular.", screenUrl: "menu.tapwork.ec", screenTitle: "Menú — Mesa 4", rows: [{a:"Entradas",b:"6 platos"},{a:"Platos fuertes",b:"11 platos"}], screenCta: "Pedir por WhatsApp", ctaLabel: "Quiero un menú digital" },
+      { label: "Reseñas de Google", image: "review-3d.webp", productName: "Tarjeta NFC de reseñas de Google", client: "Cualquier negocio con local físico", headline: "Reseñas de 5 estrellas, en el momento justo.", benefit: "Tu cliente acerca el celular y deja una reseña en Google al instante, justo cuando la experiencia fue buena.", screenUrl: "g.page/tapwork-review", screenTitle: "Danos tu opinión", rows: [{a:"Reseñas este mes",b:"+18"},{a:"Calificación",b:"4.9 ★"}], screenCta: "Dejar reseña en Google", ctaLabel: "Quiero más reseñas" },
+      { label: "Pedidos por WhatsApp", image: "dober.webp", photoMode: true, productName: "Acrílico NFC/QR — ejemplo real (Döber)", client: "Restaurantes y tiendas", headline: "Pedidos directos a tu WhatsApp, sin apps extra.", benefit: "El cliente escanea o acerca el celular y arma su pedido directo por WhatsApp, listo para confirmar.", screenUrl: "wa.me/tapwork", screenTitle: "Nuevo pedido", rows: [{a:"Producto",b:"2 combos"},{a:"Entrega",b:"A domicilio"}], screenCta: "Enviar pedido", ctaLabel: "Quiero pedidos por WhatsApp" },
+      { label: "Tarjeta de presentación", image: "tarjeta-3d.webp", productName: "Tarjeta de presentación NFC — ejemplo real (Tania Sánchez)", client: "Profesionales y equipos de venta", headline: "Tu contacto y tu portafolio, en un toque.", benefit: "Comparte tu contacto y tu página con un toque, sin imprimir tarjetas ni dictar tu número.", screenUrl: "tapwork.ec/daniela", screenTitle: "Daniela Rosero", rows: [{a:"Cargo",b:"Asesora comercial"},{a:"Contacto",b:"Guardar"}], screenCta: "Guardar contacto", ctaLabel: "Quiero mi tarjeta NFC" },
+      { label: "Página web", image: "keychain.webp", productName: "Llavero NFC de acceso a tu página", client: "Negocios sin página propia", headline: "Tu negocio con una página propia, lista para compartir.", benefit: "Una página simple con lo esencial: qué haces, dónde estás y cómo contactarte.", screenUrl: "tapwork.ec/tunegocio", screenTitle: "Tu Negocio", rows: [{a:"Secciones",b:"4"},{a:"Dominio",b:"Incluido"}], screenCta: "Ver ejemplo", ctaLabel: "Quiero mi página web" },
+      { label: "Asistencia laboral", image: "badge-3d.webp", productName: "Gafete NFC de asistencia", client: "Negocios con personal en turnos", headline: "Marcación con un toque, reporte listo para exportar.", benefit: "Tu equipo marca entrada y salida con su gafete NFC; tú exportas el reporte cuando quieras.", screenUrl: "tapwork.ec/asistencia", screenTitle: "Asistencia — Hoy", rows: [{a:"Entrada",b:"08:02"},{a:"Salida",b:"—"}], screenCta: "Exportar reporte", ctaLabel: "Quiero control de asistencia" },
+      { label: "Wi-Fi y redes", image: "wifi-3d.webp", productName: "Disco NFC de Wi-Fi", client: "Restaurantes, hoteles y salas de espera", headline: "Un toque y tu cliente ya está conectado.", benefit: "Tu cliente se conecta al Wi-Fi con un toque, sin escribir contraseñas ni pedirlas al mesero.", screenUrl: "wifi.tapwork.ec", screenTitle: "Bienvenido", rows: [{a:"Red",b:"TapWork_Clientes"},{a:"Estado",b:"Conectado"}], screenCta: "Ver redes sociales", ctaLabel: "Quiero Wi-Fi por NFC" },
+      { label: "Pagos y sugerencias", image: "pago-3d.webp", productName: "Acrílico NFC de pago", client: "Restaurantes y servicios", headline: "Cobra o recibe propinas con un enlace de pago.", benefit: "Tu cliente paga o deja una propina acercando el teléfono, sin llamar al mesero.", screenUrl: "pagar.tapwork.ec", screenTitle: "Pagar cuenta", rows: [{a:"Mesa",b:"7"},{a:"Total",b:"USD 24,50 (ejemplo)"}], screenCta: "Pagar ahora", ctaLabel: "Quiero cobrar por NFC" },
+      { label: "Gimnasios", image: "gym-3d.webp", productName: "Lector NFC para máquinas de gimnasio", client: "Gimnasios y estudios", headline: "Cada máquina, registrada con un toque.", benefit: "Tu socio acerca el teléfono al lector de la máquina y registra su serie al instante, sin apps ni papel.", screenUrl: "tapwork.ec/gimnasio", screenTitle: "Serie registrada", rows: [{a:"Máquina",b:"Prensa de pierna"},{a:"Serie",b:"3 · 12 reps"}], screenCta: "Ver mi rutina", ctaLabel: "Quiero lectores NFC para mi gimnasio" },
+      { label: "Mascotas", image: "collar.webp", productName: "Collar NFC para mascotas", client: "Dueños de mascotas", headline: "Un collar con la ficha de tu mascota, siempre a mano.", benefit: "Quien encuentre a tu mascota acerca el teléfono y ve tu contacto al instante, sin apps.", screenUrl: "tapwork.ec/firulais", screenTitle: "Firulais", rows: [{a:"Dueño",b:"Ver contacto"},{a:"Raza",b:"Mestizo"}], screenCta: "Contactar al dueño", ctaLabel: "Quiero el collar de mi mascota" },
+      { label: "Stickers", image: "sticker-3d.webp", productName: "Sticker NFC — ejemplo real (enemy®)", client: "Marcas con productos de superficie curva", headline: "Un sticker que se adapta a cualquier superficie curva.", benefit: "Va sobre botellas, cascos, laptops o autos y abre tu Instagram o tu tienda con un toque — sin QR, sin apps.", screenUrl: "instagram.com/enemy___", screenTitle: "Perfil de Instagram", rows: [{a:"Seguidores",b:"47,1 k"},{a:"Destino",b:"Instagram + tienda"}], screenCta: "Ver perfil", ctaLabel: "Quiero mi sticker NFC" }
+    ];
+    const i = this.state.selected;
+    const chips = solutions.map((s, idx) => ({
+      label: s.label,
+      pressed: idx === i ? "true" : "false",
+      style: idx === i ? "background:#f3f2f2;color:#075044;border:1px solid transparent;" : "",
+      pick: () => this.setState({ selected: idx })
+    }));
+    const current = solutions[i];
+    this._isBadgeSelected = current.image === "badge-3d.webp";
+    this._isReviewSelected = current.image === "review-3d.webp";
+    this._isMenuSelected = current.image === "menu-3d.webp";
+    this._isWifiSelected = current.image === "wifi-3d.webp";
+    this._isGymSelected = current.image === "gym-3d.webp";
+    this._isPagoSelected = current.image === "pago-3d.webp";
+    this._isStickerSelected = current.image === "sticker-3d.webp";
+    this._isTarjetaSelected = current.image === "tarjeta-3d.webp";
+    const mx = this.state.mx || 0;
+    const my = this.state.my || 0;
+    const tiltStyle = "transform:rotate(-6deg) rotateY(" + (mx * 10).toFixed(1) + "deg) rotateX(" + (my * -8).toFixed(1) + "deg) translate(" + (mx * 8).toFixed(1) + "px," + (my * 6).toFixed(1) + "px);";
+    return {
+      chips: chips,
+      tiltStyle: tiltStyle,
+      lab: {
+        image: current.image,
+        isPhoto: !!current.photoMode,
+        isDober: current.image === "dober.webp",
+        isBadge3D: current.image === "badge-3d.webp",
+        isReview3D: current.image === "review-3d.webp",
+        isMenu3D: current.image === "menu-3d.webp",
+        isWifi3D: current.image === "wifi-3d.webp",
+        isGym3D: current.image === "gym-3d.webp",
+        isPago3D: current.image === "pago-3d.webp",
+        isSticker3D: current.image === "sticker-3d.webp",
+        isTarjeta3D: current.image === "tarjeta-3d.webp",
+        showStandardGrid: current.image !== "badge-3d.webp" && current.image !== "review-3d.webp",
+        badgeCanvasStyle: current.image === "badge-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        reviewCanvasStyle: current.image === "review-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        menuCanvasStyle: current.image === "menu-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        wifiCanvasStyle: current.image === "wifi-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        gymCanvasStyle: current.image === "gym-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        pagoCanvasStyle: current.image === "pago-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        stickerCanvasStyle: current.image === "sticker-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        tarjetaStageStyle: current.image === "tarjeta-3d.webp"
+          ? "display:flex;position:absolute;inset:0;align-items:center;justify-content:center;"
+          : "display:none;",
+        isFloating: !current.photoMode,
+        isKeychain: current.image === "keychain.webp",
+        isCollar: current.image === "collar.webp",
+        productName: current.productName,
+        client: current.client,
+        headline: current.headline,
+        benefit: current.benefit,
+        screenUrl: current.screenUrl,
+        screenTitle: current.screenTitle,
+        rows: current.rows,
+        screenCta: current.screenCta,
+        ctaLabel: current.ctaLabel,
+        wa: "#"
+      }
+    };
+  }
+}
+
+  const comp = new Component({});
+  comp.state = { selected: 3, mx: 0, my: 0 };
+  comp.componentDidMount();
+  comp._isTarjetaSelected = true;
+  document.getElementById("status").textContent = "mounted";
+  window.__mounted = true;
+} catch (err) {
+  document.getElementById("status").textContent = "ERROR: " + (err && err.stack || err);
+  window.__mountError = String(err && err.stack || err);
+  console.error(err);
+}
+</script>
+</body>
+</html>
