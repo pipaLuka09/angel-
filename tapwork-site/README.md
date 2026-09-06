@@ -51,8 +51,26 @@ posición de la luz, el frustum de la sombra y el `normalBias` al tamaño real d
 lo que hay dentro; después se congela para que la sombra no tiemble cuando
 arranca la animación.
 
+## Escenario de las tres escenas CSS
+
+Tarjeta, llavero y mascotas están hechas solo con CSS, así que no pasan por
+`_studioRig`. Para que combinen con las otras nueve comparten un escenario de
+estudio: el mismo fondo casi negro neutro, un barrido de luz que sube desde el
+piso (un ciclorama, no una tarima recortada) y la línea roja al frente, que es
+el acento que se repite en todo el set.
+
+Se probó primero con una tarima en perspectiva como la de las escenas
+renderizadas y no funcionó: estas se ven casi de frente y no todas apoyan sobre
+algo — el llavero cuelga y mascotas son dos paneles planos — así que la mesa
+peleaba con la composición.
+
+Ese escenario vive en `capture/apply_studio_stage.py`. `NfcLab.dc.html` es la
+fuente, pero `capture/harness8-10.html` traen su propia copia del CSS y del
+markup de la escena, así que el mismo cambio tiene que entrar en los cuatro
+archivos o las capturas salen de una copia vieja. El script hace justo eso:
+
+    python3 capture/apply_studio_stage.py capture/NfcLab.dc.html capture/harness8.html ...
+
 ## Pendiente
 
 - Faltan los enlaces de Instagram / TikTok / Facebook (hoy dicen "pendiente").
-- Las tres escenas hechas con CSS (tarjeta, llavero, mascotas) no pasan por
-  `_studioRig`; traen su propia iluminación y su propio fondo.

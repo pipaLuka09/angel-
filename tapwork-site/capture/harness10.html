@@ -14,7 +14,7 @@ html,body{margin:0;background:#0b0f0e;}
   .ms-stage { position: relative; width: 664px; height: 716px; display: flex; align-items: center; gap: 24px; padding: 0 24px; box-sizing: border-box; overflow: hidden; transform-origin: top left; transform: scale(calc(100cqh / 716px)); background: radial-gradient(120% 90% at 26% 44%, #1c1a19 0%, #0f0e0e 58%, #080808 100%); }
   .ms-stage::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: #ec3013; z-index: 9; }
 
-  .ms-photo { position: relative; flex: none; width: 240px; aspect-ratio: 640/857; overflow: hidden; background: #2f3a22; box-shadow: 0 30px 40px -18px rgba(0,0,0,.6); }
+  .ms-photo { position: relative; z-index: 2; flex: none; width: 240px; aspect-ratio: 640/857; overflow: hidden; background: #2f3a22; box-shadow: 0 30px 40px -18px rgba(0,0,0,.6); }
   .ms-shot { position: absolute; inset: 0; background: url("dog-nfc.webp") center/cover no-repeat; transform: scale(1.02); transform-origin: 38% 62%; transition: transform 2.4s cubic-bezier(.4,0,.2,1); }
   #tw-mascotas-stage[data-state="ficha"] .ms-shot, #tw-mascotas-stage[data-state="mapa"] .ms-shot { transform: scale(1.075); }
   .ms-glow { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity .5s ease; clip-path: polygon(55.0% 59.7%,73.4% 63.9%,74.7% 68.3%,57.5% 69.6%); background: linear-gradient(115deg,rgba(255,255,255,.62),rgba(255,224,178,.30) 60%,rgba(255,255,255,0)); }
@@ -29,7 +29,7 @@ html,body{margin:0;background:#0b0f0e;}
   .ms-pin span { background: #201e1d; color: #fff; font-family: "Archivo", sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .14em; padding: 5px 9px; white-space: nowrap; }
   .ms-pin b { width: 2px; height: 26px; background: #201e1d; display: block; }
 
-  .ms-device { position: relative; flex: none; width: 352px; height: 716px; background: #141312; border-radius: 46px; padding: 11px; box-shadow: 0 40px 60px -22px rgba(0,0,0,.8); }
+  .ms-device { position: relative; z-index: 2; flex: none; width: 352px; height: 716px; background: #141312; border-radius: 46px; padding: 11px; box-shadow: 0 40px 60px -22px rgba(0,0,0,.8); }
   .ms-device::after { content: ""; position: absolute; inset: 3px; border-radius: 44px; border: 1px solid rgba(255,255,255,.10); pointer-events: none; }
   .ms-screen { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: #0b0f12; }
   .ms-island { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); width: 98px; height: 26px; background: #000; border-radius: 14px; z-index: 9; }
@@ -105,6 +105,28 @@ html,body{margin:0;background:#0b0f0e;}
   .ms-pair .ms-cta { position: static; left: auto; right: auto; bottom: auto; flex: 1; }
 
   @media (prefers-reduced-motion: reduce) { #tw-mascotas-stage .ms-view, #tw-mascotas-stage .ms-shot, #tw-mascotas-stage .ms-glow, #tw-mascotas-stage .ms-row, #tw-mascotas-stage .ms-pin, #tw-mascotas-stage .ms-tagdot, #tw-mascotas-stage .ms-sheet { transition: none; } }
+  /* ---- Escenario de estudio compartido (tarjeta / llavero / mascotas) ----
+     Las otras nueve escenas se renderizan en three.js sobre una tarima clara con
+     una línea roja al frente, contra un fondo casi negro neutro. Estas tres están
+     hechas solo con CSS, así que no pasan por `_studioRig`; esto les da el mismo
+     fondo, la misma tarima y la misma sombra de contacto para que se lean como
+     parte del mismo set y no como otra sesión de fotos. */
+  .tw-studio { background: radial-gradient(120% 90% at 30% 34%, #17191c 0%, #0c0e10 58%, #070709 100%) !important; }
+  /* Un ciclorama, no una tarima: estas escenas se ven casi de frente y no todas
+     apoyan sobre algo (el llavero cuelga, mascotas son dos paneles), así que una
+     mesa recortada pelearía con la composición. Un barrido de luz que sube desde
+     el piso más la línea roja da el mismo estudio sin forzar nada. */
+  .tw-slab { position: absolute; left: 0; right: 0; bottom: 0; height: 48%; z-index: 0; pointer-events: none; }
+  .tw-slab span { position: absolute; inset: 0; display: block; }
+  .tw-slab .tw-slab-top { background: linear-gradient(180deg, rgba(226,232,238,0) 0%, rgba(226,232,238,.05) 30%, rgba(228,234,240,.18) 58%, rgba(233,238,243,.40) 84%, rgba(238,242,246,.52) 100%); }
+  /* El viñeteo lateral tiene que entrar por abajo con una máscara: un radial
+     centrado bajo el cuadro ya está saturado en el borde superior del elemento
+     y dejaría una costura horizontal donde el barrido empieza. */
+  .tw-slab .tw-slab-shade { background: radial-gradient(76% 120% at 50% 106%, rgba(0,0,0,0) 36%, rgba(6,7,9,.52) 76%, rgba(6,7,9,.80) 100%);
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 46%); mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 46%); }
+  .tw-slab .tw-slab-face { background: linear-gradient(180deg, rgba(255,255,255,0) 82%, rgba(255,255,255,.10) 100%); }
+  .tw-slab .tw-slab-edge { top: auto; height: 6px; background: linear-gradient(180deg, #f2461f, #d8280d); }
+
 </style>
 </head>
 <body>
@@ -112,7 +134,8 @@ html,body{margin:0;background:#0b0f0e;}
 <div style="{{ lab.mascotasStageStyle }}">
 
           <div class="ms-stagebox">
-            <div class="ms-stage" id="tw-mascotas-stage" data-state="lock">
+            <div class="ms-stage tw-studio" id="tw-mascotas-stage" data-state="lock">
+              <div class="tw-slab"><span class="tw-slab-top"></span><span class="tw-slab-shade"></span><span class="tw-slab-face"></span><span class="tw-slab-edge"></span></div>
               <div class="ms-photo">
                 <div class="ms-shot"></div>
                 <div class="ms-glow"></div>

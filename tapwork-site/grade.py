@@ -116,7 +116,9 @@ def grade(key, im, target, bg):
         # Already a finished composition — just square it off around its centre.
         s = min(im.width, im.height)
         x0 = (im.width - s) // 2
-        y0 = round((im.height - s) * 0.42)          # bias up: these compose low
+        # Bottom-anchored: the studio sweep puts the red edge line on the very last
+        # row, and that line is the motif tying these to the rendered scenes.
+        y0 = im.height - s
         frame = im.crop((x0, y0, x0 + s, y0 + s)).convert('RGB').resize(
             (SIZE, SIZE), Image.LANCZOS)
     else:
