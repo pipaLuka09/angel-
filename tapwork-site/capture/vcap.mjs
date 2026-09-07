@@ -14,7 +14,7 @@ const SCENES = {
   resenas:    { h: 'harness2.html',  sel: '#tw-resenas-canvas',    warm: 6500 },
   asistencia: { h: 'harness.html',   sel: '#tw-asistencia-canvas', warm: 6500 },
   wifi:       { h: 'harness4.html',  sel: '#tw-wifi-canvas',       warm: 4500 },
-  gym:        { h: 'harness5.html',  sel: '#tw-gym-canvas',        warm: 9000 },
+  gym:        { h: 'harness5.html',  sel: '#tw-gym-canvas',        warm: 17000 },
   pago:       { h: 'harness6.html',  sel: '#tw-pago-canvas',       warm: 6000 },
   sticker:    { h: 'harness7.html',  sel: '#tw-sticker-canvas',    warm: 4500 },
   tarjeta:    { h: 'harness8.html',  sel: '.tj-stagebox',          warm: 3000 },
