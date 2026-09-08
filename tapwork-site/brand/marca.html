@@ -1,0 +1,215 @@
+<title>Marca Tap Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root {
+    --ground: #f6f4f2; --surface: #ffffff; --sunk: #efece8;
+    --ink: #17181b; --muted: #6d6f75; --faint: #92959b;
+    --red: #ec3013; --accent: #d8300f; --line: #e2ddd7;
+    --sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Source Serif 4", Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0f; --surface: #15171b; --sunk: #101216;
+      --ink: #eceef1; --muted: #8d929a; --faint: #6a6f77;
+      --accent: #ff5c36; --line: #23262c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0f; --surface: #15171b; --sunk: #101216;
+    --ink: #eceef1; --muted: #8d929a; --faint: #6a6f77;
+    --accent: #ff5c36; --line: #23262c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans);
+    font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .edge { height: 3px; background: var(--red); }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 0 22px 92px; }
+
+  header { padding: 50px 0 8px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .19em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 13px; }
+  h1 { font-size: clamp(30px, 5vw, 50px); font-weight: 700; letter-spacing: -.022em;
+    line-height: 1.04; margin: 0 0 16px; text-wrap: balance; }
+  .lede { font-family: var(--serif); font-size: 18.5px; line-height: 1.55; color: var(--muted);
+    max-width: 62ch; margin: 0; }
+
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase;
+    color: var(--faint); margin: 0; }
+  .sec { margin-top: 58px; }
+  .sec-head { border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 26px; }
+  .sec-head p { font-family: var(--serif); color: var(--muted); margin: 8px 0 0; max-width: 64ch; }
+
+  /* The tagline is the one thing on this page that gets to be loud. */
+  .claim { background: #0b0c0f; border-radius: 5px; padding: clamp(34px, 6vw, 62px) clamp(24px, 5vw, 54px);
+    display: flex; flex-direction: column; gap: 22px; }
+  .claim .mark { display: flex; align-items: center; gap: 18px; }
+  .claim .word { font-size: clamp(20px, 3vw, 27px); font-weight: 800; letter-spacing: -.03em; color: #f2f3f4; }
+  .claim q { quotes: none; font-size: clamp(30px, 6.2vw, 60px); font-weight: 700; letter-spacing: -.03em;
+    line-height: 1.06; color: #f2f3f4; text-wrap: balance; }
+  .claim q b { color: var(--red); font-weight: 700; }
+  .claim .gloss { font-family: var(--serif); font-size: 16.5px; line-height: 1.6; color: #9aa0a8; max-width: 56ch; margin: 0; }
+
+  .alts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+  @media (max-width: 700px) { .alts { grid-template-columns: 1fr; } }
+  .alt { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--line);
+    border-radius: 0 3px 3px 0; padding: 15px 17px; }
+  .alt strong { display: block; font-size: 17px; font-weight: 700; letter-spacing: -.012em; margin-bottom: 5px; }
+  .alt span { font-family: var(--serif); font-size: 14.5px; color: var(--muted); }
+
+  .marks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .m { border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--surface); }
+  .m .box { aspect-ratio: 1; display: grid; place-items: center; padding: 22px; }
+  .m .box.on-dark { background: #0b0c0f; }
+  .m .box.on-light { background: #f2f3f4; }
+  .m .cap { border-top: 1px solid var(--line); padding: 9px 11px; }
+  .m .cap b { display: block; font-size: 12.5px; font-weight: 700; }
+  .m .cap code { font-family: var(--mono); font-size: 10px; color: var(--faint); word-break: break-all; }
+  .m svg { width: 100%; height: auto; display: block; }
+
+  .sizes { display: flex; align-items: flex-end; gap: 26px; flex-wrap: wrap;
+    background: #0b0c0f; border-radius: 5px; padding: 26px 30px; }
+  .sizes figure { margin: 0; text-align: center; }
+  .sizes .av { border-radius: 50%; overflow: hidden; background: #15171b; display: grid; place-items: center; }
+  .sizes figcaption { font-family: var(--mono); font-size: 10.5px; color: #6a6f77; margin-top: 8px; }
+
+  .why { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+  .why div { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 18px 19px; }
+  .why h3 { font-size: 15px; font-weight: 700; margin: 0 0 7px; letter-spacing: -.01em; }
+  .why p { font-family: var(--serif); font-size: 15px; line-height: 1.58; color: var(--muted); margin: 0; }
+
+  .swatches { display: flex; gap: 12px; flex-wrap: wrap; }
+  .sw { border: 1px solid var(--line); border-radius: 4px; overflow: hidden; width: 156px; }
+  .sw .chip { height: 76px; }
+  .sw .info { padding: 9px 11px; background: var(--surface); }
+  .sw .info b { display: block; font-size: 12.5px; }
+  .sw .info code { font-family: var(--mono); font-size: 11px; color: var(--faint); }
+
+  .note { background: var(--sunk); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 0 3px 3px 0; padding: 18px 20px; margin-top: 26px; }
+  .note h3 { font-size: 14.5px; font-weight: 700; margin: 0 0 8px; }
+  .note p { font-family: var(--serif); font-size: 15.5px; line-height: 1.62; margin: 0 0 10px; max-width: 66ch; }
+  .note p:last-child { margin-bottom: 0; }
+  .files { font-family: var(--mono); font-size: 12.5px; color: var(--muted); line-height: 1.9; margin: 0; }
+</style>
+
+<div class="edge"></div>
+<div class="wrap">
+  <header>
+    <p class="kicker">Identidad · logo, frase y color</p>
+    <h1>Marca Tap Work</h1>
+    <p class="lede">La marca sale del material que ya existe: la línea roja que corre al frente de la tarima en las doce tomas de producto, y la Archivo con la que están escritas las pantallas de las escenas. No es una identidad nueva encima del trabajo — es la que el trabajo ya tenía, puesta por escrito.</p>
+  </header>
+
+  <section class="sec">
+    <div class="sec-head"><h2>La frase</h2></div>
+    <div class="claim">
+      <div class="mark"><span id="claimMark"></span><span class="word">Tap Work</span></div>
+      <q>Un toque hace <b>el trabajo</b>.</q>
+      <p class="gloss">Es el nombre, traducido a una promesa: <em>tap</em> es el toque y <em>work</em> es el trabajo. Y cubre el catálogo entero sin estirarse — un toque consigue la reseña, abre el menú, pasa el contacto, marca la entrada del turno y registra la serie en la máquina.</p>
+    </div>
+
+    <div class="alts">
+      <div class="alt"><strong>Lo que ya tienes, ahora trabaja.</strong>
+        <span>Si prefieres liderar con lo que nadie más ofrece: convertir el acrílico o el gafete que el negocio ya compró.</span></div>
+      <div class="alt"><strong>Un toque en vez de un trámite.</strong>
+        <span>Si el foco se va del todo a asistencia y gimnasios, donde lo que reemplazas es un procedimiento, no un papel impreso.</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>El logo</h2>
+      <p>La T de Tap emitiendo la señal del toque, apoyada en la línea roja de la tarima. Se descartaron tres alternativas por razones concretas: una etiqueta con la T calada leía como ícono de archivo de texto; los arcos usados como travesaño de la T parecían un paraguas; y un teléfono acercándose a una superficie se deshacía por debajo de 40&nbsp;px, que es justo el tamaño al que más se va a ver.</p>
+    </div>
+    <div class="marks" id="marks"></div>
+
+    <div class="sizes" style="margin-top:18px">
+      <figure><span class="av" id="s96" style="width:96px;height:96px"></span><figcaption>96 px</figcaption></figure>
+      <figure><span class="av" id="s56" style="width:56px;height:56px"></span><figcaption>56 px</figcaption></figure>
+      <figure><span class="av" id="s32" style="width:32px;height:32px"></span><figcaption>32 px · favicon</figcaption></figure>
+      <figure><span class="av" id="s24" style="width:24px;height:24px"></span><figcaption>24 px</figcaption></figure>
+      <figcaption style="font-family:var(--serif);font-size:15px;color:#9aa0a8;max-width:34ch;align-self:center">La prueba que importa: la foto de perfil de Instagram se ve a 32&nbsp;px en el feed de un teléfono.</figcaption>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>Qué te diferencia</h2>
+      <p>Cuatro cosas, sacadas de lo que efectivamente vendes — no de lo que suena bien.</p>
+    </div>
+    <div class="why">
+      <div><h3>Conviertes lo que ya compró</h3>
+        <p>Nadie más en el mercado local ofrece pegar el chip detrás del acrílico que el negocio ya mandó a hacer. Todos venden producto nuevo.</p></div>
+      <div><h3>No hay plataforma ni mensualidad</h3>
+        <p>No vendes una suscripción con panel y usuarios. Es un chip en un objeto que abre lo que tú decidas.</p></div>
+      <div><h3>Del menú a la asistencia</h3>
+        <p>El mismo toque que consigue una reseña marca la entrada de un turno. Pocos cubren marketing y operación con una sola cosa.</p></div>
+      <div><h3>El pedido llega a tu WhatsApp</h3>
+        <p>Sin formulario, sin correo, sin esperar respuesta. Escribe al 096 779 4882 y ahí mismo se cotiza.</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Color y tipografía</h2></div>
+    <div class="swatches" id="sw"></div>
+    <div class="note">
+      <h3>Por qué este rojo y esta tipografía</h3>
+      <p>El <code style="font-family:var(--mono)">#EC3013</code> no se eligió aquí: es el color exacto de la línea roja que ya corre al frente de la tarima en las doce escenas de producto. Usar otro habría obligado a rehacer todo el material. La Archivo es la que ya está dentro de las escenas, en las pantallas de los teléfonos — es gratis en Google Fonts y tiene acentos y eñes bien resueltos.</p>
+      <p>Regla de uso: el rojo es acento, no fondo. Aparece en la línea, en un botón, en una palabra. Cuando el rojo compite con el producto, el producto pierde.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Archivos</h2>
+      <p>Todo está en <code style="font-family:var(--mono);font-size:14px">tapwork-site/brand/</code>. El SVG escala a cualquier tamaño sin perder filo; el PNG es para donde no aceptan SVG, que es casi todo Instagram y Facebook.</p>
+    </div>
+    <p class="files">
+      tapwork-avatar-1080.png &nbsp;— foto de perfil de Instagram y Facebook<br>
+      tapwork-icon-512.png · tapwork-icon-180.png · tapwork-favicon-32.png &nbsp;— ícono y favicon del sitio<br>
+      tapwork-mark-dark-1080.png · tapwork-mark-light-1080.png &nbsp;— marca suelta, fondo transparente<br>
+      tapwork-mark-dark.svg · tapwork-mark-light.svg · tapwork-mark-mono.svg · tapwork-mark-red.svg · tapwork-avatar.svg
+    </p>
+  </section>
+</div>
+
+<script>
+const RED = '#ec3013', LIGHT = '#f2f3f4', DARK = '#17181b';
+function mark(size, ink, red, bg) {
+  const b = bg ? `<rect width="100" height="100" fill="${bg}"/>` : '';
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Tap Work">${b}
+    <rect x="15" y="26" width="48" height="13.5" rx="1.5" fill="${ink}"/>
+    <rect x="32.2" y="26" width="13.6" height="45" rx="1.5" fill="${ink}"/>
+    <g fill="none" stroke="${ink}" stroke-width="7.5" stroke-linecap="round">
+      <path d="M69 37.5a16.5 16.5 0 0 1 0 22"/><path d="M81 30a30 30 0 0 1 0 37"/></g>
+    <rect x="15" y="79" width="70" height="7.5" rx="3.75" fill="${red}"/></svg>`;
+}
+document.getElementById('claimMark').innerHTML = mark(52, LIGHT, RED);
+
+const VARIANTS = [
+  ['Sobre oscuro', 'tapwork-mark-dark.svg', 'on-dark', LIGHT, RED],
+  ['Sobre claro', 'tapwork-mark-light.svg', 'on-light', DARK, RED],
+  ['Un solo color', 'tapwork-mark-mono.svg', 'on-light', DARK, DARK],
+  ['Todo en rojo', 'tapwork-mark-red.svg', 'on-light', RED, RED],
+];
+document.getElementById('marks').innerHTML = VARIANTS.map(([n, f, cls, ink, red]) =>
+  `<div class="m"><div class="box ${cls}">${mark(96, ink, red)}</div>
+   <div class="cap"><b>${n}</b><code>${f}</code></div></div>`).join('');
+
+for (const [id, s] of [['s96', 62], ['s56', 36], ['s32', 21], ['s24', 16]]) {
+  document.getElementById(id).innerHTML = mark(s, LIGHT, RED);
+}
+
+const SW = [
+  ['Negro Tap Work', '#0B0C0F', 'fondo de todo el material'],
+  ['Rojo Tap Work', '#EC3013', 'acento, nunca fondo'],
+  ['Hueso', '#F2F3F4', 'texto sobre oscuro'],
+  ['Tinta', '#17181B', 'texto sobre claro'],
+];
+document.getElementById('sw').innerHTML = SW.map(([n, hex, use]) =>
+  `<div class="sw"><div class="chip" style="background:${hex}"></div>
+   <div class="info"><b>${n}</b><code>${hex}</code><br><code>${use}</code></div></div>`).join('');
+</script>
