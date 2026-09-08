@@ -14,7 +14,7 @@ without re-encoding twice. Silent — Reels autoplay muted and a silent track
 avoids a spurious "audio too quiet" flag.
 """
 import os, shutil, subprocess, sys
-from PIL import Image, ImageChops, ImageFilter
+from PIL import Image, ImageChops, ImageFilter, ImageStat
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 FRAMES = os.environ.get('TAPWORK_FRAMES', os.path.join(ROOT, 'capture', 'vf'))
@@ -36,6 +36,7 @@ WINDOW = 40          # frames of held motion to keep
 # roughly frame 36 to 160 of a ten-second capture.
 PINNED = {'tarjeta': 48, 'mascotas': 48}
 STEADINESS = 2.5     # how hard to prefer a steady window over merely a big one
+BACKDROP_LUMA = 15   # mean luminance every clip's backdrop is dimmed to
 
 
 def _slab_tone(im):
@@ -114,7 +115,14 @@ def encode(key, fmt, frames, crop, still):
 
     bg = still.crop(crop).convert('RGB').resize((w, h), Image.LANCZOS)
     bg = bg.filter(ImageFilter.GaussianBlur(w * 0.11))
-    bg = Image.blend(bg, Image.new('RGB', (w, h), (7, 7, 9)), 0.72)
+    # Dim to a fixed darkness rather than by a fixed amount. A scene built around a
+    # white slab blurs to a pale field and a fixed blend leaves it grey, so that clip
+    # reads lighter than the other ten sitting next to it. Solving the blend for a
+    # target mean puts every backdrop at the same depth.
+    dark = Image.new('RGB', (w, h), (7, 7, 9))
+    mean = ImageStat.Stat(bg.convert('L')).mean[0]
+    alpha = (mean - BACKDROP_LUMA) / (mean - 7.7) if mean > 7.7 else 0.72
+    bg = Image.blend(bg, dark, min(0.93, max(0.55, alpha)))
 
     side = round(w * fill)
     x = (w - side) // 2
