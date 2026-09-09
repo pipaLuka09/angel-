@@ -1,0 +1,246 @@
+<title>Prompts de asistencia NFC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root {
+    --ground: #f6f4f2; --surface: #ffffff; --sunk: #efece8;
+    --ink: #17181b; --muted: #6d6f75; --faint: #92959b;
+    --red: #ec3013; --accent: #d8300f; --line: #e2ddd7; --ok: #17795a;
+    --sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Source Serif 4", Georgia, serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0f; --surface: #15171b; --sunk: #101216;
+      --ink: #eceef1; --muted: #8d929a; --faint: #6a6f77;
+      --accent: #ff5c36; --line: #23262c; --ok: #43b58c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0f; --surface: #15171b; --sunk: #101216;
+    --ink: #eceef1; --muted: #8d929a; --faint: #6a6f77;
+    --accent: #ff5c36; --line: #23262c; --ok: #43b58c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans);
+    font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .edge { height: 3px; background: var(--red); }
+  .wrap { max-width: 1010px; margin: 0 auto; padding: 0 22px 92px; }
+
+  header { padding: 50px 0 30px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .19em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 13px; }
+  h1 { font-size: clamp(30px, 5vw, 50px); font-weight: 700; letter-spacing: -.022em;
+    line-height: 1.04; margin: 0 0 16px; text-wrap: balance; }
+  .lede { font-family: var(--serif); font-size: 18.5px; line-height: 1.55; color: var(--muted);
+    max-width: 62ch; margin: 0; }
+
+  h2 { font-size: 13px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase;
+    color: var(--faint); margin: 0; }
+  .sec { margin-top: 56px; }
+  .sec-head { border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 24px; }
+  .sec-head p { font-family: var(--serif); color: var(--muted); margin: 8px 0 0; max-width: 64ch; }
+
+  .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .rule { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 18px 19px; }
+  .rule h3 { font-size: 15.5px; font-weight: 700; margin: 0 0 7px; letter-spacing: -.01em; }
+  .rule p { font-family: var(--serif); font-size: 15px; line-height: 1.58; color: var(--muted); margin: 0; }
+  .rule.hot { border-left: 3px solid var(--red); }
+
+  .shot { background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 22px; margin-bottom: 16px; }
+  .shot-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .num { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--red);
+    border: 1px solid var(--red); border-radius: 2px; padding: 2px 7px; flex: none; }
+  .shot h3 { font-size: 19.5px; font-weight: 700; margin: 0; letter-spacing: -.014em; }
+  .tagrow { display: flex; gap: 7px; margin-left: auto; flex-wrap: wrap; }
+  .pill { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 2px; border: 1px solid var(--line); color: var(--faint); }
+  .pill.i2v { color: var(--ok); border-color: var(--ok); }
+  .why { font-family: var(--serif); font-size: 15px; color: var(--muted); margin: 9px 0 15px; max-width: 62ch; }
+
+  .lab { font-size: 10.5px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--faint); margin: 15px 0 7px; }
+  pre { font-family: var(--mono); font-size: 13px; line-height: 1.62; white-space: pre-wrap;
+    background: var(--sunk); border: 1px solid var(--line); border-left: 3px solid var(--red);
+    border-radius: 0 3px 3px 0; padding: 14px 15px; margin: 0; }
+  pre.neg { border-left-color: var(--line); font-size: 12.5px; color: var(--muted); }
+  .after { font-family: var(--serif); font-size: 14.5px; color: var(--muted); margin: 13px 0 0;
+    padding-left: 13px; border-left: 2px solid var(--line); max-width: 62ch; }
+  .row { display: flex; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
+  button.copy { font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+    border-radius: 3px; padding: 7px 13px; cursor: pointer; transition: border-color .12s, color .12s; }
+  button.copy:hover { border-color: var(--accent); color: var(--accent); }
+  button.copy.done { color: var(--ok); border-color: var(--ok); }
+  button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .note { background: var(--sunk); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 0 3px 3px 0; padding: 18px 20px; margin-top: 24px; }
+  .note h3 { font-size: 14.5px; font-weight: 700; margin: 0 0 8px; }
+  .note p { font-family: var(--serif); font-size: 15.5px; line-height: 1.62; margin: 0 0 10px; max-width: 66ch; }
+  .note p:last-child { margin-bottom: 0; }
+  code { font-family: var(--mono); font-size: 13.5px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="edge"></div>
+<div class="wrap">
+  <header>
+    <p class="kicker">Video con IA · sistema de asistencia</p>
+    <h1>Prompts de asistencia NFC</h1>
+    <p class="lede">Ocho tomas que juntas arman la venta: el problema, el gesto, la velocidad en un cambio de turno y el dueño revisando. Están escritos en inglés porque casi todos los modelos responden mejor en ese idioma; arriba de cada uno tienes qué es la toma en español.</p>
+  </header>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>Antes de generar nada</h2>
+      <p>Cuatro cosas que deciden si esto sale bien o sale a basura. La primera es la más importante y es la que casi nadie hace.</p>
+    </div>
+    <div class="rules">
+      <div class="rule hot">
+        <h3>Usa imagen a video con tus propios renders</h3>
+        <p>Si escribes «un lector NFC» en texto, la IA se inventa un aparato que no es el tuyo. Sube <code>img1080/asistencia.webp</code> como primer cuadro y pide solo el movimiento: el producto sale idéntico al que vendes. Cualquier herramienta que acepte «image to video» sirve.</p>
+      </div>
+      <div class="rule hot">
+        <h3>Nunca pidas texto en pantalla</h3>
+        <p>Los modelos de video siguen escribiendo letras deformes en pantallitas. Por eso todos los prompts llevan la interfaz en el negativo: la IA filma el gesto y la luz verde, y la pantalla real se la montas después con tus propios renders.</p>
+      </div>
+      <div class="rule">
+        <h3>Gente y lugares de acá</h3>
+        <p>Si sale una oficina gringa con gente gringa, tu comprador no se ve reflejado. Todos los prompts dicen ecuatoriano y ubican la escena en un galpón, un taller, una cocina — no en un coworking.</p>
+      </div>
+      <div class="rule">
+        <h3>Una acción por toma, 5 a 8 segundos</h3>
+        <p>La IA hace bien una sola acción clara. Dos acciones en el mismo clip salen mal. Genera cada toma por separado y las unes después.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>Las ocho tomas</h2>
+      <p>El orden es el del video final. La verde <strong>imagen a video</strong> marca las que deben salir de un render tuyo, no de texto — son las que muestran el producto de cerca.</p>
+    </div>
+    <div id="shots"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Después de generar</h2></div>
+    <div class="note">
+      <h3>El montaje es donde se gana</h3>
+      <p>La IA te da el gesto, la persona y el lugar. La pantalla del lector y la del celular las pones tú encima, recortadas de <code>ads/asistencia_reel.mp4</code>, que ya tiene la interfaz real: «Entrada registrada · 08:22» en verde y el estado en reposo. Eso es lo que hace que se vea como tu producto y no como un video genérico de NFC.</p>
+      <p>Orden sugerido del video de venta: <strong>01</strong> el problema (3 s) → <strong>02</strong> el toque (4 s) → <strong>03</strong> el turno completo (4 s) → <strong>06</strong> o <strong>07</strong> otro rubro (3 s) → <strong>04</strong> el reporte (4 s) → <strong>05</strong> macro con la frase y el número (3 s). Unos 21 segundos.</p>
+    </div>
+
+    <div class="note">
+      <h3>Un riesgo que te conviene mirar antes de grabar</h3>
+      <p>La toma 04 muestra al dueño revisando el reporte. Me dijiste que la página web todavía no está como la quieres — si el reporte vive ahí, cuidado con vender contra una pantalla que aún no puedes entregar el día uno. Por eso el prompt deja el celular en ángulo, ilegible: filma el gesto, no promete una interfaz.</p>
+      <p>Cuando montes la pantalla encima, monta la que vas a entregar de verdad. Si hoy el reporte es una hoja de cálculo que exportas y mandas por WhatsApp, muestra eso — se vende igual y no te deja expuesto en la primera reunión.</p>
+    </div>
+
+    <div class="note">
+      <h3>Sobre las herramientas</h3>
+      <p>No te recomiendo una específica porque cambian cada pocos meses y no puedo verificar hoy cuál está mejor. Lo que sí importa al elegir: que acepte <strong>imagen a video</strong> (para las tomas 02 y 05), que deje poner <strong>prompt negativo</strong>, y que exporte en <strong>9:16</strong>. Con esas tres cosas cualquiera de las conocidas te sirve.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+const SHOTS = [
+{ n: 'El problema: la hoja de papel', mode: 't2v', dur: '5 s',
+  why: 'El gancho. Es el argumento con el que abre tu post de asistencia: la hoja firmada a mano se firma a cualquier hora.',
+  prompt: `Handheld documentary medium shot, 35mm lens, shallow depth of field. A tired Ecuadorian man in his forties, wearing a grey work polo, stands at a small metal desk just inside the entrance of a warehouse. He signs a paper attendance sheet on a clipboard, glances briefly over his shoulder, then writes a second line below his own. Early morning light spills through a half-open roll-up door behind him, dust visible in the beam. Muted, slightly desaturated colours, natural film grain, realistic. Camera almost static with a subtle handheld drift. Vertical 9:16.`,
+  neg: `text overlay, captions, subtitles, on-screen graphics, user interface, logos, watermark, extra fingers, deformed hands, cartoon, illustration, oversaturated, slow motion`,
+  after: 'Nada que montar. Esta toma es puro problema — cuanto más cotidiana se vea, mejor.' },
+
+{ n: 'El toque', mode: 'i2v', dur: '4 s',
+  why: 'La toma central. Es el producto funcionando y es la que va a aparecer en el anuncio.',
+  prompt: `Medium close-up, 50mm lens, shallow depth of field. A young Ecuadorian woman in a dark restaurant uniform lifts the ID badge hanging from her black lanyard and taps it flat against a small dark wall-mounted reader panel beside a service doorway. One smooth motion: she raises it, holds it against the panel for half a second, lowers it, and steps past the camera. A small green indicator glows on the reader at the moment of contact. Warm morning daylight, clean tiled wall, soft shadows. Locked-off camera with a very slow push in. Photorealistic, cinematic, 24fps. Vertical 9:16.`,
+  neg: `readable screen text, letters, numbers, user interface, dashboard, logos, brand names, watermark, captions, extra fingers, deformed hands, plastic skin, cartoon, warped badge`,
+  after: 'Sube tu render de asistencia como primer cuadro. Después monta encima la pantalla del lector recortada de asistencia_reel.mp4, sincronizada con el momento del toque.' },
+
+{ n: 'Cambio de turno', mode: 't2v', dur: '6 s',
+  why: 'Responde la objeción silenciosa del dueño: «¿y no se me hace cola en la puerta?». Cuatro personas en seis segundos lo contestan sin decir nada.',
+  prompt: `Wide shot, 28mm lens, filmed from behind a short queue. Four Ecuadorian factory workers in blue overalls and hairnets file past a wall-mounted reader at a plant entrance, each tapping the badge on their lanyard without breaking stride, roughly one second apart, and walking on. Fluorescent overhead light mixed with cool daylight from the open door. Slight camera drift to the right. Realistic documentary look, natural motion blur, handheld. Vertical 9:16.`,
+  neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, cartoon, slow motion, crowd chaos`,
+  after: 'Un destello verde en el lector en cada toque, montado en post. Cuatro destellos seguidos venden la velocidad mejor que cualquier texto.' },
+
+{ n: 'El dueño revisa el reporte', mode: 't2v', dur: '5 s',
+  why: 'Le muestra al comprador qué gana él, no su personal. Es la toma que cierra la venta.',
+  prompt: `Over-the-shoulder medium shot, 40mm lens. A man in his fifties in a short-sleeved shirt sits at a cluttered desk in a small back office, holding a phone angled away from the camera so the screen is not legible. He scrolls with his thumb, nods once to himself, and sets the phone down beside a coffee cup and a stack of invoices. Late afternoon light through venetian blinds, warm tone, dust in the air. Shallow depth of field, static camera. Photorealistic. Vertical 9:16.`,
+  neg: `legible phone screen, readable text, user interface, dashboard, charts, spreadsheets, logos, watermark, captions, extra fingers, deformed hands, cartoon`,
+  after: 'Aquí montas la pantalla que de verdad vas a entregar. Si hoy el reporte es un archivo que exportas y mandas, muestra ese — no inventes un panel que todavía no existe.' },
+
+{ n: 'Macro del gafete', mode: 'i2v', dur: '4 s',
+  why: 'El cierre. Producto solo, fondo negro, y encima la frase y tu número.',
+  prompt: `Extreme close-up macro, 100mm lens. An ID badge in a black rubber holder hangs from a black woven lanyard against a pure black background, rotating very slowly on its own axis. The printed card inside shows flat blocks of deep red and near-black. Hard key light from the upper right, soft rim light from behind, studio product lighting, seamless black backdrop. Slow rotation only, no other movement. Photorealistic product cinematography, shallow depth of field. Vertical 9:16.`,
+  neg: `readable text, letters, words, numbers, logos, brand names, watermark, hands, people, background objects, fast movement, cartoon`,
+  after: 'Encima va «Un toque hace el trabajo» y 096 779 4882. El negativo pide sin letras a propósito: el texto lo pones tú, así sale con tu tipografía y no con garabatos.' },
+
+{ n: 'Taller mecánico', mode: 't2v', dur: '5 s',
+  why: 'Segundo rubro. Que se vea que no es solo para oficinas — el taller y la mecánica son de tus compradores más probables en Ecuador.',
+  prompt: `Medium shot, 35mm lens. A mechanic in his thirties with grease-stained hands and a dark work shirt walks up to a reader mounted beside the roller door of a car workshop, taps the badge clipped to his belt against it without stopping, and continues toward a car on a lift. Mixed light: harsh daylight from the open door, warm work lamps deeper inside. Tools and tyres visible in the background, real workshop clutter. Handheld, slight follow movement. Photorealistic, documentary. Vertical 9:16.`,
+  neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, clean empty studio, cartoon`,
+  after: 'Mismo destello verde en post. Si el gafete se ve borroso a esa distancia, no lo corrijas — así se ve en la vida real.' },
+
+{ n: 'Clínica o consultorio', mode: 't2v', dur: '5 s',
+  why: 'Tercer rubro, y el que mejor argumenta el «sin huella digital»: en salud, un lector que nadie toca con el dedo es una ventaja real.',
+  prompt: `Medium close-up, 50mm lens. A nurse in light blue scrubs approaches a small reader mounted on the wall beside a staff door in a clinic corridor, taps the badge on her lanyard against it, and pushes the door open with her shoulder. Clean, bright, even light, pale walls, a corridor receding out of focus behind her. Calm and unhurried. Static camera, very slight push in. Photorealistic, cinematic. Vertical 9:16.`,
+  neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, blood, medical procedure, cartoon`,
+  after: 'Esta es la toma para el argumento de higiene: nadie pone el dedo en nada. Sirve sola como post aparte para clínicas.' },
+
+{ n: 'La salida', mode: 't2v', dur: '5 s',
+  why: 'Cierra el ciclo. La entrada sin la salida no es control de asistencia, es solo una puerta.',
+  prompt: `Medium wide shot, 35mm lens. End of the working day. An Ecuadorian woman in her thirties, jacket already on and bag over her shoulder, taps her badge against the reader beside the exit, pushes the glass door open and steps out into golden late-afternoon light. The interior behind her is dim, lights already switched off. Backlit silhouette moment as she leaves. Handheld, slight drift. Photorealistic, warm, cinematic. Vertical 9:16.`,
+  neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, night, cartoon, lens flare artifacts`,
+  after: 'Buen cierre para el video largo: el mismo gesto de la toma 02, pero saliendo. Refuerza que se registran las dos horas.' },
+];
+
+const el = (t, c, x) => { const n = document.createElement(t); if (c) n.className = c; if (x) n.textContent = x; return n; };
+
+function copyBtn(src, label) {
+  const b = el('button', 'copy', label);
+  b.addEventListener('click', () => {
+    const done = () => { b.textContent = 'Copiado'; b.classList.add('done');
+      setTimeout(() => { b.textContent = label; b.classList.remove('done'); }, 1600); };
+    const text = src.textContent;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, () => fallback(text, done));
+    } else fallback(text, done);
+  });
+  return b;
+}
+function fallback(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;top:-9999px';
+  document.body.append(ta); ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) {}
+  ta.remove();
+}
+
+const host = document.getElementById('shots');
+SHOTS.forEach((s, i) => {
+  const a = el('article', 'shot');
+  const head = el('div', 'shot-head');
+  head.append(el('span', 'num', String(i + 1).padStart(2, '0')), el('h3', null, s.n));
+  const tags = el('div', 'tagrow');
+  const m = el('span', 'pill' + (s.mode === 'i2v' ? ' i2v' : ''),
+    s.mode === 'i2v' ? 'imagen a video' : 'texto a video');
+  tags.append(m, el('span', 'pill', s.dur));
+  head.append(tags);
+
+  const p = el('pre', null, s.prompt);
+  const n = el('pre', 'neg', s.neg);
+  const r1 = el('div', 'row'); r1.append(copyBtn(p, 'Copiar prompt'));
+  const r2 = el('div', 'row'); r2.append(copyBtn(n, 'Copiar negativo'));
+
+  a.append(head, el('p', 'why', s.why),
+    el('p', 'lab', 'Prompt'), p, r1,
+    el('p', 'lab', 'Prompt negativo'), n, r2,
+    el('p', 'after', s.after));
+  host.append(a);
+});
+</script>
