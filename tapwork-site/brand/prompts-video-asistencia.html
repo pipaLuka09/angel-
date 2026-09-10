@@ -97,12 +97,16 @@
   <section class="sec">
     <div class="sec-head">
       <h2>Antes de generar nada</h2>
-      <p>Cinco cosas que deciden si esto sale bien o sale a basura. Las tres primeras son las que casi nadie hace.</p>
+      <p>Seis cosas que deciden si esto sale bien o sale a basura. Las dos primeras son las que casi nadie hace.</p>
     </div>
     <div class="rules">
       <div class="rule hot">
         <h3>Usa imagen a video con tus propios renders</h3>
         <p>Si escribes «un lector NFC» en texto, la IA se inventa un aparato que no es el tuyo. Sube <code>img1080/asistencia.webp</code> como primer cuadro y pide solo el movimiento: el producto sale idéntico al que vendes. Cualquier herramienta que acepte «image to video» sirve.</p>
+      </div>
+      <div class="rule">
+        <h3>Dónde va el negativo</h3>
+        <p>Si la herramienta tiene campo de <em>negative prompt</em>, cada cosa en su campo — el modelo los procesa distinto y funciona mejor. Si no lo tiene, usa el botón «copiar todo junto»: pega el prompt con el negativo al final precedido de <code>Avoid:</code>, que la mayoría de modelos respeta.</p>
       </div>
       <div class="rule hot">
         <h3>Nunca pidas texto en pantalla</h3>
@@ -246,7 +250,12 @@ SHOTS.forEach((s, i) => {
   const p = el('pre', null, s.prompt);
   const n = el('pre', 'neg', s.neg);
   const r1 = el('div', 'row'); r1.append(copyBtn(p, 'Copiar prompt'));
-  const r2 = el('div', 'row'); r2.append(copyBtn(n, 'Copiar negativo'));
+  // Tercer botón para las herramientas que no tienen campo de negativo aparte:
+  // muchos modelos respetan el negativo pegado al final con "Avoid:".
+  const joined = el('span');
+  joined.textContent = s.prompt + '\n\nAvoid: ' + s.neg;
+  const r2 = el('div', 'row');
+  r2.append(copyBtn(n, 'Copiar negativo'), copyBtn(joined, 'Copiar todo junto'));
 
   a.append(head, el('p', 'why', s.why),
     el('p', 'lab', 'Prompt'), p, r1,
