@@ -187,6 +187,9 @@ const PEOPLE = [
   { n: 'Katherine Mendoza',   g: 'TW-012', in: '—',     out: '—',     st: 'out' },
 ];
 const ARRIVAL = { n: 'Jefferson Quinteros', g: 'TW-004', in: '07:12', out: '—', st: 'ok' };
+// La nómina es fija: que alguien marque no agrega a nadie a la planilla, así que
+// el denominador no puede moverse entre un estado y otro.
+const NOMINA = PEOPLE.length + 1;
 
 const LABEL = { ok: 'A tiempo', late: 'Atrasado', out: 'Ausente' };
 
@@ -213,7 +216,7 @@ function render(list, freshName) {
   const late = list.filter((p) => p.st === 'late').length;
   const out = list.filter((p) => p.st === 'out').length;
   const hrs = list.reduce((a, p) => a + (hours(p) || 0), 0);
-  document.getElementById('tPres').innerHTML = present + '<small>/ ' + list.length + '</small>';
+  document.getElementById('tPres').innerHTML = present + '<small>/ ' + NOMINA + '</small>';
   document.getElementById('tLate').textContent = late;
   document.getElementById('tOut').textContent = out;
   document.getElementById('tHrs').innerHTML = hrs.toFixed(1) + '<small>h</small>';
