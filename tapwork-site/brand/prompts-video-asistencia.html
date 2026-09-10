@@ -59,6 +59,7 @@
   .pill { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
     padding: 4px 9px; border-radius: 2px; border: 1px solid var(--line); color: var(--faint); }
   .pill.i2v { color: var(--ok); border-color: var(--ok); }
+  .pill.have { color: var(--red); border-color: var(--red); }
   .why { font-family: var(--serif); font-size: 15px; color: var(--muted); margin: 9px 0 15px; max-width: 62ch; }
 
   .lab { font-size: 10.5px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
@@ -101,8 +102,8 @@
     </div>
     <div class="rules">
       <div class="rule hot">
-        <h3>Usa imagen a video con tus propios renders</h3>
-        <p>Si escribes «un lector NFC» en texto, la IA se inventa un aparato que no es el tuyo. Sube <code>img1080/asistencia.webp</code> como primer cuadro y pide solo el movimiento: el producto sale idéntico al que vendes. Cualquier herramienta que acepte «image to video» sirve.</p>
+        <h3>La IA es para la gente y el lugar, no para el producto</h3>
+        <p>Los primeros planos del producto <strong>ya los tienes</strong> — son tus once clips 3D, con tu lector y tu gafete de verdad. No los vuelvas a generar. La IA sirve para lo único que no tienes: personas reales en bodegas, talleres y cocinas. En los planos con gente el lector es un panelito oscuro en la pared y uno generado pasa perfecto.</p>
       </div>
       <div class="rule">
         <h3>Dónde va el negativo</h3>
@@ -130,7 +131,7 @@
   <section class="sec">
     <div class="sec-head">
       <h2>Las nueve tomas</h2>
-      <p>El orden es el del video final. La verde <strong>imagen a video</strong> marca las que deben salir de un render tuyo, no de texto — son las que muestran el producto de cerca.</p>
+      <p>El orden es el del video final. La marcada en rojo <strong>ya la tienes</strong>: sale de tus clips 3D y no hay que generarla.</p>
     </div>
     <div id="shots"></div>
   </section>
@@ -151,7 +152,7 @@
 
     <div class="note">
       <h3>Cómo se reparten OpenArt y DaVinci</h3>
-      <p><strong>OpenArt genera, DaVinci arma.</strong> No compiten: OpenArt te da los clips —ahí pegas cada prompt, de uno en uno, con su negativo en el campo de negative prompt y la salida en 9:16—. Las tomas <strong>02</strong> y <strong>06</strong> súbelas como imagen a video con tu propio render, no las escribas de cero.</p>
+      <p><strong>OpenArt genera, DaVinci arma.</strong> No compiten: OpenArt te da los clips —ahí pegas cada prompt, de uno en uno, con su negativo en el campo de negative prompt y la salida en 9:16—. La <strong>06</strong> no la generes: recórtala de tu propio clip 3D.</p>
       <p>En <strong>DaVinci</strong> haces las tres cosas que la IA no puede: montar el panel sobre las pantallas (Fusion → Planar Tracker sobre el rectángulo del monitor, y encima el clip del dashboard), poner el destello verde en el lector en cada toque, y cortar todo al ritmo del orden de arriba. El color lo unificas al final con un solo nodo para que los nueve clips, generados por separado, parezcan la misma filmación.</p>
     </div>
   </section>
@@ -165,11 +166,11 @@ const SHOTS = [
   neg: `text overlay, captions, subtitles, on-screen graphics, user interface, logos, watermark, extra fingers, deformed hands, cartoon, illustration, oversaturated, slow motion`,
   after: 'Nada que montar. Esta toma es puro problema — cuanto más cotidiana se vea, mejor.' },
 
-{ n: 'El toque', mode: 'i2v', dur: '4 s',
+{ n: 'El toque', mode: 't2v', dur: '4 s',
   why: 'La toma central. Es el producto funcionando y es la que va a aparecer en el anuncio.',
   prompt: `Medium close-up, 50mm lens, shallow depth of field. A young Ecuadorian woman in a dark restaurant uniform lifts the ID badge hanging from her black lanyard and taps it flat against a small dark wall-mounted reader panel beside a service doorway. One smooth motion: she raises it, holds it against the panel for half a second, lowers it, and steps past the camera. A small green indicator glows on the reader at the moment of contact. Warm morning daylight, clean tiled wall, soft shadows. Locked-off camera with a very slow push in. Photorealistic, cinematic, 24fps. Vertical 9:16.`,
   neg: `readable screen text, letters, numbers, user interface, dashboard, logos, brand names, watermark, captions, extra fingers, deformed hands, plastic skin, cartoon, warped badge`,
-  after: 'Sube tu render de asistencia como primer cuadro. Después monta encima la pantalla del lector recortada de asistencia_reel.mp4, sincronizada con el momento del toque.' },
+  after: 'A este tamaño el lector es un panelito oscuro en la pared: uno generado pasa perfecto. Después le montas encima la pantalla del lector recortada de asistencia_reel.mp4, sincronizada con el toque.' },
 
 { n: 'Cambio de turno', mode: 't2v', dur: '6 s',
   why: 'Responde la objeción silenciosa del dueño: «¿y no se me hace cola en la puerta?». Cuatro personas en seis segundos lo contestan sin decir nada.',
@@ -189,11 +190,11 @@ const SHOTS = [
   neg: `screen content, icons, windows, text, letters, user interface, dashboard, charts, logos, watermark, screen reflections, glare, camera movement, handheld shake, zoom, extra fingers, deformed hands`,
   after: 'La pantalla sale gris plana a propósito. En DaVinci: Fusion → Planar Tracker sobre ese rectángulo, y encima le pegas tapwork-dashboard-telefono.mp4 o la captura de escritorio. Sin reflejos ni brillo, el rastreo agarra limpio a la primera.' },
 
-{ n: 'Macro del gafete', mode: 'i2v', dur: '4 s',
-  why: 'El cierre. Producto solo, fondo negro, y encima la frase y tu número.',
+{ n: 'Macro del gafete', mode: 'have', dur: '4 s',
+  why: 'El cierre. Esta NO la generes: recorta el final de tu propio clip 3D, que ya es exactamente esto y con tu producto real. El prompt queda por si alguna vez quieres una variante.',
   prompt: `Extreme close-up macro, 100mm lens. An ID badge in a black rubber holder hangs from a black woven lanyard against a pure black background, rotating very slowly on its own axis. The printed card inside shows flat blocks of deep red and near-black. Hard key light from the upper right, soft rim light from behind, studio product lighting, seamless black backdrop. Slow rotation only, no other movement. Photorealistic product cinematography, shallow depth of field. Vertical 9:16.`,
   neg: `readable text, letters, words, numbers, logos, brand names, watermark, hands, people, background objects, fast movement, cartoon`,
-  after: 'Encima va «Un toque hace el trabajo» y 096 779 4882. El negativo pide sin letras a propósito: el texto lo pones tú, así sale con tu tipografía y no con garabatos.' },
+  after: 'Usa ads/asistencia_reel.mp4 con un zoom al gafete. Encima va «Un toque hace el trabajo» y 096 779 4882, con tu tipografía.' },
 
 { n: 'Taller mecánico', mode: 't2v', dur: '5 s',
   why: 'Segundo rubro. Que se vea que no es solo para oficinas — el taller y la mecánica son de tus compradores más probables en Ecuador.',
@@ -242,8 +243,9 @@ SHOTS.forEach((s, i) => {
   const head = el('div', 'shot-head');
   head.append(el('span', 'num', String(i + 1).padStart(2, '0')), el('h3', null, s.n));
   const tags = el('div', 'tagrow');
-  const m = el('span', 'pill' + (s.mode === 'i2v' ? ' i2v' : ''),
-    s.mode === 'i2v' ? 'imagen a video' : 'texto a video');
+  const MODE = { i2v: ['imagen a video', ' i2v'], have: ['ya lo tienes', ' have'], t2v: ['texto a video', ''] };
+  const [mlabel, mcls] = MODE[s.mode] || MODE.t2v;
+  const m = el('span', 'pill' + mcls, mlabel);
   tags.append(m, el('span', 'pill', s.dur));
   head.append(tags);
 
