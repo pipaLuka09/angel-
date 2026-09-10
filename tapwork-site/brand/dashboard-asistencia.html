@@ -1,0 +1,287 @@
+<title>Asistencia Tap Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&display=swap">
+<style>
+  :root {
+    --ground: #f2f1ef; --surface: #ffffff; --sunk: #f7f6f4;
+    --ink: #17181b; --muted: #5c6066; --faint: #8b8f95;
+    --line: #e3e0dc; --red: #ec3013;
+    --bar: #525c66; --bar-hi: #2f363d;
+    --good: #146b50; --warn: #8a5a0c; --bad: #c0270e;
+    --good-bg: #e8f3ee; --warn-bg: #faf1e0; --bad-bg: #fceeea;
+    --sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0f; --surface: #15171b; --sunk: #101216;
+      --ink: #eceef1; --muted: #9aa0a8; --faint: #6a6f77;
+      --line: #23262c; --red: #ff5c36;
+      --bar: #7d8894; --bar-hi: #b9c3cd;
+      --good: #43b58c; --warn: #d8a24a; --bad: #ff6a45;
+      --good-bg: #12241d; --warn-bg: #241d10; --bad-bg: #2a1610;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0f; --surface: #15171b; --sunk: #101216;
+    --ink: #eceef1; --muted: #9aa0a8; --faint: #6a6f77;
+    --line: #23262c; --red: #ff5c36;
+    --bar: #7d8894; --bar-hi: #b9c3cd;
+    --good: #43b58c; --warn: #d8a24a; --bad: #ff6a45;
+    --good-bg: #12241d; --warn-bg: #241d10; --bad-bg: #2a1610;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans);
+    font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 44px; }
+
+  .bar { background: var(--surface); border-bottom: 1px solid var(--line); }
+  .bar-in { max-width: 1180px; margin: 0 auto; padding: 15px 20px; display: flex;
+    align-items: center; gap: 14px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .brand b { font-size: 17px; font-weight: 800; letter-spacing: -.025em; }
+  .brand span { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--faint); border-left: 1px solid var(--line); padding-left: 11px; }
+  .demo { margin-left: auto; font-size: 10.5px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--warn); background: var(--warn-bg);
+    border: 1px solid var(--warn); border-radius: 2px; padding: 4px 9px; }
+
+  .head { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding: 26px 0 20px; }
+  h1 { font-size: 25px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+  .head p { color: var(--muted); margin: 4px 0 0; font-size: 14px; }
+  .btn { margin-left: auto; font-family: var(--sans); font-size: 13px; font-weight: 700;
+    color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+    border-radius: 4px; padding: 9px 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .btn:hover { border-color: var(--red); color: var(--red); }
+  .btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+  /* Stat tiles, not charts: four single numbers have no shape to plot. */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 15px 17px; }
+  .tile .k { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--faint); margin: 0 0 7px; }
+  .tile .v { font-size: 32px; font-weight: 800; letter-spacing: -.03em; line-height: 1;
+    font-variant-numeric: tabular-nums; margin: 0; }
+  .tile .v small { font-size: 15px; font-weight: 700; color: var(--muted); margin-left: 3px; }
+  .tile.alert .v { color: var(--bad); }
+
+  .grid2 { display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+  @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+  .card > h2 { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--faint); margin: 0; padding: 15px 17px 0; }
+  .card > .sub { font-size: 13px; color: var(--muted); margin: 4px 0 0; padding: 0 17px; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 13px; }
+  th { font-size: 10.5px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase;
+    color: var(--faint); text-align: left; padding: 8px 17px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td { padding: 11px 17px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  tr:last-child td { border-bottom: 0; }
+  .who { font-weight: 600; }
+  .gafete { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  td.num { font-family: var(--mono); font-size: 13.5px; }
+
+  /* Status is never colour alone: every pill carries its word and a shape. */
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+    padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
+  .pill i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .pill.ok { color: var(--good); background: var(--good-bg); } .pill.ok i { background: var(--good); }
+  .pill.late { color: var(--warn); background: var(--warn-bg); } .pill.late i { background: var(--warn); border-radius: 1px; }
+  .pill.out { color: var(--bad); background: var(--bad-bg); } .pill.out i { background: var(--bad); border-radius: 1px; transform: rotate(45deg); }
+
+  /* En un teléfono la tabla no cabe a lo ancho, y esta es justo la vista que sale
+     en el video: cada fila se reordena en bloque en vez de cortarse. */
+  @media (max-width: 700px) {
+    thead { display: none; }
+    tbody, tr, td { display: block; }
+    tr { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 15px;
+         padding: 13px 17px; border-bottom: 1px solid var(--line); }
+    tr:last-child { border-bottom: 0; }
+    td { padding: 0; border: 0; }
+    td.who { flex: 1 1 auto; font-size: 15.5px; }
+    td:last-child { flex: 0 0 auto; margin-left: auto; }
+    td.gafete { flex: 1 1 100%; order: 3; }
+    td.num { flex: 0 0 auto; order: 4; text-align: left; }
+    td.num::before { content: attr(data-k); display: block; font-family: var(--sans);
+      font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--faint); }
+  }
+
+  tr.fresh { animation: land 1.5s ease-out; }
+  @keyframes land { 0% { background: var(--good-bg); } 100% { background: transparent; } }
+  @media (prefers-reduced-motion: reduce) { tr.fresh { animation: none; } }
+
+  .chartbox { padding: 15px 17px 17px; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .tip { position: fixed; pointer-events: none; opacity: 0; transition: opacity .1s;
+    background: var(--ink); color: var(--ground); font-size: 12.5px; font-weight: 600;
+    padding: 6px 10px; border-radius: 4px; white-space: nowrap; z-index: 9;
+    font-variant-numeric: tabular-nums; }
+  .foot { color: var(--faint); font-size: 12.5px; margin: 18px 0 0; }
+</style>
+
+<div class="bar"><div class="bar-in">
+  <div class="brand"><span id="mk"></span><b>Tap Work</b><span>Asistencia</span></div>
+  <div class="demo">Datos de demostración</div>
+</div></div>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Taller y Bodega · turno de la mañana</h1>
+      <p id="fecha">—</p>
+    </div>
+    <button class="btn" id="exp">Exportar reporte</button>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><p class="k">Presentes</p><p class="v" id="tPres">—<small>/ 8</small></p></div>
+    <div class="tile"><p class="k">Atrasados</p><p class="v" id="tLate">—</p></div>
+    <div class="tile alert"><p class="k">Ausentes</p><p class="v" id="tOut">—</p></div>
+    <div class="tile"><p class="k">Horas de hoy</p><p class="v" id="tHrs">—<small>h</small></p></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Marcaciones de hoy</h2>
+      <p class="sub">Se actualiza en el momento en que alguien acerca el gafete.</p>
+      <table>
+        <thead><tr>
+          <th>Colaborador</th><th>Gafete</th><th class="num">Entrada</th>
+          <th class="num">Salida</th><th class="num">Horas</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Horas registradas por día</h2>
+      <p class="sub">Últimos 7 días, todo el turno.</p>
+      <div class="chartbox"><svg id="chart" viewBox="0 0 440 260" role="img"
+        aria-label="Horas registradas por día en los últimos siete días"></svg></div>
+    </div>
+  </div>
+
+  <p class="foot">Los nombres y las horas de esta pantalla son de ejemplo, para mostrar cómo se ve el reporte. Tap Work · 096 779 4882</p>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+document.getElementById('mk').innerHTML = `<svg viewBox="0 0 100 100" width="26" height="26" aria-hidden="true">
+  <rect x="15" y="26" width="48" height="13.5" rx="1.5" fill="currentColor"/>
+  <rect x="32.2" y="26" width="13.6" height="45" rx="1.5" fill="currentColor"/>
+  <g fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round">
+    <path d="M69 37.5a16.5 16.5 0 0 1 0 22"/><path d="M81 30a30 30 0 0 1 0 37"/></g></svg>`;
+
+const PEOPLE = [
+  { n: 'Byron Loor',          g: 'TW-041', in: '06:52', out: '15:58', st: 'ok' },
+  { n: 'María Chávez',        g: 'TW-018', in: '06:58', out: '16:02', st: 'ok' },
+  { n: 'Wilson Zambrano',     g: 'TW-007', in: '07:01', out: '16:05', st: 'ok' },
+  { n: 'Doménica Pinargote',  g: 'TW-033', in: '07:04', out: '16:00', st: 'ok' },
+  { n: 'Édison Cedeño',       g: 'TW-025', in: '07:26', out: '16:11', st: 'late' },
+  { n: 'Gabriela Solórzano',  g: 'TW-052', in: '07:39', out: '16:04', st: 'late' },
+  { n: 'Katherine Mendoza',   g: 'TW-012', in: '—',     out: '—',     st: 'out' },
+];
+const ARRIVAL = { n: 'Jefferson Quinteros', g: 'TW-004', in: '07:12', out: '—', st: 'ok' };
+
+const LABEL = { ok: 'A tiempo', late: 'Atrasado', out: 'Ausente' };
+
+function hours(p) {
+  if (p.in === '—' || p.out === '—') return null;
+  const m = (t) => (+t.slice(0, 2)) * 60 + (+t.slice(3));
+  return (m(p.out) - m(p.in)) / 60;
+}
+
+function render(list, freshName) {
+  document.getElementById('rows').innerHTML = list.map((p) => {
+    const h = hours(p);
+    return `<tr class="${p.n === freshName ? 'fresh' : ''}">
+      <td class="who">${p.n}</td>
+      <td class="gafete">${p.g}</td>
+      <td class="num" data-k="Entrada">${p.in}</td>
+      <td class="num" data-k="Salida">${p.out}</td>
+      <td class="num" data-k="Horas">${h === null ? '—' : h.toFixed(1)}</td>
+      <td><span class="pill ${p.st}"><i></i>${LABEL[p.st]}</span></td>
+    </tr>`;
+  }).join('');
+
+  const present = list.filter((p) => p.in !== '—').length;
+  const late = list.filter((p) => p.st === 'late').length;
+  const out = list.filter((p) => p.st === 'out').length;
+  const hrs = list.reduce((a, p) => a + (hours(p) || 0), 0);
+  document.getElementById('tPres').innerHTML = present + '<small>/ ' + list.length + '</small>';
+  document.getElementById('tLate').textContent = late;
+  document.getElementById('tOut').textContent = out;
+  document.getElementById('tHrs').innerHTML = hrs.toFixed(1) + '<small>h</small>';
+}
+
+const DAYS = [
+  { d: 'Lun', h: 61.5 }, { d: 'Mar', h: 63.0 }, { d: 'Mié', h: 59.5 },
+  { d: 'Jue', h: 62.5 }, { d: 'Vie', h: 64.0 }, { d: 'Sáb', h: 31.0 }, { d: 'Dom', h: 0 },
+];
+
+// Single series, so the bars stay neutral graphite: hue here would encode nothing,
+// and every colour on this screen is spoken for by a status.
+function chart() {
+  const svg = document.getElementById('chart');
+  const W = 440, H = 260, L = 34, R = 6, T = 16, B = 28;
+  const max = 70, pw = W - L - R, ph = H - T - B;
+  const bw = pw / DAYS.length, gap = 6;
+  const peak = Math.max(...DAYS.map((d) => d.h));
+  let out = '';
+  for (const v of [0, 35, 70]) {
+    const y = T + ph - (v / max) * ph;
+    out += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
+    out += `<text x="${L - 8}" y="${y + 4}" text-anchor="end" font-size="11"
+      fill="var(--faint)" font-family="var(--mono)">${v}</text>`;
+  }
+  DAYS.forEach((d, i) => {
+    const h = (d.h / max) * ph, x = L + i * bw + gap / 2, y = T + ph - h;
+    const w = bw - gap;
+    const hot = d.h === peak;                          // el día más alto, etiquetado directo
+    if (d.h > 0) {
+      out += `<rect class="b" data-d="${d.d}" data-h="${d.h}" x="${x}" y="${y}" width="${w}"
+        height="${h}" rx="4" fill="${hot ? 'var(--bar-hi)' : 'var(--bar)'}"/>`;
+      if (hot) out += `<text x="${x + w / 2}" y="${y - 7}" text-anchor="middle" font-size="12"
+        font-weight="700" fill="var(--ink)" font-family="var(--mono)">${d.h}</text>`;
+    }
+    out += `<text x="${x + w / 2}" y="${H - 9}" text-anchor="middle" font-size="11.5"
+      fill="var(--muted)">${d.d}</text>`;
+  });
+  svg.innerHTML = out;
+
+  const tip = document.getElementById('tip');
+  svg.querySelectorAll('.b').forEach((b) => {
+    b.addEventListener('mouseenter', (e) => {
+      tip.textContent = b.dataset.d + ' · ' + b.dataset.h + ' h';
+      tip.style.opacity = 1;
+    });
+    b.addEventListener('mousemove', (e) => {
+      tip.style.left = (e.clientX + 12) + 'px';
+      tip.style.top = (e.clientY - 34) + 'px';
+    });
+    b.addEventListener('mouseleave', () => { tip.style.opacity = 0; });
+  });
+}
+
+const f = new Date();
+document.getElementById('fecha').textContent = f.toLocaleDateString('es-EC',
+  { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, (c) => c.toUpperCase());
+
+render(PEOPLE);
+chart();
+
+// A new tap lands while the screen is open. This is the shot the video needs: the
+// badge touches the reader and the row shows up without anyone refreshing.
+window.__arrive = () => render([ARRIVAL, ...PEOPLE], ARRIVAL.n);
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setTimeout(window.__arrive, 2600);
+
+document.getElementById('exp').addEventListener('click', function () {
+  const b = this; b.textContent = 'Reporte exportado';
+  setTimeout(() => { b.textContent = 'Exportar reporte'; }, 1800);
+});
+</script>
