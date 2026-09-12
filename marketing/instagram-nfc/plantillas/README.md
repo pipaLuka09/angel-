@@ -48,7 +48,7 @@ acomodan en el lienzo. El archivo `plantillas-instagram-nfc.html` que genera el 
   no idénticos. Si necesitas el tipo exacto en el PNG, la ruta segura es rearmar la pieza en
   Canva con las mismas fuentes — para eso está la tabla de valores de abajo.
 
-## Valores de marca (tomados del tema de la tienda)
+## Valores de marca (tomados del tema oscuro que ya existía en el proyecto)
 
 | Token | Valor |
 |---|---|

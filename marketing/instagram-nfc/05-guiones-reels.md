@@ -1,7 +1,7 @@
 # Guiones de reels
 
 Los reels son lo que le va a dar alcance a una cuenta nueva. Los posts de feed venden a quien
-ya te sigue; los reels traen gente nueva. Por eso son 10 de las 22 publicaciones del mes.
+ya te sigue; los reels traen gente nueva. Por eso son 10 de las 23 publicaciones del mes.
 
 ## Reglas que aplican a los 10
 

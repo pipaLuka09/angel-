@@ -1,6 +1,7 @@
 # Calendario — 30 días
 
 **Ritmo:** 5 publicaciones de feed por semana + historias todos los días.
+(La semana 2 lleva 6: ahí entra el catálogo, que es la pieza que reemplaza a una tienda web.)
 No es 1 post diario a propósito: una cuenta nueva rinde más con 5 posts buenos que con 7 apurados.
 
 **Horarios para Ecuador (GMT-5):**
@@ -23,7 +24,7 @@ No es 1 post diario a propósito: una cuenta nueva rinde más con 5 posts buenos
 | **SEMANA 2 — Producto por producto** ||||| |
 | 8 (Lun) | 🎬 | P06 | La tarjeta de presentación NFC, en 20 segundos | Producto estrella |
 | 9 (Mar) | 🎠 | P07 | Todo lo que cabe en tu tarjeta | Mostrar el valor real |
-| 10 (Mié) | — | — | Solo historias: detrás del empaque | Humanizar |
+| 10 (Mié) | 🎠 | P23 | Catálogo completo: los 4 productos y precios | **Tu página de precios.** Fíjalo |
 | 11 (Jue) | 🎬 | P08 | La placa que te consigue reseñas en Google | Producto B2B, alto ticket |
 | 12 (Vie) | 🎠 | P09 | Llaveros, anillos y stickers NFC | Producto de entrada, bajo precio |
 | 13 (Sáb) | 🎬 | P10 | Pegué un sticker NFC en mi carro y esto pasó | Reel de curiosidad |
@@ -49,7 +50,7 @@ No es 1 post diario a propósito: una cuenta nueva rinde más con 5 posts buenos
 
 ## Dónde está cada copy
 
-- **Carruseles y posts simples (P02, P04, P05, P07, P09, P12, P14, P15, P16, P19, P20, P22)**
+- **Carruseles y posts simples (P02, P04, P05, P07, P09, P12, P14, P15, P16, P19, P20, P22, P23)**
   → `04-publicaciones-feed.md`
 - **Reels (P01, P03, P06, P08, P10, P11, P13, P17, P18, P21)**
   → `05-guiones-reels.md` (con guion plano por plano)

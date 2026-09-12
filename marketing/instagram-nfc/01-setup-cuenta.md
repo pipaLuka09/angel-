@@ -50,12 +50,43 @@ Tarjetas · Placas de reseñas · Llaveros · Stickers NFC
 👇 Pide el tuyo
 ```
 
-**Link en bio:** usa un solo link a tu colección de la tienda.
-Si más adelante tienes varios destinos, usa Linktree o una página `/pages/nfc` propia
-(te la puedo armar en el tema de Shopify, es mejor que Linktree para SEO).
+**Link en bio:** como todavía no hay tienda web, el link **va directo a WhatsApp**.
+Nada de Linktree con seis botones — cada clic extra es gente que se cae en el camino.
 
-**Botón de contacto:** activa el botón de **WhatsApp** en el perfil profesional.
-Es el que más convierte en Ecuador — más que el link.
+Arma el link así (reemplaza el número por el tuyo, con código de país y sin `+` ni espacios):
+
+```
+https://wa.me/5939XXXXXXXX?text=Hola,%20vi%20su%20Instagram%20y%20quiero%20info%20de%20las%20tarjetas%20NFC
+```
+
+El `?text=` hace que el mensaje llegue ya escrito. Suena a detalle, pero sube bastante la
+respuesta: le quita a la persona el trabajo de pensar cómo empezar la conversación.
+
+**Botón de contacto:** activa además el botón de **WhatsApp** del perfil profesional.
+Así quedan dos caminos al mismo lugar — el link y el botón.
+
+### Dónde vive tu catálogo sin tienda web
+
+No necesitas una tienda para vender esto. Lo que reemplaza cada pieza:
+
+| Lo que haría una tienda | Sin tienda |
+|---|---|
+| Mostrar el catálogo | Un post de feed fijado con los 4 productos y precios, más la destacada "Tarjetas" |
+| Mostrar precios | La respuesta guardada `[precio]` del DM, y el post fijado |
+| Recibir el pedido | La conversación de WhatsApp (respuesta `[pedido]`) |
+| Cobrar | Transferencia, Payphone, De Una o contra entrega |
+| Mostrar envíos | La destacada "Envíos" y el carrusel P19 |
+
+**Fija tres posts en tu perfil** (Instagram te deja fijar 3): el reel P01, el carrusel de
+precios que armes, y el post de presentación P05. Esos tres hacen de página de inicio.
+
+**Sobre Instagram Shopping:** el catálogo nativo con etiquetas de producto pide un catálogo
+de Meta y, en la mayoría de los casos, un sitio web. Verifícalo cuando llegues ahí — por ahora
+no lo necesitas y no vale la pena trabarse con eso antes de tener las primeras ventas.
+
+**Cuándo sí valdría una tienda:** cuando WhatsApp se te vuelva el cuello de botella — es decir,
+cuando estés contestando el mismo precio veinte veces al día, o cuando quieras pautar anuncios
+con catálogo. Antes de eso, una tienda es trabajo que no te devuelve nada.
 
 ---
 

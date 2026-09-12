@@ -1,7 +1,7 @@
 # Instagram NFC — kit de contenido completo
 
 Todo el contenido para lanzar y operar la cuenta de Instagram de los productos NFC.
-**Mercado: Ecuador 🇪🇨 · Moneda: USD · 30 días de contenido · 22 publicaciones + historias diarias.**
+**Mercado: Ecuador 🇪🇨 · Moneda: USD · 30 días de contenido · 23 publicaciones + historias diarias.**
 
 ---
 
@@ -12,7 +12,7 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 | [`01-setup-cuenta.md`](01-setup-cuenta.md) | Crear la cuenta, @ sugeridos, bio, foto de perfil, highlights, configuración | **Primero.** Una sola vez, ~20 min |
 | [`02-datos-tecnicos-nfc.md`](02-datos-tecnicos-nfc.md) | Hoja de verdad sobre NFC: compatibilidad real, qué no prometer nunca | **Léelo antes de publicar.** Y cada vez que improvises un copy |
 | [`03-calendario-30-dias.md`](03-calendario-30-dias.md) | Qué se publica cada día, en qué formato, a qué hora | Tu tablero de control diario |
-| [`04-publicaciones-feed.md`](04-publicaciones-feed.md) | 12 copys completos de carruseles y posts, con diseño lámina por lámina | Cada día de post de feed |
+| [`04-publicaciones-feed.md`](04-publicaciones-feed.md) | 13 copys completos de carruseles y posts, con diseño lámina por lámina | Cada día de post de feed |
 | [`05-guiones-reels.md`](05-guiones-reels.md) | 10 reels con guion plano por plano, texto en pantalla y copy | Cada día de reel |
 | [`06-historias-y-highlights.md`](06-historias-y-highlights.md) | 8 formatos de historia, calendario semanal, las 6 destacadas | Todos los días |
 | [`07-hashtags-y-respuestas.md`](07-hashtags-y-respuestas.md) | 4 sets de hashtags, 7 respuestas guardadas de DM, cómo responder comentarios | Al publicar y al contestar |
@@ -54,7 +54,7 @@ grep -rn '\$__\|__ ' marketing/instagram-nfc/
 
 ## Lo que hice y lo que no
 
-**Lo que hice:** todo el contenido — setup, calendario, 22 copys completos, 10 guiones de
+**Lo que hice:** todo el contenido — setup, calendario, 23 copys completos, 10 guiones de
 reel, historias, hashtags, respuestas de DM, la hoja de datos técnicos para que nada de lo
 publicado sea falso, y las 9 plantillas gráficas en `plantillas/`.
 
@@ -64,10 +64,11 @@ publicado sea falso, y las 9 plantillas gráficas en `plantillas/`.
   Está todo especificado en `01-setup-cuenta.md`, son ~20 minutos.
 - **Publicar automáticamente.** No hay ninguna cuenta de Instagram conectada a esta sesión con
   permisos de publicación. Cuando la cuenta exista y la conectes a Meta Business Suite, puedes
-  programar los 22 posts de una sola vez desde ahí.
-- **Leer tu catálogo real de Shopify.** La API de la tienda responde que no está disponible
-  para acceso por API (probable tema de plan o facturación). Por eso el contenido cubre las
-  4 categorías de producto NFC que acordamos y no menciona SKUs ni precios específicos.
+  programar los 23 posts de una sola vez desde ahí.
+- **Leer un catálogo de productos.** No hay tienda web por ahora, y es una decisión
+  deliberada: para este volumen WhatsApp convierte mejor y no cuesta nada. Por eso el
+  contenido cubre las 4 categorías de producto NFC que acordamos, todos los CTA llevan a
+  WhatsApp, y los precios quedan como huecos para que los llenes tú.
 
 **Decisiones deliberadas que vale la pena que conozcas:**
 
@@ -87,7 +88,8 @@ publicado sea falso, y las 9 plantillas gráficas en `plantillas/`.
 
 ## Paleta y tipografía (para las gráficas)
 
-Las mismas del tema de la tienda, para que Instagram y la web se vean de la misma marca:
+Este es el sistema visual de la cuenta. Salió del tema oscuro que ya existía en el proyecto,
+así que si algún día armas una web, ya están alineados:
 
 | Uso | Color |
 |---|---|

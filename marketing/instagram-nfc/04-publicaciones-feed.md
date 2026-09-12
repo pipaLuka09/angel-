@@ -593,3 +593,63 @@ Escríbenos 👇
 ```
 
 **Hashtags:** Set A
+
+---
+
+## P23 — Catálogo completo: los 4 productos y sus precios 🎠
+**Día 10 · Carrusel de 6 · Objetivo: ser tu página de precios**
+
+> ⚠️ **Este es el post más importante de la cuenta** y por eso existe: sin tienda web, este
+> carrusel *es* tu catálogo. Fíjalo en el perfil y actualízalo cada vez que cambies un precio
+> (se edita el mismo post, no hace falta volver a publicar).
+
+### Diseño de las láminas
+Usa la plantilla `Main` para la 1, `LaminaInterior` para las 4 de producto (una foto real por
+producto, no ilustración) y `LaminaCierre` para la última.
+
+| # | Contenido |
+|---|---|
+| 1 | **"Todo lo que tenemos y cuánto cuesta"** · "Guarda este post" |
+| 2 | 📇 **Tarjeta de presentación** — `$__` — para quien reparte contacto |
+| 3 | ⭐ **Placa para reseñas de Google** — `$__` — para negocios con local |
+| 4 | 🔑 **Llavero / anillo** — `$__` — para quien no carga billetera |
+| 5 | 🏷️ **Sticker** — `$__` — para pegarlo donde quieras |
+| 6 | **Cómo pedir** + envío `$__` + WhatsApp |
+
+### Copy
+
+```
+Guarda este post. Es todo lo que tenemos y cuánto cuesta, sin que
+tengas que preguntar.
+
+📇 TARJETA DE PRESENTACIÓN NFC — $__
+Tu contacto completo con un toque. Diseño personalizado con tu logo.
+Para: quien reparte contacto todo el día.
+
+⭐ PLACA PARA RESEÑAS DE GOOGLE — $__
+De mostrador. El cliente acerca el celular y le abre el formulario de
+reseña de tu negocio, directo en las estrellas.
+Para: locales, restaurantes, consultorios.
+
+🔑 LLAVERO O ANILLO NFC — $__
+Lo mismo que la tarjeta, pero va con tus llaves o en tu mano.
+Para: quien no carga billetera.
+
+🏷️ STICKER NFC — $__
+Lo pegas donde quieras: el mostrador, la vitrina, el carro, tu laptop.
+Para: negocios con local, y para probar NFC sin gastar mucho.
+
+📦 ENVÍO
+$__ a todo el Ecuador · llega en __ días
+Formas de pago: __
+
+Todos llegan PROGRAMADOS y PROBADOS, con tu logo y apuntando a donde
+tú decidas. No te mandamos un chip en blanco.
+
+¿No sabes cuál te sirve? Escríbenos y te decimos — incluso si la
+respuesta es que ninguna 👇
+```
+
+**Hashtags:** Set B
+**Fíjalo en el perfil.** Junto con el reel P01 y el post de presentación P05, estos tres son
+tu página de inicio.
