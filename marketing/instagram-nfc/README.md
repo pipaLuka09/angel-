@@ -16,6 +16,7 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 | [`05-guiones-reels.md`](05-guiones-reels.md) | 10 reels con guion plano por plano, texto en pantalla y copy | Cada día de reel |
 | [`06-historias-y-highlights.md`](06-historias-y-highlights.md) | 8 formatos de historia, calendario semanal, las 6 destacadas | Todos los días |
 | [`07-hashtags-y-respuestas.md`](07-hashtags-y-respuestas.md) | 4 sets de hashtags, 7 respuestas guardadas de DM, cómo responder comentarios | Al publicar y al contestar |
+| [`plantillas/`](plantillas/) | 9 plantillas gráficas editables (feed 4:5 y vertical 9:16) + tabla de valores de marca | Al armar cada pieza |
 
 ---
 
@@ -54,8 +55,8 @@ grep -rn '\$__\|__ ' marketing/instagram-nfc/
 ## Lo que hice y lo que no
 
 **Lo que hice:** todo el contenido — setup, calendario, 22 copys completos, 10 guiones de
-reel, historias, hashtags, respuestas de DM, y la hoja de datos técnicos para que nada de lo
-publicado sea falso.
+reel, historias, hashtags, respuestas de DM, la hoja de datos técnicos para que nada de lo
+publicado sea falso, y las 9 plantillas gráficas en `plantillas/`.
 
 **Lo que no pude hacer:**
 

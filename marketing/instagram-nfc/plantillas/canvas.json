@@ -1,0 +1,20 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1080, "h": 1350, "title": "Portada de carrusel" },
+    { "file": "LaminaInterior.dc.html", "x": 1280, "y": 0, "w": 1080, "h": 1350, "title": "Lámina interior" },
+    { "file": "PreguntaRespuesta.dc.html", "x": 2560, "y": 0, "w": 1080, "h": 1350, "title": "Pregunta / respuesta" },
+    { "file": "Comparacion.dc.html", "x": 3840, "y": 0, "w": 1080, "h": 1350, "title": "Comparación" },
+    { "file": "LaminaCierre.dc.html", "x": 5120, "y": 0, "w": 1080, "h": 1350, "title": "Lámina de cierre (CTA)" },
+    { "file": "FotoDeProducto.dc.html", "x": 6400, "y": 0, "w": 1080, "h": 1350, "title": "Foto de producto" },
+    { "file": "PortadaReel.dc.html", "x": 0, "y": 1560, "w": 1080, "h": 1920, "title": "Portada de reel" },
+    { "file": "HistoriaEncuesta.dc.html", "x": 1280, "y": 1560, "w": 1080, "h": 1920, "title": "Historia" },
+    { "file": "PortadaDestacada.dc.html", "x": 2560, "y": 1560, "w": 1080, "h": 1920, "title": "Portada de destacada (6 en 1)" }
+  ],
+  "annotations": [
+    { "id": "nota-feed", "x": 0, "y": -190, "w": 900, "text": "FEED · 1080 × 1350 px (4:5)\nOcupa más pantalla que el cuadrado. Los 6 de esta fila son para posts y carruseles." },
+    { "id": "nota-vertical", "x": 0, "y": 1370, "w": 900, "text": "VERTICAL · 1080 × 1920 px (9:16)\nEl contenido está dentro de la zona segura: Instagram tapa ~280px arriba y ~400px abajo con su propia interfaz." },
+    { "id": "nota-destacada", "x": 3760, "y": 1560, "w": 620, "text": "La portada de destacada trae las 6 en un solo artboard.\nCambia cuál con el control \"cover\" de arriba y exporta una por una." },
+    { "id": "nota-huecos", "x": 6400, "y": -190, "w": 900, "text": "Los $__ son a propósito: pon tus precios reales antes de publicar." }
+  ],
+  "launch": { "view": "canvas" }
+}

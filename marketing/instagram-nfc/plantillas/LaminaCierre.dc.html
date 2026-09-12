@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #0B0F14; } a:hover { color: #1B2A3A; }
+  </style>
+</helmet>
+
+<div style="width: 1080px; height: 1350px; position: relative; overflow: hidden; background: {{accent}}; font-family: 'Inter', system-ui, sans-serif; color: #0B0F14;">
+
+  <div style="position: absolute; bottom: -200px; left: -160px; width: 640px; height: 640px; border-radius: 999px; border: 3px solid rgba(11,15,20,0.16);"></div>
+  <div style="position: absolute; bottom: -100px; left: -60px; width: 440px; height: 440px; border-radius: 999px; border: 3px solid rgba(11,15,20,0.16);"></div>
+
+  <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 88px 80px;">
+
+    <svg width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="#0B0F14" stroke-width="1.8" stroke-linecap="round">
+      <path d="M6.5 4.5a10.5 10.5 0 0 1 0 15"></path>
+      <path d="M11 7.2a6 6 0 0 1 0 9.6"></path>
+      <path d="M15.5 9.8a2.2 2.2 0 0 1 0 4.4"></path>
+    </svg>
+
+    <div style="display: flex; flex-direction: column; gap: 44px;">
+      <h2 style="margin: 0; font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 700; font-size: 106px; line-height: 1.02; letter-spacing: -0.02em; text-wrap: pretty;">¿Te quedó una duda?</h2>
+      <p style="margin: 0; font-size: 48px; line-height: 1.36; font-weight: 500; color: #1B2A3A; max-width: 840px; text-wrap: pretty;">Escríbenos y te decimos qué te sirve — incluso si la respuesta es que ninguna.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 40px;">
+      <div style="display: inline-flex; align-self: flex-start; align-items: center; gap: 20px; padding: 30px 48px; border-radius: 999px; background: #0B0F14;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.5 11.6a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.6-4.6A8.4 8.4 0 1 1 20.5 11.6z"></path>
+        </svg>
+        <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 42px; font-weight: 700; color: #E7EEF6;">WhatsApp en la bio</span>
+      </div>
+      <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 38px; font-weight: 700;">@nfc.ecuador &nbsp;·&nbsp; Envíos a todo el Ecuador</span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#2F6FEB","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1350}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#12D6DF' };
+  }
+}
+</script>
+</body>
+</html>

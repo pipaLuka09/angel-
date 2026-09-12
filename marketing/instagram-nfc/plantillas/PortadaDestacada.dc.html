@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #12D6DF; } a:hover { color: #2F6FEB; }
+  </style>
+</helmet>
+
+<div style="width: 1080px; height: 1920px; position: relative; overflow: hidden; background: #0B0F14; font-family: 'Inter', system-ui, sans-serif; color: #E7EEF6;">
+
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 760px; height: 760px; border-radius: 999px; background: radial-gradient(circle, #111820 0%, #0B0F14 78%);"></div>
+
+  <div style="position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+
+    <sc-if value="{{ isFunciona }}" hint-placeholder-val="{{ true }}">
+      <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.5" stroke-linecap="round">
+        <path d="M6.5 4.5a10.5 10.5 0 0 1 0 15"></path>
+        <path d="M11 7.2a6 6 0 0 1 0 9.6"></path>
+        <path d="M15.5 9.8a2.2 2.2 0 0 1 0 4.4"></path>
+      </svg>
+    </sc-if>
+
+    <sc-if value="{{ isTarjetas }}" hint-placeholder-val="{{ false }}">
+      <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2.5" y="5.5" width="19" height="13" rx="2.4"></rect>
+        <path d="M9 11a3.4 3.4 0 0 1 0 2.6"></path>
+        <path d="M12.3 9.4a6.2 6.2 0 0 1 0 5.8"></path>
+        <path d="M15.6 7.8a9.2 9.2 0 0 1 0 9"></path>
+      </svg>
+    </sc-if>
+
+    <sc-if value="{{ isResenas }}" hint-placeholder-val="{{ false }}">
+      <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.6l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 17l-5.3 2.8 1.1-5.9L3.5 9.8l5.9-.8z"></path>
+      </svg>
+    </sc-if>
+
+    <sc-if value="{{ isLlaveros }}" hint-placeholder-val="{{ false }}">
+      <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8.4" cy="8.4" r="4.4"></circle>
+        <path d="M11.6 11.6L20 20"></path>
+        <path d="M16.6 16.6l-2.2 2.2"></path>
+        <path d="M19 19l-2.2 2.2"></path>
+      </svg>
+    </sc-if>
+
+    <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ false }}">
+      <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.5 11.6a8.4 8.4 0 0 1-12.3 7.4L3.5 20.5l1.6-4.6A8.4 8.4 0 1 1 20.5 11.6z"></path>
+        <path d="M8.8 11.5h.01"></path>
+        <path d="M12 11.5h.01"></path>
+        <path d="M15.2 11.5h.01"></path>
+      </svg>
+    </sc-if>
+
+    <sc-if value="{{ isEnvios }}" hint-placeholder-val="{{ false }}">
+      <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.5 8.2v7.6L12 20.5l-8.5-4.7V8.2L12 3.5z"></path>
+        <path d="M3.5 8.2L12 12.9l8.5-4.7"></path>
+        <path d="M12 12.9v7.6"></path>
+      </svg>
+    </sc-if>
+
+  </div>
+
+  <div style="position: absolute; bottom: 150px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+    <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 52px; font-weight: 700; color: #93A5B9;">{{ name }}</span>
+    <span style="font-size: 26px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #1E2A38;">Instagram recorta el círculo del centro</span>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"cover":{"editor":"enum","options":["funciona","tarjetas","resenas","llaveros","clientes","envios"],"default":"funciona","section":"Destacada"},"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#2F6FEB","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1920}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const cover = this.props.cover ?? 'funciona';
+    const names = {
+      funciona: 'Cómo funciona',
+      tarjetas: 'Tarjetas',
+      resenas: 'Reseñas Google',
+      llaveros: 'Llaveros',
+      clientes: 'Clientes',
+      envios: 'Envíos'
+    };
+    return {
+      accent: this.props.accent ?? '#12D6DF',
+      name: names[cover] ?? names.funciona,
+      isFunciona: cover === 'funciona',
+      isTarjetas: cover === 'tarjetas',
+      isResenas: cover === 'resenas',
+      isLlaveros: cover === 'llaveros',
+      isClientes: cover === 'clientes',
+      isEnvios: cover === 'envios'
+    };
+  }
+}
+</script>
+</body>
+</html>

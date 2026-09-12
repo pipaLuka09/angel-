@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #12D6DF; } a:hover { color: #2F6FEB; }
+  </style>
+</helmet>
+
+<div style="width: 1080px; height: 1350px; position: relative; overflow: hidden; background: #0B0F14; font-family: 'Inter', system-ui, sans-serif; color: #E7EEF6;">
+
+  <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 88px 80px;">
+
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-size: 28px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {{accent}};">Qué es</span>
+      <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 30px; font-weight: 700; color: #93A5B9;">2 / 7</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 52px;">
+      <div style="width: 128px; height: 128px; border-radius: 24px; background: #111820; border: 1px solid #1E2A38; display: flex; align-items: center; justify-content: center;">
+        <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect>
+          <path d="M8 10.5a4 4 0 0 1 0 3"></path>
+          <path d="M11.5 8.8a7 7 0 0 1 0 6.4"></path>
+          <path d="M15 7a10 10 0 0 1 0 10"></path>
+        </svg>
+      </div>
+
+      <h2 style="margin: 0; font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 700; font-size: 92px; line-height: 1.04; letter-spacing: -0.02em; text-wrap: pretty;">Una tarjeta con un chip adentro</h2>
+
+      <p style="margin: 0; font-size: 46px; line-height: 1.42; color: #93A5B9; max-width: 880px; text-wrap: pretty;">Ese chip guarda un link. Nada más. El celular lo lee y decide qué abrir: tu WhatsApp, tu catálogo, tus redes.</p>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div style="width: 64px; height: 4px; border-radius: 999px; background: {{accent}};"></div>
+      <span style="font-size: 30px; font-weight: 500; color: #93A5B9;">@nfc.ecuador</span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#2F6FEB","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1350}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#12D6DF' };
+  }
+}
+</script>
+</body>
+</html>

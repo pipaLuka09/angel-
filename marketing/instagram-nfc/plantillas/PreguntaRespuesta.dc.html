@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #12D6DF; } a:hover { color: #2F6FEB; }
+  </style>
+</helmet>
+
+<div style="width: 1080px; height: 1350px; position: relative; overflow: hidden; background: #0B0F14; font-family: 'Inter', system-ui, sans-serif; color: #E7EEF6;">
+
+  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 10px; background: {{accent}};"></div>
+
+  <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 104px 80px 88px;">
+
+    <div style="display: flex; flex-direction: column; gap: 40px;">
+      <span style="font-size: 28px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #93A5B9;">Pregunta frecuente</span>
+
+      <div style="display: flex; gap: 28px; align-items: flex-start;">
+        <svg width="62" height="62" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 10px;">
+          <circle cx="12" cy="12" r="9.2"></circle>
+          <path d="M9.3 9.2a2.8 2.8 0 0 1 5.4.9c0 1.9-2.7 2.2-2.7 4"></path>
+          <path d="M12 17.4h.01"></path>
+        </svg>
+        <h2 style="margin: 0; font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 700; font-size: 88px; line-height: 1.05; letter-spacing: -0.02em; color: {{accent}}; text-wrap: pretty;">¿Y si se moja?</h2>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 34px; padding: 56px; border-radius: 24px; background: #111820; border: 1px solid #1E2A38;">
+      <span style="font-size: 28px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #93A5B9;">Respuesta</span>
+      <p style="margin: 0; font-size: 50px; line-height: 1.36; font-weight: 500; text-wrap: pretty;">El chip está sellado dentro de la tarjeta. El agua no lo daña.</p>
+      <p style="margin: 0; font-size: 40px; line-height: 1.4; color: #93A5B9; text-wrap: pretty;">Lo que sí se puede rayar con el uso diario es el diseño impreso de la superficie.</p>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-size: 30px; font-weight: 500; color: #93A5B9;">@nfc.ecuador</span>
+      <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 30px; font-weight: 700; color: #93A5B9;">2 / 8</span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#2F6FEB","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1350}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#12D6DF' };
+  }
+}
+</script>
+</body>
+</html>

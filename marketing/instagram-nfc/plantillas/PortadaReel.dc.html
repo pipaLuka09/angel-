@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #12D6DF; } a:hover { color: #2F6FEB; }
+  </style>
+</helmet>
+
+<div style="width: 1080px; height: 1920px; position: relative; overflow: hidden; background: linear-gradient(160deg, #0B0F14 0%, #101B2C 52%, #0B0F14 100%); font-family: 'Inter', system-ui, sans-serif; color: #E7EEF6;">
+
+  <div style="position: absolute; inset: 0; background: #111820; display: flex; align-items: center; justify-content: center;">
+    <span style="font-size: 34px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #93A5B9; opacity: 0.4;">Reemplaza con tu video</span>
+  </div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,15,20,0.86) 0%, rgba(11,15,20,0.35) 42%, rgba(11,15,20,0.92) 100%);"></div>
+
+  <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 300px 170px 400px 80px;">
+
+    <div style="display: flex; flex-direction: column; gap: 40px;">
+      <div style="display: inline-flex; align-self: flex-start; align-items: center; gap: 16px; padding: 18px 32px; border-radius: 999px; background: {{accent}};">
+        <span style="font-size: 30px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0B0F14;">Míralo</span>
+      </div>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 700; font-size: 124px; line-height: 0.98; letter-spacing: -0.025em; text-wrap: pretty; text-shadow: 0 8px 40px rgba(11,15,20,0.7);">Bota tus tarjetas de papel</h1>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+      <div style="width: 180px; height: 10px; border-radius: 999px; background: {{accent}};"></div>
+      <p style="margin: 0; font-size: 52px; line-height: 1.3; font-weight: 500; text-wrap: pretty;">Un toque y ya tienen tu contacto.</p>
+      <span style="font-size: 34px; font-weight: 500; color: #93A5B9;">@nfc.ecuador</span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#2F6FEB","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1920}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#12D6DF' };
+  }
+}
+</script>
+</body>
+</html>
