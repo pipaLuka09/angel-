@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
   <style>
     body { margin: 0; }
-    a { color: #12D6DF; } a:hover { color: #2F6FEB; }
+    a { color: #12D6DF; } a:hover { color: #4A85F5; }
   </style>
 </helmet>
 
@@ -19,7 +19,7 @@
   <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 88px 80px;">
 
     <div style="display: flex; align-items: center; justify-content: space-between;">
-      <span style="font-size: 28px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {{accent}};">Qué es</span>
+      <span style="font-size: 30px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {{accent}};">Qué es</span>
       <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 30px; font-weight: 700; color: #93A5B9;">2 / 7</span>
     </div>
 
@@ -47,7 +47,7 @@
 </div>
 </x-dc>
 
-<script data-dc-script data-props='{"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#2F6FEB","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1350}}'>
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#4A85F5","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1350}}'>
 class Component extends DCLogic {
   renderVals() {
     return { accent: this.props.accent ?? '#12D6DF' };

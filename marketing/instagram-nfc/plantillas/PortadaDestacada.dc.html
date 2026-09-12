@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
   <style>
     body { margin: 0; }
-    a { color: #12D6DF; } a:hover { color: #2F6FEB; }
+    a { color: #12D6DF; } a:hover { color: #4A85F5; }
   </style>
 </helmet>
 
@@ -73,13 +73,12 @@
 
   <div style="position: absolute; bottom: 150px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px;">
     <span style="font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 52px; font-weight: 700; color: #93A5B9;">{{ name }}</span>
-    <span style="font-size: 26px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #1E2A38;">Instagram recorta el círculo del centro</span>
   </div>
 
 </div>
 </x-dc>
 
-<script data-dc-script data-props='{"cover":{"editor":"enum","options":["funciona","tarjetas","resenas","llaveros","clientes","envios"],"default":"funciona","section":"Destacada"},"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#2F6FEB","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1920}}'>
+<script data-dc-script data-props='{"cover":{"editor":"enum","options":["funciona","tarjetas","resenas","llaveros","clientes","envios"],"default":"funciona","section":"Destacada"},"accent":{"editor":"color","default":"#12D6DF","options":["#12D6DF","#4A85F5","#E7EEF6"],"section":"Marca"},"$preview":{"width":1080,"height":1920}}'>
 class Component extends DCLogic {
   renderVals() {
     const cover = this.props.cover ?? 'funciona';

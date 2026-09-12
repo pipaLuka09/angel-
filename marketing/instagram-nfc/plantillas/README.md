@@ -35,7 +35,13 @@ acomodan en el lienzo. El archivo `plantillas-instagram-nfc.html` que genera el 
   Instagram recorta el **círculo del centro**, así que el nombre que sale abajo en la plantilla
   no se va a ver — ese se escribe como título de la destacada en la app.
 - **El control `accent`** cambia el color de acento en todas las plantillas a la vez
-  (`#12D6DF` turquesa, `#2F6FEB` azul, `#E7EEF6` blanco). Útil para diferenciar series de posts.
+  (`#12D6DF` turquesa, `#4A85F5` azul, `#E7EEF6` blanco). Útil para diferenciar series de posts.
+  En `LaminaCierre` el acento es el **fondo**, así que ahí solo se ofrecen turquesa y blanco:
+  el azul sobre texto oscuro da 4.2:1 y no pasa AA.
+- **Por qué el azul es `#4A85F5` y no el `#2F6FEB` del tema:** el primario de la web se usa
+  sobre fondo claro. Como texto sobre `#0B0F14` da 4.20:1, por debajo del mínimo AA de 4.5:1.
+  `#4A85F5` es el mismo azul aclarado y da 5.46:1. Todas las combinaciones de estas plantillas
+  se verificaron con cálculo WCAG real, igual que se hizo con el tema.
 - **Los `$__`** son los mismos huecos de precio del resto del kit. Llénalos antes de exportar.
 - **Al exportar PNG, las tipografías caen al sistema** (Space Grotesk e Inter se cargan desde
   Google Fonts y la exportación no las alcanza a incrustar). Los titulares se ven parecidos pero
@@ -53,6 +59,7 @@ acomodan en el lienzo. El archivo `plantillas-instagram-nfc.html` que genera el 
 | Texto secundario | `#93A5B9` |
 | Primario | `#2F6FEB` |
 | Acento | `#12D6DF` |
+| Azul de acento (texto) | `#4A85F5` |
 | Degradado de fondo | `linear-gradient(135deg, #0B0F14 0%, #101B2C 55%, #0B0F14 100%)` |
 
 | Elemento | Especificación |
