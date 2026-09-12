@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 const jobs = [
   { key: 'menu',       h: 'harness3.html',  sel: '#tw-menu-canvas',       t: 6000 },
   { key: 'resenas',    h: 'harness2.html',  sel: '#tw-resenas-canvas',    t: 10000 },
-  { key: 'asistencia', h: 'harness.html',   sel: '#tw-asistencia-canvas', t: 10000 },
+  { key: 'asistencia', h: 'harness.html',   sel: '#tw-asistencia-canvas', t: 11000 },
   { key: 'wifi',       h: 'harness4.html',  sel: '#tw-wifi-canvas',       t: 7000 },
   { key: 'gym',        h: 'harness5.html',  sel: '#tw-gym-canvas',        t: 18000 },
   { key: 'pago',       h: 'harness6.html',  sel: '#tw-pago-canvas',       t: 9000 },

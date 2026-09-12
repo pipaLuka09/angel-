@@ -1155,66 +1155,31 @@ class Component extends DCLogic {
     const ACCENT = 0xec3013;
     const two = (n) => String(n).padStart(2, "0");
     const hhmm = (d) => two(d.getHours()) + ":" + two(d.getMinutes());
-    const hhmmss = (d) => hhmm(d) + ":" + two(d.getSeconds());
+    // The scene runs on a fixed 08:00 workday so the marking always reads as a
+    // believable clock-in, whatever the machine rendering it thinks the time is.
+    const SHIFT_START = (() => { const d = new Date(); d.setHours(8, 1, 0, 0); return d.getTime(); })();
+    const clockAt = (ms) => new Date(SHIFT_START + ms);
 
     const MAT = {
-      caseDark: new THREE.MeshStandardMaterial({ name: "terminal_case", color: 0x2a2827, roughness: 0.55, metalness: 0.15 }),
-      caseLight: new THREE.MeshStandardMaterial({ name: "terminal_bezel", color: 0xdedbd8, roughness: 0.5, metalness: 0.1 }),
       accent: new THREE.MeshStandardMaterial({ name: "accent_red", color: ACCENT, roughness: 0.4, metalness: 0.05 }),
       phoneBody: new THREE.MeshStandardMaterial({ name: "phone_body", color: 0x1c1b1a, roughness: 0.4, metalness: 0.3 }),
       stand: new THREE.MeshStandardMaterial({ name: "phone_stand", color: 0xc9c6c2, roughness: 0.6, metalness: 0.1 }),
-      led: new THREE.MeshStandardMaterial({ name: "led", color: 0x333030, emissive: 0x000000, roughness: 0.3 }),
     };
 
     const root = new THREE.Group();
     root.name = "attendance_scene";
 
-    const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.022, 0.20), MAT.stand);
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.022, 0.17), MAT.stand);
     plinth.name = "counter_top";
-    plinth.position.set(0.03, 0.011, 0.01);
+    plinth.position.set(0, 0.011, 0);
     root.add(plinth);
-    const plinthEdge = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.004, 0.001), MAT.accent);
+    const plinthEdge = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.004, 0.001), MAT.accent);
     plinthEdge.name = "counter_edge";
-    plinthEdge.position.set(0.03, 0.020, 0.1105);
+    plinthEdge.position.set(0, 0.020, 0.0855);
     root.add(plinthEdge);
 
-    const post = new THREE.Mesh(new THREE.BoxGeometry(0.048, 0.130, 0.048), MAT.caseDark);
-    post.name = "reader_post";
-    post.position.set(-0.08, 0.087, -0.03);
-    root.add(post);
-
-    const reader = new THREE.Group(); reader.name = "reader_terminal";
-    reader.position.set(-0.08, 0.235, -0.012);
-    reader.rotation.x = -0.22;
-    root.add(reader);
-
-    const readerBody = plate(0.135, 0.200, 0.008, 0.038, MAT.caseDark, "reader_body", 0.002);
-    readerBody.position.z = -0.019; reader.add(readerBody);
-    const bezel = plate(0.118, 0.182, 0.006, 0.004, MAT.caseLight, "reader_bezel");
-    bezel.position.z = 0.0015; reader.add(bezel);
-
-    const rs = screenCanvas(512, 320);
-    const readerScreenMat = new THREE.MeshStandardMaterial({
-      name: "reader_screen", map: rs.tex, emissiveMap: rs.tex, emissive: 0xffffff,
-      emissiveIntensity: 0.85, roughness: 0.25, metalness: 0.0
-    });
-    const readerScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.104, 0.062), readerScreenMat);
-    readerScreen.name = "reader_screen_glass";
-    readerScreen.position.set(0, 0.052, 0.0048); reader.add(readerScreen);
-
-    const ringMat = new THREE.MeshStandardMaterial({ name: "rfid_ring", color: 0x565250, roughness: 0.5, emissive: 0x000000 });
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.030, 0.0022, 12, 64), ringMat);
-    ring.name = "rfid_ring"; ring.position.set(0, -0.030, 0.004); reader.add(ring);
-    const ringInner = new THREE.Mesh(new THREE.TorusGeometry(0.019, 0.0018, 12, 48), ringMat);
-    ringInner.name = "rfid_ring_inner"; ringInner.position.set(0, -0.030, 0.004); reader.add(ringInner);
-    const ringDot = new THREE.Mesh(new THREE.CircleGeometry(0.005, 32), ringMat);
-    ringDot.name = "rfid_dot"; ringDot.position.set(0, -0.030, 0.0042); reader.add(ringDot);
-
-    const led = new THREE.Mesh(new THREE.BoxGeometry(0.060, 0.005, 0.002), MAT.led);
-    led.name = "status_led"; led.position.set(0, -0.078, 0.0045); reader.add(led);
-
     const phoneRig = new THREE.Group(); phoneRig.name = "phone_rig";
-    phoneRig.position.set(0.155, 0.022, 0.035);
+    phoneRig.position.set(0, 0.022, -0.012);
     root.add(phoneRig);
 
     const standBase = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.010, 0.075), MAT.stand);
@@ -1242,7 +1207,7 @@ class Component extends DCLogic {
     const badgeRig = new THREE.Group(); badgeRig.name = "badge_rig";
     badge.position.set(0, -0.163, 0);
     badgeRig.add(badge);
-    badgeRig.position.set(-0.08, 0.365, 0.20);
+    badgeRig.position.set(0, 0.3307, 0.14);
     root.add(badgeRig);
 
     scene.add(root);
@@ -1250,45 +1215,24 @@ class Component extends DCLogic {
     const box = new THREE.Box3().setFromObject(root);
     const sphere = box.getBoundingSphere(new THREE.Sphere());
     const dist = (sphere.radius / Math.tan((camera.fov * Math.PI) / 360)) * 1.35;
-    const dir = new THREE.Vector3(1, 0.55, 1.25).normalize();
+    const dir = new THREE.Vector3(0.62, 0.48, 1.30).normalize();
     camera.position.copy(sphere.center).add(dir.multiplyScalar(dist));
     camera.lookAt(sphere.center);
 
     // ---- screen painting (verbatim colors/fonts/layout) ----
     let markedAt = null;
-    const paintReader = (state, now) => {
-      const { ctx, c, tex } = rs;
-      ctx.fillStyle = state === "ok" ? "#12351d" : "#151313";
-      ctx.fillRect(0, 0, c.width, c.height);
-      ctx.fillStyle = state === "ok" ? "#5be08a" : "#ec3013";
-      ctx.fillRect(0, 0, c.width, 10);
-      ctx.textAlign = "center";
-      if (state === "ok") {
-        ctx.fillStyle = "#8df0ae";
-        ctx.font = "700 44px Archivo, sans-serif";
-        ctx.fillText("ENTRADA", c.width / 2, 108);
-        ctx.fillText("REGISTRADA", c.width / 2, 156);
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "700 84px Archivo, sans-serif";
-        ctx.fillText(markedAt ? hhmm(markedAt) : "--:--", c.width / 2, 250);
-      } else {
-        ctx.fillStyle = "#f3f2f2";
-        ctx.font = "700 40px Archivo, sans-serif";
-        ctx.fillText("ACERQUE SU", c.width / 2, 110);
-        ctx.fillText("CREDENCIAL", c.width / 2, 158);
-        ctx.fillStyle = "#8b8785";
-        ctx.font = "600 40px Archivo, sans-serif";
-        ctx.fillText(hhmmss(now), c.width / 2, 240);
-      }
-      tex.needsUpdate = true;
-    };
     const paintPhone = (state, now) => {
       const { ctx, c, tex } = ps;
       ctx.fillStyle = "#100f0f"; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = "#ec3013"; ctx.fillRect(0, 0, c.width, 8);
       ctx.fillStyle = "#6d6a68";
       ctx.font = "600 24px Archivo, sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("XPRINT ASISTENCIA", 40, 70);
+      ctx.fillText("TAP WORK · ASISTENCIA", 40, 78);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#4a4746";
+      ctx.font = "600 22px Archivo, sans-serif";
+      ctx.fillText("NFC", c.width - 40, 78);
       ctx.textAlign = "center";
       ctx.fillStyle = "#f3f2f2";
       ctx.font = "700 132px Archivo, sans-serif";
@@ -1299,77 +1243,80 @@ class Component extends DCLogic {
       ctx.strokeStyle = "#2a2827"; ctx.lineWidth = 4;
       ctx.beginPath(); ctx.moveTo(40, 360); ctx.lineTo(c.width - 40, 360); ctx.stroke();
       if (state === "ok") {
-        ctx.fillStyle = "#ec3013"; ctx.fillRect(40, 410, c.width - 80, 250);
+        ctx.fillStyle = "#ec3013"; ctx.fillRect(40, 555, c.width - 80, 310);
         ctx.textAlign = "left"; ctx.fillStyle = "#ffffff";
-        ctx.font = "700 30px Archivo, sans-serif";
-        ctx.fillText("ASISTENCIA REGISTRADA", 68, 470);
-        ctx.font = "700 92px Archivo, sans-serif";
-        ctx.fillText(markedAt ? hhmm(markedAt) : "--:--", 68, 570);
-        ctx.font = "600 26px Archivo, sans-serif";
-        ctx.fillText("ENTRADA · PUERTA 1", 68, 620);
+        ctx.font = "700 32px Archivo, sans-serif";
+        ctx.fillText("ENTRADA REGISTRADA", 72, 620);
+        ctx.font = "700 104px Archivo, sans-serif";
+        ctx.fillText(markedAt ? hhmm(markedAt) : "--:--", 72, 730);
+        ctx.font = "600 28px Archivo, sans-serif";
+        ctx.fillText("AYUDANTE / OPERADOR A", 72, 790);
         ctx.textAlign = "center"; ctx.fillStyle = "#6d6a68";
         ctx.font = "600 26px Archivo, sans-serif";
-        ctx.fillText("AYUDANTE / OPERADOR A", c.width / 2, 730);
-        ctx.fillText("EQUIPO DE INSTALACIÓN", c.width / 2, 772);
+        ctx.fillText("SIGUIENTE PERSONA", c.width / 2, 930);
       } else {
-        ctx.textAlign = "left"; ctx.fillStyle = "#8b8785";
-        ctx.font = "600 28px Archivo, sans-serif";
-        ctx.fillText("SIN MARCAR HOY", 68, 470);
-        ctx.strokeStyle = "#2a2827"; ctx.strokeRect(40, 410, c.width - 80, 130);
-        ctx.fillStyle = "#4a4746";
+        ctx.setLineDash([12, 10]);
+        ctx.strokeStyle = "#2a2827"; ctx.lineWidth = 4;
+        ctx.strokeRect(40, 555, c.width - 80, 310);
+        ctx.setLineDash([]);
+        ctx.strokeStyle = "#4a4746"; ctx.lineWidth = 6;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.arc(c.width / 2 - 30, 660, 22 + i * 20, -0.7, 0.7);
+          ctx.stroke();
+        }
+        ctx.textAlign = "center"; ctx.fillStyle = "#f3f2f2";
+        ctx.font = "700 36px Archivo, sans-serif";
+        ctx.fillText("ACERCA TU GAFETE", c.width / 2, 775);
+        ctx.fillStyle = "#6d6a68";
         ctx.font = "600 24px Archivo, sans-serif";
-        ctx.fillText("Acerque la credencial al lector", 68, 512);
+        ctx.fillText("A ESTE CELULAR", c.width / 2, 815);
       }
       tex.needsUpdate = true;
     };
 
-    // ---- animation timeline (verbatim timings/easing) ----
+    // ---- animation timeline (same timings, retargeted to the phone) ----
     const CYCLE = 8.0, T_TAP = 2.0, T_HOLD_END = 4.6, T_BACK = 6.0;
     const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-    const START_Z = 0.19, TAP_Z = 0.062;
+    const START_Z = 0.14, TAP_Z = -0.0689, TAP_TILT = -0.28, TAP_X = -0.032;
     let last = "idle", lastPaint = -1;
 
     const frame = (ms) => {
       const t = (ms / 1000) % CYCLE;
-      const now = new Date();
-      let z = START_Z, tilt = 0, state = "idle";
+      const now = clockAt(ms);
+      // k is how far the gafete has travelled towards the phone: 0 held back, 1 on it.
+      let k = 0, state = "idle";
       if (t < T_TAP) {
-        const k = ease(t / T_TAP);
-        z = START_Z + (TAP_Z - START_Z) * k;
-        tilt = -0.20 * k;
+        k = ease(t / T_TAP);
       } else if (t < T_HOLD_END) {
-        z = TAP_Z; tilt = -0.20; state = "ok";
+        k = 1; state = "ok";
       } else if (t < T_BACK) {
-        const k = ease((t - T_HOLD_END) / (T_BACK - T_HOLD_END));
-        z = TAP_Z + (START_Z - TAP_Z) * k;
-        tilt = -0.20 * (1 - k);
+        k = 1 - ease((t - T_HOLD_END) / (T_BACK - T_HOLD_END));
         state = "ok";
       }
-      if (state === "ok" && last !== "ok") markedAt = new Date();
-      if (state !== last) { paintReader(state, now); paintPhone(state, now); last = state; }
-      const sway = Math.sin(ms / 900) * 0.02 * (t < T_TAP || t > T_BACK ? 1 : 0.25);
-      badgeRig.position.set(-0.08 + Math.sin(ms / 1400) * 0.004, 0.365, z);
-      badgeRig.rotation.set(tilt, sway, Math.sin(ms / 1100) * 0.015);
-      const lit = state === "ok";
-      MAT.led.color.setHex(lit ? 0x3ddc7a : 0x4a2018);
-      MAT.led.emissive.setHex(lit ? 0x2fbf68 : 0x6b1b0c);
-      MAT.led.emissiveIntensity = lit ? 1.4 : 0.35;
-      ringMat.emissive.setHex(lit ? 0x1e6b3c : 0x000000);
-      ringMat.emissiveIntensity = lit ? 0.9 : 0;
+      if (state === "ok" && last !== "ok") markedAt = now;
+      if (state !== last) { paintPhone(state, now); last = state; }
+      // The idle drift fades out as it lands, so the tap reads as a steady hold
+      // and the gafete sits off-centre enough to leave the screen readable.
+      const drift = 1 - k;
+      const sway = Math.sin(ms / 900) * 0.02 * drift;
+      badgeRig.position.set(Math.sin(ms / 1400) * 0.004 * drift + TAP_X * k,
+                            0.3307,
+                            START_Z + (TAP_Z - START_Z) * k);
+      badgeRig.rotation.set(TAP_TILT * k, sway, Math.sin(ms / 1100) * 0.015 * drift);
       const sec = Math.floor(ms / 250);
       if (sec !== lastPaint) {
         lastPaint = sec;
-        if (state !== "ok") { paintReader(state, now); paintPhone(state, now); }
+        if (state !== "ok") paintPhone(state, now);
       }
     };
     // Redundant feed so the canvas textures keep repainting even if the
     // outer rAF loop stalls for a moment — kept per the design handoff.
     phoneScreen.onBeforeRender = () => { try { frame(performance.now()); } catch (e) {} };
 
-    paintReader("idle", new Date());
-    paintPhone("idle", new Date());
+    paintPhone("idle", clockAt(0));
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => { paintReader(last, new Date()); paintPhone(last, new Date()); });
+      document.fonts.ready.then(() => paintPhone(last, clockAt(0)));
     }
 
     const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;

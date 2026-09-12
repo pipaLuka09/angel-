@@ -12,7 +12,11 @@ import fs from 'fs';
 const SCENES = {
   menu:       { h: 'harness3.html',  sel: '#tw-menu-canvas',       warm: 5200 },
   resenas:    { h: 'harness2.html',  sel: '#tw-resenas-canvas',    warm: 6500 },
-  asistencia: { h: 'harness.html',   sel: '#tw-asistencia-canvas', warm: 6500 },
+  // Its warm-up is a phase, not a duration: the mount pump advances the virtual
+  // clock by however long the scene took to come up, so a fixed warm lands on a
+  // different beat every run. Snapping to 1.4s of the 8s loop always opens mid-
+  // approach and runs into the confirmation hold.
+  asistencia: { h: 'harness.html',   sel: '#tw-asistencia-canvas', warm: 0, phase: 1400, cycle: 8000 },
   wifi:       { h: 'harness4.html',  sel: '#tw-wifi-canvas',       warm: 4500 },
   gym:        { h: 'harness5.html',  sel: '#tw-gym-canvas',        warm: 17000 },
   pago:       { h: 'harness6.html',  sel: '#tw-pago-canvas',       warm: 6000 },
@@ -61,6 +65,12 @@ for (const [key, s] of Object.entries(SCENES)) {
     clearInterval(pump);
     // Walk the animation forward to where it reads best, then start recording.
     await page.evaluate((w) => window.__advance(w), s.warm);
+    if (s.phase != null) {
+      await page.evaluate(({ p, cyc }) => {
+        const d = (p - (window.__vt() % cyc) + cyc) % cyc;
+        window.__advance(d);
+      }, { p: s.phase, cyc: s.cycle });
+    }
 
     const box = await page.evaluate((sel) => {
       const r = document.querySelector(sel).getBoundingClientRect();

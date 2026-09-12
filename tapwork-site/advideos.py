@@ -29,12 +29,14 @@ FORMATS = {'reel': (1080, 1920, 0.94, 0.40), 'feed': (1080, 1350, 0.98, 0.40)}
 # it. So keep a short, steady window and ping-pong it into a seamless loop that
 # still clears the three-second minimum Reels enforces.
 WINDOW = 40          # frames of held motion to keep
+# asistencia is pinned for a different reason: its capture is phase-locked to the
+# tap, so the whole sequence is the payoff and the window is simply the front of it.
 # Two scenes need the window pinned by hand. Their "NFC detectada" notice is a big
 # bright card held on a dark screen, so it scores higher on both size and
 # steadiness than the thing it announces -- the contact card, the pet's record --
 # and the picker lands on the notice every time. Both hold their payoff from
 # roughly frame 36 to 160 of a ten-second capture.
-PINNED = {'tarjeta': 48, 'mascotas': 48}
+PINNED = {'tarjeta': 48, 'mascotas': 48, 'asistencia': 0}
 STEADINESS = 2.5     # how hard to prefer a steady window over merely a big one
 BACKDROP_LUMA = 15   # mean luminance every clip's backdrop is dimmed to
 

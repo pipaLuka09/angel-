@@ -103,7 +103,7 @@
     <div class="rules">
       <div class="rule hot">
         <h3>La IA es para la gente y el lugar, no para el producto</h3>
-        <p>Los primeros planos del producto <strong>ya los tienes</strong> — son tus once clips 3D, con tu lector y tu gafete de verdad. No los vuelvas a generar. La IA sirve para lo único que no tienes: personas reales en bodegas, talleres y cocinas. En los planos con gente el lector es un panelito oscuro en la pared y uno generado pasa perfecto.</p>
+        <p>Los primeros planos del producto <strong>ya los tienes</strong> — son tus once clips 3D, con tu gafete y el celular de marcación de verdad. No los vuelvas a generar. La IA sirve para lo único que no tienes: personas reales en bodegas, talleres y cocinas. En los planos con gente el lector es un panelito oscuro en la pared y uno generado pasa perfecto.</p>
       </div>
       <div class="rule">
         <h3>Dónde va el negativo</h3>
@@ -140,7 +140,7 @@
     <div class="sec-head"><h2>Después de generar</h2></div>
     <div class="note">
       <h3>El montaje es donde se gana</h3>
-      <p>La IA te da el gesto, la persona y el lugar. La pantalla del lector y la del celular las pones tú encima, recortadas de <code>ads/asistencia_reel.mp4</code>, que ya tiene la interfaz real: «Entrada registrada · 08:22» en verde y el estado en reposo. Eso es lo que hace que se vea como tu producto y no como un video genérico de NFC.</p>
+      <p>La IA te da el gesto, la persona y el lugar. La pantalla del celular de la entrada la pones tú encima, recortada de <code>ads/asistencia_reel.mp4</code>, que ya tiene la interfaz real: «Entrada registrada · 08:22» en verde y el estado en reposo. Eso es lo que hace que se vea como tu producto y no como un video genérico de NFC.</p>
       <p>Orden sugerido del video de venta: <strong>01</strong> el problema (3&nbsp;s) → <strong>02</strong> el toque (4&nbsp;s) → <strong>03</strong> el turno completo (4&nbsp;s) → <strong>07</strong> u <strong>08</strong> otro rubro (3&nbsp;s) → <strong>04</strong> o <strong>05</strong> el panel (5&nbsp;s) → <strong>06</strong> macro con la frase y el número (3&nbsp;s). Unos 22 segundos.</p>
     </div>
 
@@ -153,7 +153,7 @@
     <div class="note">
       <h3>Cómo se reparten OpenArt y DaVinci</h3>
       <p><strong>OpenArt genera, DaVinci arma.</strong> No compiten: OpenArt te da los clips —ahí pegas cada prompt, de uno en uno, con su negativo en el campo de negative prompt y la salida en 9:16—. La <strong>06</strong> no la generes: recórtala de tu propio clip 3D.</p>
-      <p>En <strong>DaVinci</strong> haces las tres cosas que la IA no puede: montar el panel sobre las pantallas (Fusion → Planar Tracker sobre el rectángulo del monitor, y encima el clip del dashboard), poner el destello verde en el lector en cada toque, y cortar todo al ritmo del orden de arriba. El color lo unificas al final con un solo nodo para que los nueve clips, generados por separado, parezcan la misma filmación.</p>
+      <p>En <strong>DaVinci</strong> haces las tres cosas que la IA no puede: montar el panel sobre las pantallas (Fusion → Planar Tracker sobre el rectángulo del monitor, y encima el clip del dashboard), poner el destello de pantalla en cada toque, y cortar todo al ritmo del orden de arriba. El color lo unificas al final con un solo nodo para que los nueve clips, generados por separado, parezcan la misma filmación.</p>
     </div>
   </section>
 </div>
@@ -168,15 +168,15 @@ const SHOTS = [
 
 { n: 'El toque', mode: 't2v', dur: '4 s',
   why: 'La toma central. Es el producto funcionando y es la que va a aparecer en el anuncio.',
-  prompt: `Medium close-up, 50mm lens, shallow depth of field. A young Ecuadorian woman in a dark restaurant uniform lifts the ID badge hanging from her black lanyard and taps it flat against a small dark wall-mounted reader panel beside a service doorway. One smooth motion: she raises it, holds it against the panel for half a second, lowers it, and steps past the camera. A small green indicator glows on the reader at the moment of contact. Warm morning daylight, clean tiled wall, soft shadows. Locked-off camera with a very slow push in. Photorealistic, cinematic, 24fps. Vertical 9:16.`,
+  prompt: `Medium close-up, 50mm lens, shallow depth of field. A young Ecuadorian woman in a dark restaurant uniform lifts the ID badge hanging from her black lanyard and taps it flat against the face of a smartphone standing upright in a small stand on a narrow shelf beside a service doorway. One smooth motion: she raises it, holds it against the phone for half a second, lowers it, and steps past the camera. The phone screen brightens at the moment of contact. Warm morning daylight, clean tiled wall, soft shadows. Locked-off camera with a very slow push in. Photorealistic, cinematic, 24fps. Vertical 9:16.`,
   neg: `readable screen text, letters, numbers, user interface, dashboard, logos, brand names, watermark, captions, extra fingers, deformed hands, plastic skin, cartoon, warped badge`,
-  after: 'A este tamaño el lector es un panelito oscuro en la pared: uno generado pasa perfecto. Después le montas encima la pantalla del lector recortada de asistencia_reel.mp4, sincronizada con el toque.' },
+  after: 'Lo que lee el gafete es un celular en un soporte, no un lector de pared — así es el producto de verdad. A este tamaño la pantalla sale ilegible, así que encima le montas la del celular recortada de asistencia_reel.mp4, sincronizada con el toque.' },
 
 { n: 'Cambio de turno', mode: 't2v', dur: '6 s',
   why: 'Responde la objeción silenciosa del dueño: «¿y no se me hace cola en la puerta?». Cuatro personas en seis segundos lo contestan sin decir nada.',
-  prompt: `Wide shot, 28mm lens, filmed from behind a short queue. Four Ecuadorian factory workers in blue overalls and hairnets file past a wall-mounted reader at a plant entrance, each tapping the badge on their lanyard without breaking stride, roughly one second apart, and walking on. Fluorescent overhead light mixed with cool daylight from the open door. Slight camera drift to the right. Realistic documentary look, natural motion blur, handheld. Vertical 9:16.`,
+  prompt: `Wide shot, 28mm lens, filmed from behind a short queue. Four Ecuadorian factory workers in blue overalls and hairnets file past a smartphone propped upright in a stand on a small table at a plant entrance, each tapping the badge on their lanyard against it without breaking stride, roughly one second apart, and walking on. Fluorescent overhead light mixed with cool daylight from the open door. Slight camera drift to the right. Realistic documentary look, natural motion blur, handheld. Vertical 9:16.`,
   neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, cartoon, slow motion, crowd chaos`,
-  after: 'Un destello verde en el lector en cada toque, montado en post. Cuatro destellos seguidos venden la velocidad mejor que cualquier texto.' },
+  after: 'Un destello de la pantalla del celular en cada toque, montado en post. Cuatro destellos seguidos venden la velocidad mejor que cualquier texto.' },
 
 { n: 'El dueño revisa el reporte', mode: 't2v', dur: '5 s',
   why: 'Le muestra al comprador qué gana él, no su personal. Es la toma que cierra la venta.',
@@ -198,19 +198,19 @@ const SHOTS = [
 
 { n: 'Taller mecánico', mode: 't2v', dur: '5 s',
   why: 'Segundo rubro. Que se vea que no es solo para oficinas — el taller y la mecánica son de tus compradores más probables en Ecuador.',
-  prompt: `Medium shot, 35mm lens. A mechanic in his thirties with grease-stained hands and a dark work shirt walks up to a reader mounted beside the roller door of a car workshop, taps the badge clipped to his belt against it without stopping, and continues toward a car on a lift. Mixed light: harsh daylight from the open door, warm work lamps deeper inside. Tools and tyres visible in the background, real workshop clutter. Handheld, slight follow movement. Photorealistic, documentary. Vertical 9:16.`,
+  prompt: `Medium shot, 35mm lens. A mechanic in his thirties with grease-stained hands and a dark work shirt walks up to a smartphone sitting in a stand on a shelf beside the roller door of a car workshop, taps the badge clipped to his belt against it without stopping, and continues toward a car on a lift. Mixed light: harsh daylight from the open door, warm work lamps deeper inside. Tools and tyres visible in the background, real workshop clutter. Handheld, slight follow movement. Photorealistic, documentary. Vertical 9:16.`,
   neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, clean empty studio, cartoon`,
-  after: 'Mismo destello verde en post. Si el gafete se ve borroso a esa distancia, no lo corrijas — así se ve en la vida real.' },
+  after: 'Mismo destello de pantalla en post. Si el gafete se ve borroso a esa distancia, no lo corrijas — así se ve en la vida real.' },
 
 { n: 'Clínica o consultorio', mode: 't2v', dur: '5 s',
-  why: 'Tercer rubro, y el que mejor argumenta el «sin huella digital»: en salud, un lector que nadie toca con el dedo es una ventaja real.',
-  prompt: `Medium close-up, 50mm lens. A nurse in light blue scrubs approaches a small reader mounted on the wall beside a staff door in a clinic corridor, taps the badge on her lanyard against it, and pushes the door open with her shoulder. Clean, bright, even light, pale walls, a corridor receding out of focus behind her. Calm and unhurried. Static camera, very slight push in. Photorealistic, cinematic. Vertical 9:16.`,
+  why: 'Tercer rubro, y el que mejor argumenta el «sin huella digital»: en salud, marcar sin que nadie ponga el dedo en nada es una ventaja real.',
+  prompt: `Medium close-up, 50mm lens. A nurse in light blue scrubs approaches a smartphone standing in a small stand on a ledge beside a staff door in a clinic corridor, taps the badge on her lanyard against it, and pushes the door open with her shoulder. Clean, bright, even light, pale walls, a corridor receding out of focus behind her. Calm and unhurried. Static camera, very slight push in. Photorealistic, cinematic. Vertical 9:16.`,
   neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, blood, medical procedure, cartoon`,
   after: 'Esta es la toma para el argumento de higiene: nadie pone el dedo en nada. Sirve sola como post aparte para clínicas.' },
 
 { n: 'La salida', mode: 't2v', dur: '5 s',
   why: 'Cierra el ciclo. La entrada sin la salida no es control de asistencia, es solo una puerta.',
-  prompt: `Medium wide shot, 35mm lens. End of the working day. An Ecuadorian woman in her thirties, jacket already on and bag over her shoulder, taps her badge against the reader beside the exit, pushes the glass door open and steps out into golden late-afternoon light. The interior behind her is dim, lights already switched off. Backlit silhouette moment as she leaves. Handheld, slight drift. Photorealistic, warm, cinematic. Vertical 9:16.`,
+  prompt: `Medium wide shot, 35mm lens. End of the working day. An Ecuadorian woman in her thirties, jacket already on and bag over her shoulder, taps her badge against a smartphone standing in a stand beside the exit, pushes the glass door open and steps out into golden late-afternoon light. The interior behind her is dim, lights already switched off. Backlit silhouette moment as she leaves. Handheld, slight drift. Photorealistic, warm, cinematic. Vertical 9:16.`,
   neg: `text overlay, captions, user interface, readable screens, logos, watermark, extra fingers, deformed hands, night, cartoon, lens flare artifacts`,
   after: 'Buen cierre para el video largo: el mismo gesto de la toma 02, pero saliendo. Refuerza que se registran las dos horas.' },
 ];
