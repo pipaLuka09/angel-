@@ -73,7 +73,7 @@ a {
   color: var(--color-accent);
   text-decoration: none;
 }
-a:hover { color: var(--color-primary); }
+a:hover { color: var(--color-primary-light); }
 
 img, svg { max-width: 100%; display: block; }
 

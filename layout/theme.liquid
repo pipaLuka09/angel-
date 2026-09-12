@@ -127,6 +127,9 @@
       --color-text: {{ settings.color_text }};
       --color-text-muted: {{ settings.color_text_muted }};
       --color-primary: {{ settings.color_primary }};
+      {% comment %} Aclarado 10% para usarse como texto sobre el fondo oscuro: el primario
+         tal cual da 4.20:1 y no pasa AA. Se deriva del ajuste para que siga al comerciante. {% endcomment %}
+      --color-primary-light: {{ settings.color_primary | color_lighten: 10 }};
       --color-accent: {{ settings.color_accent }};
       --color-border: {{ settings.color_border }};
       --font-heading: {{ settings.font_heading }};
