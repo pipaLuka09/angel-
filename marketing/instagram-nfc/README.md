@@ -14,7 +14,7 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 | [`03-calendario-30-dias.md`](03-calendario-30-dias.md) | Qué se publica cada día, en qué formato, a qué hora | Tu tablero de control diario |
 | [`04-publicaciones-feed.md`](04-publicaciones-feed.md) | 15 copys completos de carruseles y posts, con diseño lámina por lámina | Cada día de post de feed |
 | [`05-guiones-reels.md`](05-guiones-reels.md) | 10 reels con guion plano por plano, texto en pantalla y copy | Cada día de reel |
-| [`06-historias-y-highlights.md`](06-historias-y-highlights.md) | 8 formatos de historia, calendario semanal, las 6 destacadas | Todos los días |
+| [`06-historias-y-highlights.md`](06-historias-y-highlights.md) | 8 formatos de historia, calendario semanal, las 7 destacadas | Todos los días |
 | [`07-hashtags-y-respuestas.md`](07-hashtags-y-respuestas.md) | 4 sets de hashtags, 7 respuestas guardadas de DM, cómo responder comentarios | Al publicar y al contestar |
 | [`08-guia-de-fotos.md`](08-guia-de-fotos.md) | Qué fotos y videos sacar, con qué luz y cómo — 15 fotos, el video del toque, 4 grabaciones de pantalla | **Antes de publicar nada** |
 | [`plantillas/`](plantillas/) | 9 plantillas gráficas editables (feed 4:5 y vertical 9:16) + tabla de valores de marca | Al armar cada pieza |
