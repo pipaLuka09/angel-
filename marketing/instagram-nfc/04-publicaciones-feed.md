@@ -464,7 +464,7 @@ contraseñas, ni datos bancarios, ni información privada que robar.
 | 1 | **"Cómo pedir la tuya"** · "En 4 pasos" |
 | 2 | **1.** Nos escribes al WhatsApp y nos dices qué quieres que haga tu tarjeta |
 | 3 | **2.** Te mandamos el diseño para aprobar (`__` horas) |
-| 4 | **3.** Pagas por `__` (transferencia / Payphone / De Una / contra entrega) |
+| 4 | **3.** Pagas por **transferencia bancaria** o en **efectivo** |
 | 5 | **4.** Te llega en **2 días**. Envío **$3** a todo el país — **gratis desde $80** |
 
 ### Copy
@@ -483,8 +483,8 @@ Te lo mandamos en __ horas. Lo revisas, pides cambios si quieres, y
 recién ahí se manda a producción.
 
 3️⃣ PAGAS
-Aceptamos __ (transferencia bancaria / Payphone / De Una / contra
-entrega en __).
+Transferencia bancaria o efectivo. Te pasamos los datos por el mismo
+WhatsApp.
 
 4️⃣ TE LLEGA
 En 2 días, a donde estés. Envío $3 a todo el Ecuador — mismo precio
@@ -655,7 +655,7 @@ $3 a todo el Ecuador · llega en 2 días
 Mismo precio para cualquier ciudad del país.
 GRATIS desde $80 — que son 3 tarjetas, o 20 stickers, o 10 acrílicos
 de menú.
-Formas de pago: __
+Pago: transferencia bancaria o efectivo.
 
 Todos llegan PROGRAMADOS y PROBADOS, apuntando a donde tú decidas.
 No te mandamos un chip en blanco para que lo pelees tú.

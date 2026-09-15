@@ -169,7 +169,7 @@ Para armar tu pedido necesito:
 🎯 A dónde quieres que lleve el toque
 🖼️ Tu logo, si tienes
 
-Formas de pago: __
+Formas de pago: transferencia bancaria o efectivo
 Te llega en 2 días, con envío de $3 a cualquier ciudad
 (gratis si tu pedido pasa de $80).
 
@@ -184,7 +184,7 @@ Enviamos a todo el Ecuador 🇪🇨
 📦 Mismo precio para cualquier ciudad, sin importar qué tan lejos
 🎁 GRATIS desde $80 — o sea 3 tarjetas, 20 stickers, o 10 acrílicos
    de menú
-💰 Formas de pago: __
+💰 Formas de pago: transferencia bancaria o efectivo
 
 El pedido sale una vez que apruebes el diseño.
 ¿En qué ciudad estás?

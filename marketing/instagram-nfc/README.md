@@ -43,9 +43,16 @@ por cantidad; envío plano de **$3 a todo el Ecuador, 2 días, gratis desde $80*
 > pide 4 placas de reseñas — un pedido bueno — igual paga envío. Si quieres que esos dos también
 > califiquen, hay que bajar el umbral o armar un combo; dímelo y lo ajusto en los copys.
 
+**Pago:** transferencia bancaria o efectivo.
+
+> **Aclara qué significa "efectivo" antes de publicar.** Vendes a todo el país con envío, así
+> que un cliente en Loja que lee "efectivo" va a asumir **contra entrega**. Si el efectivo solo
+> aplica cuando entregas en persona en tu ciudad, hay que decirlo en el copy — o vas a discutirlo
+> por WhatsApp en cada pedido de provincia. Dime cuál de las dos es y ajusto los cuatro lugares
+> donde aparece.
+
 Lo que todavía falta:
 
-- [ ] **Formas de pago** que aceptas
 - [ ] **En cuántas horas** mandas la propuesta de diseño
 - [ ] **Qué hace por dentro el sistema de asistencia** — P24 tiene huecos en las láminas 4 y 5
       (reportes, panel, exportar, horas extra, si necesita internet). Son los que deciden esa
