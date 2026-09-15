@@ -76,7 +76,7 @@ El atajo va entre corchetes.
    (10 a $6 · 20 a $4 · 40 a $2.80 c/u)
 
 Todos llegan programados y probados, con tu diseño.
-Envío: $__ (llega en __ días a todo el Ecuador)
+Envío: $3 a todo el Ecuador, llega en 2 días
 
 Cuéntame a qué te dedicas y te digo cuál te conviene de verdad 🙌
 ```
@@ -168,7 +168,7 @@ Para armar tu pedido necesito:
 🖼️ Tu logo, si tienes
 
 Formas de pago: __
-Te llega en __ días hábiles.
+Te llega en 2 días, con envío de $3 a cualquier ciudad.
 
 ¿Empezamos?
 ```
@@ -177,8 +177,8 @@ Te llega en __ días hábiles.
 ```
 Enviamos a todo el Ecuador 🇪🇨
 
-📦 Quito y Guayaquil: $__ · __ días
-📦 Resto del país: $__ · __ días
+📦 $3 a todo el Ecuador · llega en 2 días
+📦 Mismo precio para cualquier ciudad, sin importar qué tan lejos
 💰 Formas de pago: __
 
 El pedido sale una vez que apruebes el diseño.

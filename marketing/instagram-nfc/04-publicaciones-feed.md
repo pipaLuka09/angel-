@@ -465,7 +465,7 @@ contraseñas, ni datos bancarios, ni información privada que robar.
 | 2 | **1.** Nos escribes al WhatsApp y nos dices qué quieres que haga tu tarjeta |
 | 3 | **2.** Te mandamos el diseño para aprobar (`__` horas) |
 | 4 | **3.** Pagas por `__` (transferencia / Payphone / De Una / contra entrega) |
-| 5 | **4.** Te llega en `__` días a todo el Ecuador. Programada y probada |
+| 5 | **4.** Te llega en **2 días**. Envío **$3** a todo el Ecuador, sin importar la ciudad |
 
 ### Copy
 
@@ -487,8 +487,8 @@ Aceptamos __ (transferencia bancaria / Payphone / De Una / contra
 entrega en __).
 
 4️⃣ TE LLEGA
-En __ días hábiles a todo el Ecuador. Costo de envío: $__
-(Quito y Guayaquil: __ · resto del país: __)
+En 2 días, a donde estés. Envío $3 a todo el Ecuador — mismo precio
+para Quito, para Guayaquil y para el cantón más lejano.
 
 Y llega PROGRAMADA y PROBADA. No te mandamos un chip en blanco para
 que lo pelees tú. Llega funcionando.
@@ -616,7 +616,7 @@ producto**, no ilustración), la última con `LaminaCierre`.
 | 4 | 🍽️ **Acrílico de menú — $14** · desde $7 por volumen |
 | 5 | 💳 **Acrílico de pagos — $10** · $7.50 llevando 3 |
 | 6 | 🏷️ **Sticker de redes — $8** · desde $2.80 por volumen |
-| 7 | **Cómo pedir** + envío + WhatsApp |
+| 7 | **Cómo pedir** + envío $3 / 2 días + WhatsApp |
 
 ### Copy
 
@@ -647,7 +647,8 @@ Lo pegas donde quieras y abre tu Instagram.
 10: $6 c/u · 20: $4 c/u · 40: $2.80 c/u · 50 o más: cotizamos
 
 📦 ENVÍO
-$__ a todo el Ecuador · llega en __ días
+$3 a todo el Ecuador · llega en 2 días
+Mismo precio para cualquier ciudad del país.
 Formas de pago: __
 
 Todos llegan PROGRAMADOS y PROBADOS, apuntando a donde tú decidas.

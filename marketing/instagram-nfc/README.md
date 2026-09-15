@@ -34,10 +34,9 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 
 ## Lo que tienes que llenar tú
 
-**Precios: listos.** Aplicados desde tu hoja `Precios.xlsx`, con los escalones por cantidad
-incluidos en cada copy. Lo que todavía falta:
+**Precios y envío: listos.** Precios aplicados desde tu hoja `Precios.xlsx` con los escalones
+por cantidad; envío plano de **$3 a todo el Ecuador, 2 días**. Lo que todavía falta:
 
-- [ ] **Costo y tiempo de envío** (Quito / Guayaquil / resto del país)
 - [ ] **Formas de pago** que aceptas
 - [ ] **En cuántas horas** mandas la propuesta de diseño
 - [ ] **Qué hace por dentro el sistema de asistencia** — P24 tiene huecos en las láminas 4 y 5
