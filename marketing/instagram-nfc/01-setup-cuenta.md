@@ -45,10 +45,13 @@ Copia esta, tal cual (cabe en los 150 caracteres):
 
 ```
 Tu contacto y tus redes con un toque 📲
-Tarjetas · Placas de reseñas · Llaveros · Stickers NFC
-🇪🇨 Envíos a todo el país
+Tarjetas · Acrílicos · Stickers NFC
+🇪🇨 Envío $3 · Pagas contra entrega
 👇 Pide el tuyo
 ```
+
+El "pagas contra entrega" va en la bio a propósito: es tu mejor argumento mientras la cuenta
+sea nueva y no tengas reseñas. Le quita al comprador el único riesgo que percibe de verdad.
 
 **Link en bio:** como todavía no hay tienda web, el link **va directo a WhatsApp**.
 Nada de Linktree con seis botones — cada clic extra es gente que se cae en el camino.
@@ -98,16 +101,17 @@ El archivo de diseño está en la carpeta de gráficas.
 
 ---
 
-## 5. Highlights (destacadas) — crea estas 6 portadas vacías desde el día 1
+## 5. Highlights (destacadas) — crea estas 7 portadas vacías desde el día 1
 
 | Orden | Nombre | Qué va adentro |
 |---|---|---|
 | 1 | `Cómo funciona` | El video de demo del toque, en 3 historias |
 | 2 | `Tarjetas` | Producto, colores, personalización |
-| 3 | `Reseñas Google` | La placa de mostrador, para negocios |
-| 4 | `Llaveros` | Llaveros, anillos, stickers |
-| 5 | `Clientes` | **Vacía hasta que tengas clientes reales.** No la llenes con ejemplos. |
-| 6 | `Envíos` | Costos, tiempos, cobertura, cómo pedir |
+| 3 | `Reseñas Google` | El acrílico de reseñas, para negocios con local |
+| 4 | `Mostrador` | Acrílico de menú, acrílico de pagos y stickers |
+| 5 | `Asistencia` | El control de personal. Tu producto recurrente merece su propia destacada |
+| 6 | `Clientes` | **Vacía hasta que tengas clientes reales.** No la llenes con ejemplos. |
+| 7 | `Envíos` | $3, 2 días, gratis desde $80, contra entrega |
 
 > La destacada **"Clientes" se queda vacía a propósito**. Poner testimonios inventados es la
 > forma más rápida de quemar una cuenta nueva — y en un nicho chico como este, alguien lo nota.

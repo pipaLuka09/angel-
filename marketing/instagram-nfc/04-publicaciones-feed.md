@@ -139,6 +139,7 @@ entregamos un chip en blanco para que lo pelees tú.
 Lo que puedes esperar de nosotros:
 ✅ Te decimos si tu celular sirve ANTES de venderte
 ✅ Te lo entregamos programado y probado
+✅ Pagas contra entrega: no nos das un centavo hasta tenerlo en la mano
 ✅ Si no te funciona, lo arreglamos
 
 Envíos a todo el país. Escríbenos al WhatsApp del perfil y te ayudamos
@@ -464,7 +465,7 @@ contraseñas, ni datos bancarios, ni información privada que robar.
 | 1 | **"Cómo pedir la tuya"** · "En 4 pasos" |
 | 2 | **1.** Nos escribes al WhatsApp y nos dices qué quieres que haga tu tarjeta |
 | 3 | **2.** Te mandamos el diseño para aprobar (`__` horas) |
-| 4 | **3.** Pagas por **transferencia bancaria** o en **efectivo** |
+| 4 | **3.** **Transferencia** o **contra entrega** — pagas cuando lo tienes en la mano |
 | 5 | **4.** Te llega en **2 días**. Envío **$3** a todo el país — **gratis desde $80** |
 
 ### Copy
@@ -483,8 +484,9 @@ Te lo mandamos en __ horas. Lo revisas, pides cambios si quieres, y
 recién ahí se manda a producción.
 
 3️⃣ PAGAS
-Transferencia bancaria o efectivo. Te pasamos los datos por el mismo
-WhatsApp.
+Transferencia bancaria, o CONTRA ENTREGA a todo el país: pagas en
+efectivo cuando el pedido ya está en tu mano. No tienes que confiar en
+nosotros antes de tener el producto.
 
 4️⃣ TE LLEGA
 En 2 días, a donde estés. Envío $3 a todo el Ecuador — mismo precio
@@ -546,6 +548,10 @@ escaneó", te está vendiendo otra cosa (un link acortado con métricas),
 no el chip.
 
 Preguntas honestas, respuestas honestas. Pregunta lo que quieras 👇
+
+PD: y si la desconfianza es con nosotros y no con el chip, también está
+resuelto — enviamos contra entrega a todo el país. Pagas cuando lo
+tienes en la mano.
 ```
 
 **Hashtags:** Set B
@@ -655,7 +661,7 @@ $3 a todo el Ecuador · llega en 2 días
 Mismo precio para cualquier ciudad del país.
 GRATIS desde $80 — que son 3 tarjetas, o 20 stickers, o 10 acrílicos
 de menú.
-Pago: transferencia bancaria o efectivo.
+Pago: transferencia o CONTRA ENTREGA en todo el país.
 
 Todos llegan PROGRAMADOS y PROBADOS, apuntando a donde tú decidas.
 No te mandamos un chip en blanco para que lo pelees tú.

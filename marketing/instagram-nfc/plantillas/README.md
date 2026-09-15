@@ -23,15 +23,15 @@ acomodan en el lienzo. El archivo `plantillas-instagram-nfc.html` que genera el 
 |---|---|
 | `PortadaReel.dc.html` | Portada/carátula de reel |
 | `HistoriaEncuesta.dc.html` | Historia con pregunta (el sticker de encuesta se pone en Instagram) |
-| `PortadaDestacada.dc.html` | Las 6 portadas de destacadas en un solo artboard |
+| `PortadaDestacada.dc.html` | Las 7 portadas de destacadas en un solo artboard |
 
 ## Cosas que hay que saber al usarlas
 
 - **Zona segura vertical:** el contenido de las plantillas 9:16 está entre los 280 px de arriba
   y los 400 px de abajo, porque Instagram tapa esas franjas con su propia interfaz (nombre,
   botones, caption). No subas texto por encima de ese margen.
-- **Las 6 destacadas están en un solo artboard.** Cambia cuál se muestra con el control `cover`
-  (funciona / tarjetas / resenas / llaveros / clientes / envios) y exporta una por una.
+- **Las 7 destacadas están en un solo artboard.** Cambia cuál se muestra con el control `cover`
+  (funciona / tarjetas / resenas / mostrador / asistencia / clientes / envios) y exporta una por una.
   Instagram recorta el **círculo del centro**, así que el nombre que sale abajo en la plantilla
   no se va a ver — ese se escribe como título de la destacada en la app.
 - **El control `accent`** cambia el color de acento en todas las plantillas a la vez

@@ -43,13 +43,12 @@ por cantidad; envío plano de **$3 a todo el Ecuador, 2 días, gratis desde $80*
 > pide 4 placas de reseñas — un pedido bueno — igual paga envío. Si quieres que esos dos también
 > califiquen, hay que bajar el umbral o armar un combo; dímelo y lo ajusto en los copys.
 
-**Pago:** transferencia bancaria o efectivo.
+**Pago:** transferencia o **contra entrega a todo el país**.
 
-> **Aclara qué significa "efectivo" antes de publicar.** Vendes a todo el país con envío, así
-> que un cliente en Loja que lee "efectivo" va a asumir **contra entrega**. Si el efectivo solo
-> aplica cuando entregas en persona en tu ciudad, hay que decirlo en el copy — o vas a discutirlo
-> por WhatsApp en cada pedido de provincia. Dime cuál de las dos es y ajusto los cuatro lugares
-> donde aparece.
+> El contra entrega no quedó solo listado como dato: se usa como argumento en la bio, en P05,
+> en P19 y en P20. Es la respuesta directa al problema más grande de una cuenta nueva — nadie te
+> conoce y la destacada "Clientes" está vacía a propósito. "Pagas cuando lo tienes en la mano"
+> elimina el único riesgo que el comprador percibe de verdad.
 
 Lo que todavía falta:
 

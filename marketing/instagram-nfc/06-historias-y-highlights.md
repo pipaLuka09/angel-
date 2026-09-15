@@ -62,9 +62,9 @@ te quema con una audiencia chica.
 
 ---
 
-## Las 6 destacadas (highlights)
+## Las 7 destacadas (highlights)
 
-Crea las 6 portadas el día 1, aunque estén vacías. Un perfil con destacadas se ve establecido;
+Crea las 7 portadas el día 1, aunque estén vacías. Un perfil con destacadas se ve establecido;
 uno sin ellas se ve abandonado.
 
 **Portadas:** fondo `#0B0F14`, ícono en `#12D6DF`, sin texto (el nombre va debajo).
@@ -73,10 +73,11 @@ uno sin ellas se ve abandonado.
 |---|---|
 | **Cómo funciona** | El reel P01, la grabación del toque, el carrusel P02 y el de dudas P16 |
 | **Tarjetas** | Fotos del producto, materiales, colores, el reel P06 |
-| **Reseñas Google** | El reel P08 y todo lo de la placa de mostrador. Es tu destacada más rentable |
-| **Llaveros** | Llaveros, anillos y stickers. El carrusel P09 y el reel P10 |
+| **Reseñas Google** | El reel P08 y todo lo del acrílico de reseñas |
+| **Mostrador** | Acrílico de menú, acrílico de pagos y stickers. El carrusel P09 y los reels P10 y P13 |
+| **Asistencia** | El carrusel P24. Tu producto recurrente y el de mayor valor por cliente |
 | **Clientes** | ⚠️ **Déjala vacía** hasta tener 3 capturas reales. Ver abajo |
-| **Envíos** | Costos, tiempos, cobertura, formas de pago, el carrusel P19 |
+| **Envíos** | $3, 2 días, gratis desde $80, contra entrega. El carrusel P19 |
 
 ### Sobre la destacada "Clientes"
 
