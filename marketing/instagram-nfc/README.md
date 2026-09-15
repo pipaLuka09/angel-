@@ -16,6 +16,7 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 | [`05-guiones-reels.md`](05-guiones-reels.md) | 10 reels con guion plano por plano, texto en pantalla y copy | Cada día de reel |
 | [`06-historias-y-highlights.md`](06-historias-y-highlights.md) | 8 formatos de historia, calendario semanal, las 6 destacadas | Todos los días |
 | [`07-hashtags-y-respuestas.md`](07-hashtags-y-respuestas.md) | 4 sets de hashtags, 7 respuestas guardadas de DM, cómo responder comentarios | Al publicar y al contestar |
+| [`08-guia-de-fotos.md`](08-guia-de-fotos.md) | Qué fotos y videos sacar, con qué luz y cómo — 15 fotos, el video del toque, 4 grabaciones de pantalla | **Antes de publicar nada** |
 | [`plantillas/`](plantillas/) | 9 plantillas gráficas editables (feed 4:5 y vertical 9:16) + tabla de valores de marca | Al armar cada pieza |
 
 ---
@@ -24,11 +25,14 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 
 1. **Lee `02-datos-tecnicos-nfc.md`** y llena la lista de huecos del final (precios, envíos,
    tipo de chip). Sin esos datos, la mitad de los copys no se pueden publicar.
-2. **Crea la cuenta** siguiendo `01-setup-cuenta.md`. Incluye las 6 destacadas vacías.
-3. **Carga las respuestas guardadas** de `07-hashtags-y-respuestas.md` en el DM.
-4. **Prepara los 5 primeros posts como borrador** en Instagram. Esto es lo que evita que el
+2. **Crea la cuenta** siguiendo `01-setup-cuenta.md`. Incluye las 7 destacadas vacías.
+3. **Saca las fotos y el video** siguiendo `08-guia-de-fotos.md`. Esto es lo que de verdad
+   bloquea el arranque: sin fotos de producto no se puede publicar casi nada, y el video del
+   toque es el reel del día 1.
+4. **Carga las respuestas guardadas** de `07-hashtags-y-respuestas.md` en el DM.
+5. **Prepara los 5 primeros posts como borrador** en Instagram. Esto es lo que evita que el
    plan se caiga el jueves de la primera semana.
-5. **Publica el día 1** (el reel P01) y sigue el calendario.
+6. **Publica el día 1** (el reel P01) y sigue el calendario.
 
 ---
 
