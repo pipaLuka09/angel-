@@ -1,7 +1,8 @@
 # Calendario — 30 días
 
 **Ritmo:** 5 publicaciones de feed por semana + historias todos los días.
-(La semana 2 lleva 6: ahí entra el catálogo, que es la pieza que reemplaza a una tienda web.)
+(Las semanas 2, 3 y 4 llevan 6: ahí entran el catálogo, el control de asistencia y el post de
+volumen — las tres piezas que más plata mueven.)
 No es 1 post diario a propósito: una cuenta nueva rinde más con 5 posts buenos que con 7 apurados.
 
 **Horarios para Ecuador (GMT-5):**
@@ -26,13 +27,13 @@ No es 1 post diario a propósito: una cuenta nueva rinde más con 5 posts buenos
 | 9 (Mar) | 🎠 | P07 | Todo lo que cabe en tu tarjeta | Mostrar el valor real |
 | 10 (Mié) | 🎠 | P23 | Catálogo completo: los 4 productos y precios | **Tu página de precios.** Fíjalo |
 | 11 (Jue) | 🎬 | P08 | La placa que te consigue reseñas en Google | Producto B2B, alto ticket |
-| 12 (Vie) | 🎠 | P09 | Llaveros, anillos y stickers NFC | Producto de entrada, bajo precio |
+| 12 (Vie) | 🎠 | P09 | Lo que va en tu mostrador: stickers y acrílicos | Producto de entrada, desde $8 |
 | 13 (Sáb) | 🎬 | P10 | Pegué un sticker NFC en mi carro y esto pasó | Reel de curiosidad |
 | 14 (Dom) | — | — | Solo historias: repaso de la semana | Recordatorio |
 | **SEMANA 3 — Casos de uso por oficio** ||||| |
 | 15 (Lun) | 🎬 | P11 | Si eres barbero o estilista, esto es para ti | Nicho 1 |
 | 16 (Mar) | 🎠 | P12 | Bienes raíces: tu cartera completa en un toque | Nicho 2, ticket alto |
-| 17 (Mié) | — | — | Solo historias: encuesta "¿en qué trabajas?" | Segmentar audiencia |
+| 17 (Mié) | 🎠 | P24 | Control de asistencia con NFC | **Ingreso recurrente.** El de mayor valor |
 | 18 (Jue) | 🎬 | P13 | Restaurantes: carta digital sin QR borroso | Nicho 3 |
 | 19 (Vie) | 🎠 | P14 | 7 oficios que ya la están usando en Ecuador | Amplitud, muy compartible |
 | 20 (Sáb) | 🖼️ | P15 | Médicos, abogados y consultores | Nicho 4, profesional |
@@ -40,7 +41,7 @@ No es 1 post diario a propósito: una cuenta nueva rinde más con 5 posts buenos
 | **SEMANA 4 — Objeciones y cierre** ||||| |
 | 22 (Lun) | 🎠 | P16 | "¿Y si se moja?" y otras 6 dudas | Desarmar objeciones |
 | 23 (Mar) | 🎬 | P17 | ¿Se puede cambiar el link después? | Objeción técnica |
-| 24 (Mié) | — | — | Solo historias: proceso de personalización | Transparencia |
+| 24 (Mié) | 🎠 | P25 | Si tu equipo reparte tarjetas, te sale la mitad | **Volumen.** Donde está tu margen |
 | 25 (Jue) | 🎬 | P18 | Cómo se programa tu tarjeta (paso a paso) | Quitar el miedo a "es complicado" |
 | 26 (Vie) | 🎠 | P19 | Cómo pedir la tuya: envíos y tiempos | Conversión directa |
 | 27 (Sáb) | 🖼️ | P20 | ¿Es seguro? La respuesta honesta | Confianza |
@@ -50,7 +51,7 @@ No es 1 post diario a propósito: una cuenta nueva rinde más con 5 posts buenos
 
 ## Dónde está cada copy
 
-- **Carruseles y posts simples (P02, P04, P05, P07, P09, P12, P14, P15, P16, P19, P20, P22, P23)**
+- **Carruseles y posts simples (P02, P04, P05, P07, P09, P12, P14, P15, P16, P19, P20, P22, P23, P24, P25)**
   → `04-publicaciones-feed.md`
 - **Reels (P01, P03, P06, P08, P10, P11, P13, P17, P18, P21)**
   → `05-guiones-reels.md` (con guion plano por plano)

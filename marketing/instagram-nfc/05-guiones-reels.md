@@ -1,7 +1,7 @@
 # Guiones de reels
 
 Los reels son lo que le va a dar alcance a una cuenta nueva. Los posts de feed venden a quien
-ya te sigue; los reels traen gente nueva. Por eso son 10 de las 23 publicaciones del mes.
+ya te sigue; los reels traen gente nueva. Por eso son 10 de las 25 publicaciones del mes.
 
 ## Reglas que aplican a los 10
 
@@ -109,7 +109,7 @@ respuesta es alcance gratis y varios de esos comentarios se convierten en venta.
 | 2–6s | Giro lento mostrando ambos lados y el material | **"Tu nombre. Tu logo. Tu chip."** |
 | 6–11s | El toque, plano cerrado. Se abre el perfil en el celular | **"Un toque = tu contacto guardado"** |
 | 11–16s | Split screen: a la izquierda 100 tarjetas de papel, a la derecha una sola | **"1 vez, no cada año"** |
-| 16–20s | Tarjeta en la mano, fondo negro | **"Desde $__ · Envíos a todo el Ecuador"** |
+| 16–20s | Tarjeta en la mano, fondo negro | **"$30 la unidad · desde $12 al por mayor"** |
 
 ### Copy
 
@@ -127,7 +127,8 @@ Lo que la hace distinta de la de papel:
 ✅ El contacto se guarda en el celular mientras todavía conversas
 ✅ Sin batería. Nunca se carga.
 
-Desde $__ · Diseño personalizado · Llega programada y probada
+$30 la unidad · desde $12 llevando 20 · Diseño personalizado
+Llega programada y probada
 Envíos a todo el Ecuador 🇪🇨
 
 Escríbenos al WhatsApp del perfil 👇
@@ -151,7 +152,7 @@ Escríbenos al WhatsApp del perfil 👇
 | 7–13s | La placa NFC sobre el mostrador. Un cliente acerca el celular | **"Con la placa: acerca y se abre el formulario"** |
 | 13–20s | Grabación de pantalla: se abre directo la caja de reseña de Google, con las estrellas | **"Directo a las estrellas. 3 toques y está."** |
 | 20–26s | Plano de la placa en distintos lugares: mostrador, mesa, junto a la caja | **"Va donde el cliente ya está parado"** |
-| 26–30s | Fondo negro | **"Placa NFC para reseñas · $__"** |
+| 26–30s | Fondo negro | **"Placa de reseñas · $25 · desde $15 llevando 4"** |
 
 ### Copy
 
@@ -197,7 +198,7 @@ hagas. Pedirla está permitido; pagarla no.
 | 2–6s | Tú a cámara, tono de "escucha esto" | **"Vendo el carro. Odiaba el letrero de 'se vende'."** |
 | 6–12s | Alguien pasando, acercando el celular al vidrio. Se abre una ficha con fotos y precio | **"Ahora acercan el celular y ven fotos, año, kilometraje y precio"** |
 | 12–17s | Grabación de pantalla del WhatsApp con mensajes entrando | **"Y me escriben directo. Sin llamarme a las 11 de la noche."** |
-| 17–20s | El sticker en primer plano | **"Stickers NFC desde $__"** |
+| 17–20s | El sticker en primer plano | **"Stickers NFC · $8 c/u · desde $2.80 por volumen"** |
 
 ### Copy
 
@@ -221,7 +222,7 @@ Y lo mismo sirve para:
 🚗 El tablero, si manejas taxi o haces fletes
 💻 La parte de atrás de tu laptop
 
-Un sticker cuesta desde $__ y lo pegas donde quieras.
+Un sticker cuesta $8, o $2.80 cada uno si llevas 40. Lo pegas donde quieras.
 
 ¿Dónde pegarías el tuyo? 👇
 ```
@@ -282,7 +283,7 @@ escribo".
 | 3–7s | Alguien intentando enfocar el QR, alejando y acercando el celular, sin éxito | **"Y el cliente lleva 20 segundos enfocando."** |
 | 7–13s | Sticker NFC en la mesa. El cliente solo apoya el celular encima | **"Con NFC: apoya el celular. Ya."** |
 | 13–19s | Grabación de pantalla: se abre la carta con fotos y precios | **"Carta con fotos · precios actualizados · el wifi"** |
-| 19–25s | Plano de la mesa con el sticker discreto | **"Cambias el precio en 30 seg. Sin reimprimir nada."** |
+| 19–25s | Plano de la mesa con el acrílico discreto | **"$14 el acrílico · desde $7 llevando 30"** |
 
 ### Copy
 
@@ -306,7 +307,12 @@ cartas ni 20 QR.
 
 También sirve en la caja, en la entrada y en el empaque del delivery.
 
-¿Tienes restaurante, cafetería o food truck? Escríbenos 👇
+💵 El acrílico de menú cuesta $14. Si tienes varias mesas te sale mucho
+menos: llevando 10 son $11 cada uno, llevando 20 son $8.50, llevando 30
+son $7.
+
+¿Tienes restaurante, cafetería o food truck? Dime cuántas mesas y te paso
+el precio 👇
 ```
 
 **Hashtags:** Set A

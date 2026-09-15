@@ -58,9 +58,13 @@ Si un cliente te reclama en comentarios, todo lo que publicaste tiene que ser ci
 
 ## Huecos que tienes que llenar tú antes de publicar
 
-- [ ] Precio de cada producto (los copys tienen `$__`)
+- [x] ~~Precio de cada producto~~ — recibidos y aplicados (hoja `Precios.xlsx`, sept 2026)
 - [ ] Costo y tiempo de envío en Ecuador (los copys tienen `__`)
 - [ ] Tipo de chip que vendes (NTAG213 / 215 / 216)
 - [ ] ¿Tus tags vienen bloqueados o regrabables?
 - [ ] ¿El diseño de la tarjeta es personalizado o estándar?
+- [ ] **Qué hace por dentro el sistema de asistencia** (reportes, panel, exportar, horas extra,
+      si funciona sin internet) — el copy de P24 tiene esos huecos y son los que venden
+- [ ] Precio de llaveros/imanes, sistema de gym y collar NFC (quedaron fuera del contenido
+      hasta que lo tengas)
 - [ ] Número de WhatsApp de ventas

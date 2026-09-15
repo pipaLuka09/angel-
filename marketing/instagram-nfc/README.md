@@ -1,7 +1,7 @@
 # Instagram NFC — kit de contenido completo
 
 Todo el contenido para lanzar y operar la cuenta de Instagram de los productos NFC.
-**Mercado: Ecuador 🇪🇨 · Moneda: USD · 30 días de contenido · 23 publicaciones + historias diarias.**
+**Mercado: Ecuador 🇪🇨 · Moneda: USD · 30 días de contenido · 25 publicaciones + historias diarias.**
 
 ---
 
@@ -12,7 +12,7 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 | [`01-setup-cuenta.md`](01-setup-cuenta.md) | Crear la cuenta, @ sugeridos, bio, foto de perfil, highlights, configuración | **Primero.** Una sola vez, ~20 min |
 | [`02-datos-tecnicos-nfc.md`](02-datos-tecnicos-nfc.md) | Hoja de verdad sobre NFC: compatibilidad real, qué no prometer nunca | **Léelo antes de publicar.** Y cada vez que improvises un copy |
 | [`03-calendario-30-dias.md`](03-calendario-30-dias.md) | Qué se publica cada día, en qué formato, a qué hora | Tu tablero de control diario |
-| [`04-publicaciones-feed.md`](04-publicaciones-feed.md) | 13 copys completos de carruseles y posts, con diseño lámina por lámina | Cada día de post de feed |
+| [`04-publicaciones-feed.md`](04-publicaciones-feed.md) | 15 copys completos de carruseles y posts, con diseño lámina por lámina | Cada día de post de feed |
 | [`05-guiones-reels.md`](05-guiones-reels.md) | 10 reels con guion plano por plano, texto en pantalla y copy | Cada día de reel |
 | [`06-historias-y-highlights.md`](06-historias-y-highlights.md) | 8 formatos de historia, calendario semanal, las 6 destacadas | Todos los días |
 | [`07-hashtags-y-respuestas.md`](07-hashtags-y-respuestas.md) | 4 sets de hashtags, 7 respuestas guardadas de DM, cómo responder comentarios | Al publicar y al contestar |
@@ -34,27 +34,36 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 
 ## Lo que tienes que llenar tú
 
-Los copys tienen huecos marcados con `$__` y `__`. Son a propósito: **no inventé ni un precio
-ni un tiempo de envío.** Los que hay que llenar:
+**Precios: listos.** Aplicados desde tu hoja `Precios.xlsx`, con los escalones por cantidad
+incluidos en cada copy. Lo que todavía falta:
 
-- [ ] Precio de cada producto (tarjeta, placa, llavero, anillo, sticker)
-- [ ] Costo y tiempo de envío (Quito / Guayaquil / resto del país)
-- [ ] Formas de pago que aceptas
-- [ ] Tipo de chip (NTAG213 / 215 / 216) y si viene regrabable o bloqueado
+- [ ] **Costo y tiempo de envío** (Quito / Guayaquil / resto del país)
+- [ ] **Formas de pago** que aceptas
+- [ ] **En cuántas horas** mandas la propuesta de diseño
+- [ ] **Qué hace por dentro el sistema de asistencia** — P24 tiene huecos en las láminas 4 y 5
+      (reportes, panel, exportar, horas extra, si necesita internet). Son los que deciden esa
+      venta: un dueño no compra "marcar entrada", compra "dejar de pelear con las horas a fin de mes"
+- [ ] **Cuánto cuestan 100 tarjetas de papel** en una imprenta de tu ciudad — para P04.
+      Cotízalo de verdad; si inflas ese número y alguien que sí imprime lo ve, pierdes la cuenta
+- [ ] Tipo de chip (NTAG213 / 215 / 216) y si vienen regrabables o bloqueados
 - [ ] Número de WhatsApp de ventas
-- [ ] Tu historia real para el post P05 (es el único que no puedo escribir por ti)
+- [ ] Tu historia real para el post P05 (el único que no puedo escribir por ti)
 
-Búscalos todos de una vez con:
+Búscalos todos con:
 
 ```bash
 grep -rn '\$__\|__ ' marketing/instagram-nfc/
 ```
 
----
+### Fuera del contenido por ahora
+
+Llaveros e imanes, sistema de gym y collar NFC no aparecen en ninguna publicación: tu hoja dice
+"no sé aún" en el precio y un catálogo con huecos genera DMs que no puedes cerrar. Cuando tengas
+esos precios, dímelo y los agrego.
 
 ## Lo que hice y lo que no
 
-**Lo que hice:** todo el contenido — setup, calendario, 23 copys completos, 10 guiones de
+**Lo que hice:** todo el contenido — setup, calendario, 25 copys completos, 10 guiones de
 reel, historias, hashtags, respuestas de DM, la hoja de datos técnicos para que nada de lo
 publicado sea falso, y las 9 plantillas gráficas en `plantillas/`.
 
@@ -64,7 +73,7 @@ publicado sea falso, y las 9 plantillas gráficas en `plantillas/`.
   Está todo especificado en `01-setup-cuenta.md`, son ~20 minutos.
 - **Publicar automáticamente.** No hay ninguna cuenta de Instagram conectada a esta sesión con
   permisos de publicación. Cuando la cuenta exista y la conectes a Meta Business Suite, puedes
-  programar los 23 posts de una sola vez desde ahí.
+  programar los 25 posts de una sola vez desde ahí.
 - **Leer un catálogo de productos.** No hay tienda web por ahora, y es una decisión
   deliberada: para este volumen WhatsApp convierte mejor y no cuesta nada. Por eso el
   contenido cubre las 4 categorías de producto NFC que acordamos, todos los CTA llevan a

@@ -62,17 +62,56 @@ El atajo va entre corchetes.
 
 ### `[precio]`
 ```
-¡Hola! 👋 Te cuento los precios:
+¡Hola! 👋 Te paso los precios:
 
-📇 Tarjeta de presentación NFC — desde $__
-⭐ Placa para reseñas de Google — desde $__
-🔑 Llavero NFC — desde $__
-🏷️ Sticker NFC — desde $__
+📇 Tarjeta de presentación — $30
+   (10 a $20 c/u · 20 a $12 c/u · 30+ cotizamos)
+⭐ Acrílico de reseñas de Google — $25
+   (2 a $20 c/u · 4 a $15 c/u)
+🍽️ Acrílico de menú digital — $14
+   (10 a $11 · 20 a $8.50 · 30 a $7 c/u)
+💳 Acrílico de pagos — $10
+   (3 a $7.50 c/u)
+🏷️ Sticker de redes — $8
+   (10 a $6 · 20 a $4 · 40 a $2.80 c/u)
 
 Todos llegan programados y probados, con tu diseño.
 Envío: $__ (llega en __ días a todo el Ecuador)
 
 Cuéntame a qué te dedicas y te digo cuál te conviene de verdad 🙌
+```
+
+### `[volumen]` — cuando preguntan por varios
+```
+Ahí es donde baja fuerte 👇
+
+📇 Tarjetas: 10 a $20 c/u · 20 a $12 c/u · 30+ cotizamos
+🍽️ Acrílicos de menú: 10 a $11 · 20 a $8.50 · 30 a $7 c/u
+🏷️ Stickers: 10 a $6 · 20 a $4 · 40 a $2.80 c/u
+⭐ Acrílicos de reseñas: 2 a $20 c/u · 4 a $15 c/u
+💳 Acrílicos de pagos: 3 a $7.50 c/u
+
+Un solo pedido, un solo envío, un diseño aprobado.
+
+¿Cuántos necesitas? Dime el número y te armo la cotización hoy.
+```
+
+### `[asistencia]` — control de personal
+```
+Te cuento cómo funciona 👇
+
+Cada trabajador tiene su tarjeta NFC y la acerca al entrar y al salir.
+Queda registrado en el momento, con la hora real. Nadie marca por otro.
+
+💵 PRECIOS
+· 1 a 10 trabajadores — $25 instalación + $30 al mes
+· 11 a 25 trabajadores — $35 instalación + $40 al mes
+· 26 a 40 trabajadores — $45 instalación + $50 al mes
+· Tarjeta de cada trabajador: $5
+
+Nosotros lo instalamos y lo dejamos funcionando.
+
+¿Cuántos trabajadores tienes? Con ese número te paso el costo exacto.
 ```
 
 ### `[celular]`
@@ -168,6 +207,7 @@ y varios de esos comentarios se vuelven venta.
 | Tipo de comentario | Cómo responder |
 |---|---|
 | "¿Cuánto cuesta?" | Da el precio **en el comentario**, no digas "te escribo al DM". Esconder el precio espanta. Luego sí, invita al DM para lo específico |
+| "¿Y si llevo varios?" | **Este es tu mejor comentario del día.** Da los precios por cantidad ahí mismo y pide el número: "¿cuántos serían?". El volumen es donde está tu margen |
 | "¿Sirve en mi [modelo]?" | Responde sí o no, concreto. Si no sabes el modelo, dilo: "no conozco ese, revisa Ajustes → NFC y me dices" |
 | "Ya existe, es como el QR" | Dale razón en lo que tiene razón y marca la diferencia: "se parecen en el objetivo, pero el QR hay que enfocarlo y NFC solo se toca". Sin pelear |
 | "Eso lo hago con un QR gratis" | **Es verdad, y hay que decirlo.** "Sí, un QR es gratis y funciona. NFC te sirve si quieres que sea físico, más rápido y que no se vea como un papel pegado". Reconocerlo genera más confianza que discutirlo |

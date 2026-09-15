@@ -75,7 +75,7 @@ Desliza para ver el resumen ➡️ y si te queda alguna duda, escríbenos.
 | 1 | Pantalla partida. Izquierda: montón de tarjetas de papel. Derecha: una sola tarjeta NFC. Titular: **"100 tarjetas vs. 1"** |
 | 2 | **PAPEL:** se acaban · se doblan · se mojan · cambias de número y tiras todas |
 | 3 | **NFC:** una sola · cambias el link cuando quieras · dura años |
-| 4 | Tabla de costo: 100 de papel = `$__` al año (y se repite cada año) vs. 1 NFC = `$__` una vez |
+| 4 | Tabla de costo: 100 de papel = `$__` al año (y se repite cada año) vs. 1 NFC = `$30` una vez |
 | 5 | **EL DETALLE QUE NADIE CUENTA:** de 100 tarjetas de papel repartidas, la mayoría termina en la basura sin que nadie te guarde. Con NFC el contacto se guarda en el celular en el momento |
 | 6 | CTA: **"Una vez. No cada año."** |
 
@@ -96,7 +96,7 @@ Esa es la cuenta que casi nadie hace.
 · Una sola, para siempre
 · ¿Cambiaste de número? Cambias el link en 30 segundos, la misma tarjeta
 · El contacto se guarda en el celular en ese momento, no se pierde
-· Costo: $__ una vez
+· Costo: $30 una vez, o $12 cada una llevando 20
 
 Pero lo importante no es el precio. Es esto:
 
@@ -197,49 +197,50 @@ catálogo de diciembre, en enero tu promoción nueva. La misma tarjeta.
 
 ---
 
-## P09 — Llaveros, anillos y stickers NFC 🎠
-**Día 12 · Carrusel de 6 · Objetivo: producto de entrada, precio bajo**
+## P09 — Lo que va en tu mostrador: stickers y acrílicos 🎠
+**Día 12 · Carrusel de 6 · Objetivo: productos de entrada, el precio más bajo del catálogo**
 
 ### Diseño de las láminas
 
 | # | Contenido |
 |---|---|
-| 1 | Los tres productos en fila sobre fondo negro. **"No todo es una tarjeta"** |
-| 2 | 🔑 **LLAVERO** — lo llevas siempre, no se te olvida en la casa |
-| 3 | 💍 **ANILLO** — el más discreto. Tocas y ya. Sin sacar nada del bolsillo |
-| 4 | 🏷️ **STICKER** — lo pegas donde quieras: el mostrador, el carro, la vitrina, tu laptop |
-| 5 | Precios desde `$__` · Comparación rápida de cuál le sirve a quién |
-| 6 | CTA: **"¿Cuál va contigo?"** |
+| 1 | Los tres sobre un mostrador real. **"Lo que va en tu mostrador"** · "Desde $8" |
+| 2 | 🏷️ **STICKER DE REDES — $8** · lo pegas donde quieras · desde $2.80 llevando 40 |
+| 3 | 🍽️ **ACRÍLICO DE MENÚ — $14** · tu carta digital en la mesa · desde $7 llevando 30 |
+| 4 | 💳 **ACRÍLICO DE PAGOS — $10** · el cliente paga sin que dictes la cuenta · $7.50 llevando 3 |
+| 5 | Tabla de precios por cantidad, los tres juntos |
+| 6 | CTA: **"¿Cuál va en tu local?"** |
 
 ### Copy
 
 ```
-La tarjeta no es para todos. Y está bien.
+Lo más barato del catálogo es también lo que más se usa. Desde $8.
 
-Si eres de los que no carga billetera, esto es lo tuyo 👇
+🏷️ STICKER DE REDES — $8
+Lo pegas donde quieras: el mostrador, la vitrina, el tablero del carro,
+tu laptop. El cliente acerca el celular y se le abre tu Instagram.
+Llevando 10 sale a $6 · llevando 20 a $4 · llevando 40 a $2.80
 
-🔑 LLAVERO NFC — desde $__
-Va con tus llaves, o sea que lo llevas siempre. El que nunca se te
-olvida en la casa.
-Ideal para: quien reparte contacto todo el día fuera de una oficina.
+🍽️ ACRÍLICO DE MENÚ — $14
+Va en la mesa. El cliente apoya el celular y se le abre tu carta con
+fotos y precios. Se acabó el QR arrugado que nadie logra enfocar.
+Y si subes un precio, lo cambias en el link en 30 segundos — sin
+reimprimir 40 cartas.
+Llevando 10 sale a $11 · llevando 20 a $8.50 · llevando 30 a $7
 
-💍 ANILLO NFC — desde $__
-El más discreto de todos. Das la mano, acercas y ya está. No sacas nada
-del bolsillo.
-Ideal para: eventos, networking, quien quiere que se vea natural.
+💳 ACRÍLICO DE PAGOS — $10
+El cliente acerca el celular y le abre tu link de pago. Sin dictar
+número de cuenta, sin dictar cédula, sin errores de transferencia.
+Llevando 3 sale a $7.50 cada uno
 
-🏷️ STICKER NFC — desde $__
-Se pega donde tú quieras: el mostrador del local, el vidrio de la
-vitrina, el tablero del carro, la parte de atrás del celular.
-Ideal para: negocios con local fijo y para probar NFC sin gastar mucho.
+Los tres funcionan igual: acercar el celular, nada de apps, nada de
+enfocar la cámara.
 
-Los tres hacen exactamente lo mismo que la tarjeta. Cambia dónde lo
-llevas, no lo que hace.
-
-¿Cuál va contigo? 👇
+¿Cuál va en tu local? 👇
 ```
 
 **Hashtags:** Set B
+**Primer comentario:** `Si tienes mesas, el de menú te sirve en cada una. Dime cuántas y te paso el precio 👇`
 
 ---
 
@@ -596,25 +597,26 @@ Escríbenos 👇
 
 ---
 
-## P23 — Catálogo completo: los 4 productos y sus precios 🎠
-**Día 10 · Carrusel de 6 · Objetivo: ser tu página de precios**
+## P23 — Catálogo completo: todo y cuánto cuesta 🎠
+**Día 10 · Carrusel de 7 · Objetivo: ser tu página de precios**
 
-> ⚠️ **Este es el post más importante de la cuenta** y por eso existe: sin tienda web, este
-> carrusel *es* tu catálogo. Fíjalo en el perfil y actualízalo cada vez que cambies un precio
-> (se edita el mismo post, no hace falta volver a publicar).
+> ⚠️ **Este es el post más importante de la cuenta.** Sin tienda web, este carrusel *es* tu
+> catálogo. Fíjalo en el perfil. Cuando cambies un precio, edita este mismo post — no publiques
+> uno nuevo, o vas a tener dos catálogos contradictorios circulando.
 
 ### Diseño de las láminas
-Usa la plantilla `Main` para la 1, `LaminaInterior` para las 4 de producto (una foto real por
-producto, no ilustración) y `LaminaCierre` para la última.
+Lámina 1 con la plantilla `Main`, las 5 de producto con `LaminaInterior` (**una foto real por
+producto**, no ilustración), la última con `LaminaCierre`.
 
 | # | Contenido |
 |---|---|
 | 1 | **"Todo lo que tenemos y cuánto cuesta"** · "Guarda este post" |
-| 2 | 📇 **Tarjeta de presentación** — `$__` — para quien reparte contacto |
-| 3 | ⭐ **Placa para reseñas de Google** — `$__` — para negocios con local |
-| 4 | 🔑 **Llavero / anillo** — `$__` — para quien no carga billetera |
-| 5 | 🏷️ **Sticker** — `$__` — para pegarlo donde quieras |
-| 6 | **Cómo pedir** + envío `$__` + WhatsApp |
+| 2 | 📇 **Tarjeta de presentación — $30** · desde $12 por volumen |
+| 3 | ⭐ **Acrílico de reseñas de Google — $25** · desde $15 llevando 4 |
+| 4 | 🍽️ **Acrílico de menú — $14** · desde $7 por volumen |
+| 5 | 💳 **Acrílico de pagos — $10** · $7.50 llevando 3 |
+| 6 | 🏷️ **Sticker de redes — $8** · desde $2.80 por volumen |
+| 7 | **Cómo pedir** + envío + WhatsApp |
 
 ### Copy
 
@@ -622,34 +624,151 @@ producto, no ilustración) y `LaminaCierre` para la última.
 Guarda este post. Es todo lo que tenemos y cuánto cuesta, sin que
 tengas que preguntar.
 
-📇 TARJETA DE PRESENTACIÓN NFC — $__
-Tu contacto completo con un toque. Diseño personalizado con tu logo.
-Para: quien reparte contacto todo el día.
+📇 TARJETA DE PRESENTACIÓN — $30
+Tu contacto completo con un toque, con tu logo y tu diseño.
+10 unidades: $20 c/u · 20 unidades: $12 c/u · 30 o más: cotizamos
 
-⭐ PLACA PARA RESEÑAS DE GOOGLE — $__
+⭐ ACRÍLICO DE RESEÑAS DE GOOGLE — $25
 De mostrador. El cliente acerca el celular y le abre el formulario de
 reseña de tu negocio, directo en las estrellas.
-Para: locales, restaurantes, consultorios.
+2 unidades: $20 c/u · 4 unidades: $15 c/u
 
-🔑 LLAVERO O ANILLO NFC — $__
-Lo mismo que la tarjeta, pero va con tus llaves o en tu mano.
-Para: quien no carga billetera.
+🍽️ ACRÍLICO DE MENÚ — $14
+Va en la mesa. Apoyan el celular y se abre tu carta con fotos y
+precios. Cambias un precio en 30 segundos, sin reimprimir nada.
+10: $11 c/u · 20: $8.50 c/u · 30: $7 c/u
 
-🏷️ STICKER NFC — $__
-Lo pegas donde quieras: el mostrador, la vitrina, el carro, tu laptop.
-Para: negocios con local, y para probar NFC sin gastar mucho.
+💳 ACRÍLICO DE PAGOS — $10
+Abre tu link de pago. Sin dictar número de cuenta ni cédula.
+3 unidades: $7.50 c/u
+
+🏷️ STICKER DE REDES — $8
+Lo pegas donde quieras y abre tu Instagram.
+10: $6 c/u · 20: $4 c/u · 40: $2.80 c/u · 50 o más: cotizamos
 
 📦 ENVÍO
 $__ a todo el Ecuador · llega en __ días
 Formas de pago: __
 
-Todos llegan PROGRAMADOS y PROBADOS, con tu logo y apuntando a donde
-tú decidas. No te mandamos un chip en blanco.
+Todos llegan PROGRAMADOS y PROBADOS, apuntando a donde tú decidas.
+No te mandamos un chip en blanco para que lo pelees tú.
 
-¿No sabes cuál te sirve? Escríbenos y te decimos — incluso si la
-respuesta es que ninguna 👇
+¿Tienes un equipo o varios locales? Los precios bajan bastante por
+cantidad — escríbenos y te cotizamos 👇
 ```
 
 **Hashtags:** Set B
-**Fíjalo en el perfil.** Junto con el reel P01 y el post de presentación P05, estos tres son
-tu página de inicio.
+**Fíjalo en el perfil.** Junto con el reel P01 y la presentación P05, estos tres son tu página
+de inicio.
+
+---
+
+## P24 — Control de asistencia con NFC: tu equipo marca con una tarjeta 🎠
+**Día 17 · Carrusel de 7 · Objetivo: tu único producto con ingreso recurrente**
+
+> ⚠️ **Llena los huecos antes de publicar.** Yo sé qué cuesta tu sistema, pero no sé qué hace
+> por dentro: si da reportes, si hay una app o un panel web, si exporta a Excel, si calcula
+> horas extra, si funciona sin internet. Eso lo tienes que completar tú en las láminas 4 y 5 —
+> y es justo lo que va a decidir la venta, porque un dueño no compra "marcar entrada", compra
+> "dejar de pelear con las horas a fin de mes".
+
+### Diseño de las láminas
+
+| # | Contenido |
+|---|---|
+| 1 | Foto de un trabajador acercando su tarjeta al lector. **"Tu equipo marca entrada con una tarjeta"** |
+| 2 | **EL PROBLEMA:** el cuaderno de firmas se llena a las 8:05 con la letra de otro |
+| 3 | **CÓMO FUNCIONA:** cada trabajador tiene su tarjeta · la acerca al entrar y al salir · queda registrado |
+| 4 | **LO QUE VES TÚ:** `__` (reportes, panel, exportar a Excel — completa con lo que hace de verdad) |
+| 5 | **LO QUE NO NECESITAS:** `__` (¿huella? ¿internet? ¿computadora en sitio? — aclara qué NO hace falta) |
+| 6 | **PRECIOS:** tabla por número de trabajadores + $5 por tarjeta |
+| 7 | CTA: "Te lo instalamos" |
+
+### Copy
+
+```
+El cuaderno de firmas de tu negocio es una obra de ficción.
+
+Todos llegamos 8:00 en punto. Todos. Todos los días. Y la letra de la
+línea de las 8:00 del martes sospechosamente se parece a la del
+compañero.
+
+No es maldad, es que un cuaderno no puede decir la verdad: se firma
+cuando uno se acuerda, y se firma la hora que uno quiere.
+
+CON NFC FUNCIONA ASÍ:
+📲 Cada trabajador tiene su tarjeta
+📲 La acerca al entrar y al salir
+📲 Queda registrado en el momento, con la hora real
+
+Nadie marca por otro sin que se note, y nadie se pelea a fin de mes por
+si llegó tarde tres veces o cinco.
+
+💵 PRECIOS
+· 1 a 10 trabajadores — $25 de instalación + $30 al mes
+· 11 a 25 trabajadores — $35 de instalación + $40 al mes
+· 26 a 40 trabajadores — $45 de instalación + $50 al mes
+· Tarjeta de cada trabajador: $5
+
+Nosotros te lo instalamos y te lo dejamos funcionando. No te
+entregamos un equipo para que lo configures tú.
+
+¿Cuántos trabajadores tienes? Dime el número y te paso el costo exacto
+👇
+```
+
+**Hashtags:** Set D (o arma un set nuevo con `#recursoshumanos #controldepersonal #pymesecuador`)
+**Primer comentario:** `Si tienes más de 40 trabajadores, escríbenos igual y lo cotizamos 👇`
+
+---
+
+## P25 — Si tu equipo reparte tarjetas, esto te sale la mitad 🎠
+**Día 24 · Carrusel de 6 · Objetivo: el ángulo de volumen, que es donde está tu margen**
+
+> Este post existe porque tus precios por cantidad son agresivos y vender de a una no es tu
+> negocio. Una tarjeta suelta son $30; veinte son $240 en una sola conversación, un solo envío
+> y un solo diseño.
+
+### Diseño de las láminas
+
+| # | Contenido |
+|---|---|
+| 1 | Mano sosteniendo un abanico de tarjetas con el mismo diseño. **"¿Tu equipo reparte tarjetas?"** |
+| 2 | **1 tarjeta: $30** · grande, sola en la lámina |
+| 3 | **20 tarjetas: $12 cada una** · el mismo diseño, el nombre de cada quien |
+| 4 | La cuenta: 20 sueltas serían $600 · en volumen son $240 |
+| 5 | **También aplica a:** acrílicos de menú (30 por $7 c/u) y stickers (40 por $2.80 c/u) |
+| 6 | CTA: "Dime cuántos son y te cotizo hoy" |
+
+### Copy
+
+```
+Una tarjeta cuesta $30. Veinte cuestan $12 cada una.
+
+Si tienes un equipo de ventas, varios locales o una franquicia, estás
+pagando de más por comprar de a una.
+
+📇 TARJETAS DE PRESENTACIÓN
+1 → $30 c/u
+10 → $20 c/u
+20 → $12 c/u
+30 o más → te cotizamos
+
+Veinte tarjetas sueltas serían $600. En volumen son $240. La diferencia
+son $360 que se quedan en tu bolsillo por hacer un solo pedido.
+
+Y cada tarjeta lleva el nombre de cada persona de tu equipo — no es un
+diseño genérico repetido.
+
+También baja fuerte en el resto:
+🍽️ Acrílicos de menú: 30 por $7 cada uno (en vez de $14)
+🏷️ Stickers: 40 por $2.80 cada uno (en vez de $8)
+⭐ Acrílicos de reseñas: 4 por $15 cada uno (en vez de $25)
+
+Un pedido, un envío, un diseño aprobado. Listo.
+
+¿Cuántos son en tu equipo? Dime el número y te cotizo hoy mismo 👇
+```
+
+**Hashtags:** Set C
+**Primer comentario:** `Esto aplica también si eres una franquicia con varios locales — escríbeme 👇`
