@@ -77,11 +77,13 @@ El atajo va entre corchetes.
 
 Todos llegan programados y probados, con tu diseño.
 Envío: $3 a todo el Ecuador, llega en 2 días
+Desde $80 el envío es gratis
 
 Cuéntame a qué te dedicas y te digo cuál te conviene de verdad 🙌
 ```
 
 ### `[volumen]` — cuando preguntan por varios
+> Cierra siempre recordando el envío gratis: cualquier pedido de volumen pasa los $80.
 ```
 Ahí es donde baja fuerte 👇
 
@@ -168,7 +170,8 @@ Para armar tu pedido necesito:
 🖼️ Tu logo, si tienes
 
 Formas de pago: __
-Te llega en 2 días, con envío de $3 a cualquier ciudad.
+Te llega en 2 días, con envío de $3 a cualquier ciudad
+(gratis si tu pedido pasa de $80).
 
 ¿Empezamos?
 ```
@@ -179,6 +182,8 @@ Enviamos a todo el Ecuador 🇪🇨
 
 📦 $3 a todo el Ecuador · llega en 2 días
 📦 Mismo precio para cualquier ciudad, sin importar qué tan lejos
+🎁 GRATIS desde $80 — o sea 3 tarjetas, 20 stickers, o 10 acrílicos
+   de menú
 💰 Formas de pago: __
 
 El pedido sale una vez que apruebes el diseño.

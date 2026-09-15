@@ -465,7 +465,7 @@ contraseñas, ni datos bancarios, ni información privada que robar.
 | 2 | **1.** Nos escribes al WhatsApp y nos dices qué quieres que haga tu tarjeta |
 | 3 | **2.** Te mandamos el diseño para aprobar (`__` horas) |
 | 4 | **3.** Pagas por `__` (transferencia / Payphone / De Una / contra entrega) |
-| 5 | **4.** Te llega en **2 días**. Envío **$3** a todo el Ecuador, sin importar la ciudad |
+| 5 | **4.** Te llega en **2 días**. Envío **$3** a todo el país — **gratis desde $80** |
 
 ### Copy
 
@@ -489,6 +489,10 @@ entrega en __).
 4️⃣ TE LLEGA
 En 2 días, a donde estés. Envío $3 a todo el Ecuador — mismo precio
 para Quito, para Guayaquil y para el cantón más lejano.
+
+📦 Y desde $80 el envío es GRATIS. Para que tengas una idea:
+3 tarjetas ya son $90 · 10 acrílicos de menú son $110 · 20 stickers
+son $80 exactos.
 
 Y llega PROGRAMADA y PROBADA. No te mandamos un chip en blanco para
 que lo pelees tú. Llega funcionando.
@@ -616,7 +620,7 @@ producto**, no ilustración), la última con `LaminaCierre`.
 | 4 | 🍽️ **Acrílico de menú — $14** · desde $7 por volumen |
 | 5 | 💳 **Acrílico de pagos — $10** · $7.50 llevando 3 |
 | 6 | 🏷️ **Sticker de redes — $8** · desde $2.80 por volumen |
-| 7 | **Cómo pedir** + envío $3 / 2 días + WhatsApp |
+| 7 | **Cómo pedir** + envío $3 / 2 días / **gratis desde $80** + WhatsApp |
 
 ### Copy
 
@@ -649,6 +653,8 @@ Lo pegas donde quieras y abre tu Instagram.
 📦 ENVÍO
 $3 a todo el Ecuador · llega en 2 días
 Mismo precio para cualquier ciudad del país.
+GRATIS desde $80 — que son 3 tarjetas, o 20 stickers, o 10 acrílicos
+de menú.
 Formas de pago: __
 
 Todos llegan PROGRAMADOS y PROBADOS, apuntando a donde tú decidas.
@@ -738,7 +744,7 @@ entregamos un equipo para que lo configures tú.
 | 2 | **1 tarjeta: $30** · grande, sola en la lámina |
 | 3 | **20 tarjetas: $12 cada una** · el mismo diseño, el nombre de cada quien |
 | 4 | La cuenta: 20 sueltas serían $600 · en volumen son $240 |
-| 5 | **También aplica a:** acrílicos de menú (30 por $7 c/u) y stickers (40 por $2.80 c/u) |
+| 5 | **También aplica a:** acrílicos de menú (30 por $7 c/u) y stickers (40 por $2.80 c/u) · **envío gratis desde $80** |
 | 6 | CTA: "Dime cuántos son y te cotizo hoy" |
 
 ### Copy
@@ -767,6 +773,9 @@ También baja fuerte en el resto:
 ⭐ Acrílicos de reseñas: 4 por $15 cada uno (en vez de $25)
 
 Un pedido, un envío, un diseño aprobado. Listo.
+
+📦 Y desde $80 no pagas envío. Cualquier pedido de volumen lo pasa de
+sobra — 3 tarjetas ya son $90.
 
 ¿Cuántos son en tu equipo? Dime el número y te cotizo hoy mismo 👇
 ```

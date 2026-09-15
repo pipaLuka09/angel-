@@ -35,7 +35,15 @@ Todo el contenido para lanzar y operar la cuenta de Instagram de los productos N
 ## Lo que tienes que llenar tú
 
 **Precios y envío: listos.** Precios aplicados desde tu hoja `Precios.xlsx` con los escalones
-por cantidad; envío plano de **$3 a todo el Ecuador, 2 días**. Lo que todavía falta:
+por cantidad; envío plano de **$3 a todo el Ecuador, 2 días, gratis desde $80**.
+
+> **Ojo con un hueco del umbral:** el acrílico de reseñas de Google en su mejor escalón
+> (4 unidades a $15) suma $60, y el de pagos en el suyo (3 a $7.50) suma $22.50. Ninguno de
+> los dos llega a $80 por sí solo, ni siquiera comprando el máximo del escalón. Un negocio que
+> pide 4 placas de reseñas — un pedido bueno — igual paga envío. Si quieres que esos dos también
+> califiquen, hay que bajar el umbral o armar un combo; dímelo y lo ajusto en los copys.
+
+Lo que todavía falta:
 
 - [ ] **Formas de pago** que aceptas
 - [ ] **En cuántas horas** mandas la propuesta de diseño
