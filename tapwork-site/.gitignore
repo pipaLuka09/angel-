@@ -3,3 +3,11 @@ tapwork-nfc.html
 
 # La misma salida, copiada con el nombre que pide Netlify al subirla.
 brand/entregables/index.html
+
+# Fotogramas intermedios de advideos.py y webclips.py.
+capture/.work/
+capture/.workweb/
+
+# Página armada por buildsimple.py: se regenera con `python3 buildsimple.py`
+# a partir de build.py, webclips/ e img1080/, y duplicaría esos medios en git.
+dist/
