@@ -21,10 +21,19 @@ STILLS = os.path.join(ROOT, 'img1080')
 PHONE = '096 779 4882'
 WA = '593967794882'
 
-# Scenes that animate get a clip; acrílico renders once and never moves, and
-# pedidos-por-WhatsApp is the one product shown with a real client's photo
-# (Döber's own acrylic), which no render should replace.
-STILL = {'acrilico': 'acrilico', 'whatsapp': 'dober'}
+# Scenes that animate get a clip; acrílico renders once and never moves, so it
+# stays a still.
+STILL = {'acrilico': 'acrilico'}
+
+# Pedidos por WhatsApp is the one product with real footage: the merchant filmed
+# his own acrylic in a venue, a phone touching it and the menu opening. A render
+# of the same thing would be a downgrade, so the card plays the real thing.
+FILMED = {'whatsapp': 'pedidos-whatsapp'}
+
+# Dropped from the catalogue at the merchant's request. They stay in build.py,
+# which still drives the older scroll page and the ad clips, so removing them
+# here is a decision about what this page sells, not a deletion of the work.
+DROPPED = {'llavero', 'stickers'}
 
 HOW = [
     ('Acercas el celular',
@@ -44,7 +53,8 @@ def products():
         r"kind='(?P<kind>[^']*)', client='(?P<client>[^']*)',\s*"
         r"headline='(?P<headline>[^']*)',\s*benefit='(?P<benefit>[^']*)',\s*"
         r"cta='(?P<cta>[^']*)', real='(?P<real>[^']*)', code='(?P<code>[^']*)'")
-    return [m.groupdict() for m in block.finditer(src)]
+    return [m.groupdict() for m in block.finditer(src)
+            if m.group('id') not in DROPPED]
 
 
 # The catalogue is written all-lowercase as a styling choice on the other page,
@@ -90,18 +100,35 @@ def wa_link(text):
 def card(p):
     pid, img = p['id'], p['img']
     name = sentence(p['label'])
-    alt = 'El celular se acerca al %s y se abre %s' % (p['kind'], p['label'])
+    # The colon carries the article, which otherwise has to agree with twelve
+    # different nouns ("se abre menú digital" against "se abre la ficha").
+    kind = sentence(p['kind'])
+    kind = kind[0].lower() + kind[1:]
+    # "al tarjeta" reads as broken Spanish to the client the alt text is for.
+    # Every kind in the catalogue is a single noun first, so its ending decides
+    # the article: tarjeta and placa take "a la", the rest take "al".
+    art = 'a la' if kind.split()[0].endswith('a') else 'al'
+    alt = ('Un celular se acerca %s %s y en su pantalla se abre lo que guarda el chip: %s'
+           % (art, kind, p['label']))
     if pid in STILL:
         media = ('<img class="shot" src="v/%s.webp" alt="%s" width="480" height="480" loading="lazy">'
                  % (STILL[pid], sentence(p['label'])))
     else:
+        if pid in FILMED:
+            img = FILMED[pid]
+            alt = ('Un celular se acerca al acrílico sobre la mesa y se abre el menú '
+                   'del local, filmado en un negocio real')
         media = (
             '<video class="shot" muted loop playsinline preload="none" poster="v/%s.jpg"\n'
             '             aria-label="%s" width="480" height="480">\n'
             '        <source src="v/%s.webm" type="video/webm">\n'
             '        <source src="v/%s.mp4" type="video/mp4">\n'
             '      </video>' % (img, alt, img, img))
-    real = ('<span class="real">Hecho para %s</span>' % sentence(p['real'])) if p['real'] else ''
+    # The credit names whose acrylic the still showed. The filmed card replaced
+    # that still with footage from a different venue, so the old credit would sit
+    # next to a screen that plainly says another name.
+    credit = '' if pid in FILMED else p['real']
+    real = ('<span class="real">Hecho para %s</span>' % credit.title()) if credit else ''
     return '''    <article class="item">
       %s
       <p class="code">%s</p>
@@ -136,16 +163,18 @@ def build():
             shutil.copy(s, os.path.join(OUT, 'v', STILL[p['id']] + '.webp'))
             kept.append(STILL[p['id']] + '.webp')
         else:
+            name = FILMED.get(p['id'], p['img'])
             for ext in ('mp4', 'webm', 'jpg'):
-                s = os.path.join(CLIPS, '%s.%s' % (p['img'], ext))
+                s = os.path.join(CLIPS, '%s.%s' % (name, ext))
                 if os.path.exists(s):
-                    shutil.copy(s, os.path.join(OUT, 'v', '%s.%s' % (p['img'], ext)))
-                    kept.append('%s.%s' % (p['img'], ext))
+                    shutil.copy(s, os.path.join(OUT, 'v', '%s.%s' % (name, ext)))
+                    kept.append('%s.%s' % (name, ext))
     total = sum(os.path.getsize(os.path.join(OUT, 'v', f)) for f in kept)
     print('dist/index.html %d KB · dist/v/ %d archivos, %d KB · %d productos'
           % (len(page) // 1024, len(kept), total // 1024, len(ps)))
-    missing = [p['img'] for p in ps if p['id'] not in STILL
-               and not os.path.exists(os.path.join(CLIPS, p['img'] + '.mp4'))]
+    missing = [FILMED.get(p['id'], p['img']) for p in ps if p['id'] not in STILL
+               and not os.path.exists(
+                   os.path.join(CLIPS, FILMED.get(p['id'], p['img']) + '.mp4'))]
     if missing:
         print('FALTAN clips:', ', '.join(missing))
 

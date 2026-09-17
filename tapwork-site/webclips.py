@@ -92,8 +92,46 @@ def build(key):
     return n, made
 
 
+# Footage the merchant filmed in a real venue, which no render should stand in for.
+# It arrives as a finished video rather than a frame sequence, so it skips the
+# compositing above: there is no transparent plinth to lay on the page ground,
+# only a trim to the part that shows the tap, a square crop and the same encode
+# so it sits in the grid like the rendered clips.
+FOOTAGE = {
+    # key: (source file, start, end, y offset of the 464-wide square crop)
+    'pedidos-whatsapp': ('pedidos-whatsapp-fuente.mp4', 6.0, 12.7, 200),
+}
+
+
+def build_footage(key):
+    src, ss, to, y = FOOTAGE[key]
+    src = os.path.join(ROOT, 'footage', src)
+    os.makedirs(OUT, exist_ok=True)
+    vf = 'crop=iw:iw:0:%d,scale=%d:%d:flags=lanczos' % (y, SIZE, SIZE)
+    made = []
+    for ext, args in (
+        ('mp4', ['-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
+                 '-crf', '30', '-preset', 'veryslow', '-movflags', '+faststart']),
+        ('webm', ['-c:v', 'libvpx-vp9', '-crf', '42', '-b:v', '0', '-row-mt', '1']),
+    ):
+        path = os.path.join(OUT, '%s.%s' % (key, ext))
+        # -an: the card autoplays, and the other eleven are silent.
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-ss', str(ss), '-to', str(to),
+                        '-i', src, '-vf', vf, '-an', *args, path], check=True)
+        made.append((ext, os.path.getsize(path) // 1024))
+    poster = os.path.join(OUT, '%s.jpg' % key)
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-ss', str(to - 0.9), '-i', src,
+                    '-frames:v', '1', '-vf', vf, '-q:v', '4', poster], check=True)
+    made.append(('jpg', os.path.getsize(poster) // 1024))
+    return made
+
+
 if __name__ == '__main__':
-    keys = sys.argv[1:] or sorted(os.listdir(FRAMES))
+    keys = sys.argv[1:] or sorted(os.listdir(FRAMES)) + sorted(FOOTAGE)
     for k in keys:
-        n, made = build(k)
-        print('%-11s %3d frames  %s' % (k, n, ' · '.join('%s %dKB' % m for m in made)))
+        if k in FOOTAGE:
+            made = build_footage(k)
+            print('%-17s filmado    %s' % (k, ' · '.join('%s %dKB' % m for m in made)))
+        else:
+            n, made = build(k)
+            print('%-17s %3d frames  %s' % (k, n, ' · '.join('%s %dKB' % m for m in made)))
