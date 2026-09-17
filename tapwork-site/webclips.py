@@ -35,10 +35,19 @@ def content_box(frames):
     return box
 
 
-def square(box, w, h, pad=1.08):
+def square(box, w, h, pad=1.12):
+    """Size the crop on the content's height, not its widest dimension.
+
+    The plinth is far wider than it is tall, so squaring on the width leaves the
+    product small in the middle of a lot of empty plinth — and the product is the
+    whole point of these clips. Squaring on the height fills the frame and lets
+    the plinth run off the sides, which reads as framing rather than as a crop.
+    Height already covers the camera push-in, since the box is the union of every
+    frame, so nothing is ever cut off the top or bottom.
+    """
     x0, y0, x1, y1 = box
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-    half = min(max(x1 - x0, y1 - y0) * pad / 2, max(w, h) / 2)
+    half = min((y1 - y0) * pad / 2, max(w, h) / 2)
     return (round(cx - half), round(cy - half), round(cx + half), round(cy + half))
 
 

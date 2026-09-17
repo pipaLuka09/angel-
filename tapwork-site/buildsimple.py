@@ -106,7 +106,7 @@ def card(p):
       %s
       <p class="code">%s</p>
       <h3>%s</h3>
-      <p class="kind">%s · para %s</p>
+      <p class="kind">%s · %s</p>
       <p class="benefit">%s</p>
       <p class="acts"><a class="ask" href="%s" target="_blank" rel="noopener">%s %s</a>%s</p>
     </article>''' % (
