@@ -27,8 +27,16 @@ SAFE = 4.0                        # mm inside the trim: nothing important crosse
 W, H = TRIM_W + BLEED * 2, TRIM_H + BLEED * 2
 
 RED = '#E30613'
-INK = '#FFFFFF'
+INK = '#EDF0F2'          # plata claro: el tono plano para textos pequeños
 BLACK = '#0D0D0D'
+# Un degradado plateado es una sucesión de luces y sombras, no un gris: son los
+# cambios los que el ojo lee como metal. Va solo en las piezas grandes — sobre
+# texto chico el degradado se ensucia al imprimir.
+SILVER = ('linear-gradient(118deg, #FFFFFF 0%, #AFB7BF 17%, #F4F7F9 33%, '
+          '#8F979F 52%, #FBFCFD 68%, #A9B1B9 85%, #E8ECEF 100%)')
+SILVER_STOPS = [('0%', '#FFFFFF'), ('17%', '#AFB7BF'), ('33%', '#F4F7F9'),
+                ('52%', '#8F979F'), ('68%', '#FBFCFD'), ('85%', '#A9B1B9'),
+                ('100%', '#E8ECEF')]
 
 
 def font_face():
@@ -45,11 +53,13 @@ def font_face():
 # 45-degree cuts throughout; these paths reproduce that construction rather than
 # tracing the photograph, which would carry its lighting into the artwork.
 MONOGRAM = '''<svg viewBox="0 0 112 90" width="100%" height="100%" aria-label="TP">
+  <defs><linearGradient id="plata" x1="0" y1="0" x2="1" y2="1">{stops}</linearGradient></defs>
   <path fill="{red}" d="M9,0 H66 V18 H47 V77 L37,88 L27,77 V18 H0 Z"/>
-  <path fill="{ink}" fill-rule="evenodd"
+  <path fill="url(#plata)" fill-rule="evenodd"
         d="M57,0 H95 L109,13 V33 L95,46 H75 V88 H57 Z
            M75,15 H90 L96,20 V26 L90,31 H75 Z"/>
-</svg>'''.format(red=RED, ink=INK)
+</svg>'''.format(red=RED, stops=''.join(
+    '<stop offset="%s" stop-color="%s"/>' % (o, c) for o, c in SILVER_STOPS))
 
 # The contactless mark: three arcs opening right, struck from one centre.
 NFC = '''<svg viewBox="0 0 44 44" width="100%" height="100%" aria-label="NFC">
@@ -73,7 +83,10 @@ body {{ font-family: 'Montserrat', sans-serif; -webkit-font-smoothing: antialias
 /* Kept very shallow on purpose: a strong gradient over a large dark area is
    where offset printing bands. */
 .sheen {{ position: absolute; inset: 0;
-  background: radial-gradient(120% 80% at 50% 22%, #1A1A1A 0%, {black} 62%); }}
+  background:
+    linear-gradient(118deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,0) 34%,
+                    rgba(255,255,255,.03) 52%, rgba(255,255,255,0) 72%),
+    radial-gradient(120% 82% at 50% 20%, #1D1D1D 0%, {black} 64%); }}
 /* The corner slashes run off the artboard, which is what the bleed is for. */
 .slash {{ position: absolute; background: {red}; transform-origin: center; }}
 .s1 {{ top: -6mm; left: -7mm; width: 1.1mm; height: 26mm; transform: rotate(-45deg); }}
@@ -85,18 +98,24 @@ body {{ font-family: 'Montserrat', sans-serif; -webkit-font-smoothing: antialias
   align-items: center; }}
 .mono {{ width: 24mm; margin-top: 12mm; }}
 .word {{ margin-top: 8.2mm; font-weight: 800; font-size: 6.4mm; letter-spacing: .20em;
-  white-space: nowrap; text-indent: .20em; }}
-.word b {{ font-weight: 800; color: {red}; }}
+  white-space: nowrap; text-indent: .20em;
+  background: {silver}; -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; }}
+.word b {{ font-weight: 800; -webkit-text-fill-color: {red}; color: {red}; }}
 .tag {{ margin-top: 5.2mm; font-weight: 400; font-size: 2.0mm; letter-spacing: .28em;
-  line-height: 1.85; text-align: center; text-indent: .28em; color: #E8E8E8; }}
+  line-height: 1.85; text-align: center; text-indent: .28em; color: #CDD3D9; }}
 .nfc {{ position: absolute; left: 0; right: 0; bottom: 12.5mm;
   display: flex; flex-direction: column; align-items: center; gap: 2.2mm; }}
 .nfc .sym {{ width: 7.4mm; }}
 .nfc span {{ font-weight: 600; font-size: 2.1mm; letter-spacing: .34em; text-indent: .34em; }}
 /* Back */
 .back {{ justify-content: center; }}
-.claim {{ font-weight: 400; font-size: 2.9mm; letter-spacing: .30em; line-height: 2.05;
-  text-align: center; text-indent: .30em; }}
+/* Plata plana, no degradado: a 2.9 mm el degradado deja unas letras oscuras y
+   otras claras dentro de la misma palabra, y eso se lee como suciedad de
+   impresión, no como metal. El degradado se queda donde hay superficie que lo
+   sostenga — el monograma y el wordmark. */
+.claim {{ font-weight: 500; font-size: 2.9mm; letter-spacing: .30em; line-height: 2.05;
+  text-align: center; text-indent: .30em; color: #E4E8EB; }}
 .rule {{ margin-top: 5.4mm; width: 13mm; height: .7mm; background: {red}; }}
 </style></head><body>{body}</body></html>
 '''
@@ -107,7 +126,7 @@ FRONT = '''<div class="card"><div class="sheen"></div>
   <div class="stack">
     <div class="mono">{mono}</div>
     <div class="word">TAP <b>WORK</b></div>
-    <div class="tag">TU NEGOCIO,<br>SIEMPRE CONECTADO</div>
+    <div class="tag">INNOVACIÓN QUE<br>IMPULSA TU NEGOCIO</div>
   </div>
   <div class="nfc"><div class="sym">{nfc}</div><span>NFC</span></div>
 </div>'''
@@ -122,7 +141,8 @@ BACK = '''<div class="card"><div class="sheen"></div>
 
 def page(body):
     return PAGE.format(face=font_face(), w=W, h=H, tw=TRIM_W, th=TRIM_H,
-                       bleed=BLEED, black=BLACK, ink=INK, red=RED, body=body)
+                       bleed=BLEED, black=BLACK, ink=INK, red=RED,
+                       silver=SILVER, body=body)
 
 
 if __name__ == '__main__':

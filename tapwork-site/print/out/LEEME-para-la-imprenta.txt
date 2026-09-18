@@ -19,6 +19,7 @@ ARCHIVOS
   tapwork-tarjeta-frente-600dpi.png .... 1417 x 2164 px a 600 dpi
   tapwork-tarjeta-reverso-600dpi.png ... 1417 x 2164 px a 600 dpi
   GUIA-medidas-no-imprimir.png ......... referencia visual, NO enviar a imprenta
+  tapwork-tarjeta-mockup.png ........... simulación del acabado, NO es arte
 
   Preferir el PDF: el texto y el logo van en vectores y no pixelan a ningún tamaño.
   El PDF mide 60.37 x 91.69 mm en vez de 60 x 91.6 exactos porque el generador
@@ -29,13 +30,25 @@ COLOR
   Los archivos estan en RGB.
   Rojo ....... #E30613   aprox. C0 M100 Y85 K0
   Negro ...... #0D0D0D
-  Blanco ..... #FFFFFF
+  Plata ...... degradado #FFFFFF -> #8F979F -> #E8ECEF  (monograma y "TAP")
+               plano #E4E8EB en los textos pequenos
 
   Para el fondo negro pedir NEGRO RICO (aprox. C60 M50 Y50 K100), no K100 solo:
   en un area grande el negro plano sale lavado y gris.
 
+  SOBRE EL PLATEADO: impreso en CMYK, el degradado plateado sale como un gris
+  con brillo simulado. Se ve bien, pero NO es metalico. Si se quiere plata de
+  verdad hay que pedir FOIL PLATEADO (estampado en caliente) sobre el monograma
+  y el wordmark; eso es un proceso aparte y se cotiza por separado.
+
+ACABADO
+  El brillo de la tarjeta lo da el acabado, no el archivo: pedir LAMINADO
+  BRILLANTE o BARNIZ UV. En los archivos de arte no hay ningun reflejo pintado
+  a proposito — si lo hubiera, quedaria como una mancha gris fija en el mismo
+  sitio por mucho que se mueva la tarjeta.
+
+  El mockup adjunto muestra como se ve con acabado brillante.
+  Alternativa: PVC mate o soft-touch, mas sobrio, pero marca menos huellas.
+
 TIPOGRAFIA
   Montserrat (Google Fonts, gratuita). Va incrustada en el PDF.
-
-ACABADO SUGERIDO
-  PVC mate o soft-touch. El diseno es casi todo negro: en brillante marca huellas.
