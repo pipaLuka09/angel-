@@ -17,3 +17,6 @@ __pycache__/
 
 # Intermedios de card.py: el HTML se regenera, los PDF/PNG salen de él.
 print/out/*.html
+
+# Symlink a la instalación global de Node que usa print/render.mjs.
+print/node_modules

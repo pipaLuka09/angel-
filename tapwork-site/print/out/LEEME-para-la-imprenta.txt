@@ -30,7 +30,7 @@ COLOR
   Los archivos estan en RGB.
   Rojo ....... #E30613   aprox. C0 M100 Y85 K0
   Negro ...... #0D0D0D
-  Plata ...... degradado #FFFFFF -> #8F979F -> #E8ECEF  (monograma y "TAP")
+  Plata ...... degradado #F4F6F8 -> #C3CAD1 -> #E6EAED  (monograma y "TAP")
                plano #E4E8EB en los textos pequenos
 
   Para el fondo negro pedir NEGRO RICO (aprox. C60 M50 Y50 K100), no K100 solo:

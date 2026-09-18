@@ -32,11 +32,8 @@ BLACK = '#0D0D0D'
 # Un degradado plateado es una sucesión de luces y sombras, no un gris: son los
 # cambios los que el ojo lee como metal. Va solo en las piezas grandes — sobre
 # texto chico el degradado se ensucia al imprimir.
-SILVER = ('linear-gradient(118deg, #FFFFFF 0%, #AFB7BF 17%, #F4F7F9 33%, '
-          '#8F979F 52%, #FBFCFD 68%, #A9B1B9 85%, #E8ECEF 100%)')
-SILVER_STOPS = [('0%', '#FFFFFF'), ('17%', '#AFB7BF'), ('33%', '#F4F7F9'),
-                ('52%', '#8F979F'), ('68%', '#FBFCFD'), ('85%', '#A9B1B9'),
-                ('100%', '#E8ECEF')]
+SILVER = ('linear-gradient(122deg, #F4F6F8 0%, #C3CAD1 46%, #E6EAED 100%)')
+SILVER_STOPS = [('0%', '#F4F6F8'), ('46%', '#C3CAD1'), ('100%', '#E6EAED')]
 
 
 def font_face():
@@ -52,12 +49,12 @@ def font_face():
 # The monogram, redrawn. The mockup shows an angular T and P sharing a stem, with
 # 45-degree cuts throughout; these paths reproduce that construction rather than
 # tracing the photograph, which would carry its lighting into the artwork.
-MONOGRAM = '''<svg viewBox="0 0 112 90" width="100%" height="100%" aria-label="TP">
-  <defs><linearGradient id="plata" x1="0" y1="0" x2="1" y2="1">{stops}</linearGradient></defs>
-  <path fill="{red}" d="M9,0 H66 V18 H47 V77 L37,88 L27,77 V18 H0 Z"/>
+MONOGRAM = '''<svg viewBox="0 0 108 96" width="100%" height="100%" aria-label="TP">
+  <defs><linearGradient id="plata" x1="0" y1="0" x2=".7" y2="1">{stops}</linearGradient></defs>
+  <path fill="{red}" d="M14,0 H58 V20 H44 V92 H24 V20 H0 Z"/>
   <path fill="url(#plata)" fill-rule="evenodd"
-        d="M57,0 H95 L109,13 V33 L95,46 H75 V88 H57 Z
-           M75,15 H90 L96,20 V26 L90,31 H75 Z"/>
+        d="M58,0 H80 A26,26 0 0 1 80,52 H78 V92 H58 Z
+           M78,20 H80 A6,6 0 0 1 80,32 H78 Z"/>
 </svg>'''.format(red=RED, stops=''.join(
     '<stop offset="%s" stop-color="%s"/>' % (o, c) for o, c in SILVER_STOPS))
 
@@ -84,8 +81,8 @@ body {{ font-family: 'Montserrat', sans-serif; -webkit-font-smoothing: antialias
    where offset printing bands. */
 .sheen {{ position: absolute; inset: 0;
   background:
-    linear-gradient(118deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,0) 34%,
-                    rgba(255,255,255,.03) 52%, rgba(255,255,255,0) 72%),
+    linear-gradient(118deg, rgba(255,255,255,.028) 0%, rgba(255,255,255,0) 36%,
+                    rgba(255,255,255,.015) 54%, rgba(255,255,255,0) 74%),
     radial-gradient(120% 82% at 50% 20%, #1D1D1D 0%, {black} 64%); }}
 /* The corner slashes run off the artboard, which is what the bleed is for. */
 .slash {{ position: absolute; background: {red}; transform-origin: center; }}
@@ -150,5 +147,11 @@ if __name__ == '__main__':
     io.open(os.path.join(OUT, 'frente.html'), 'w', encoding='utf-8').write(
         page(FRONT.format(mono=MONOGRAM, nfc=NFC)))
     io.open(os.path.join(OUT, 'reverso.html'), 'w', encoding='utf-8').write(page(BACK))
+    # Las dos caras en un solo PDF de dos páginas: es el archivo que la imprenta
+    # pide, y así ninguna de las dos puede llegar sin la otra.
+    io.open(os.path.join(OUT, 'ambas.html'), 'w', encoding='utf-8').write(
+        page(FRONT.format(mono=MONOGRAM, nfc=NFC)
+             + '<div style="break-before:page;page-break-before:always"></div>'
+             + BACK))
     print('artboard %.1f x %.1f mm (corte %.1f x %.1f + %.0f de sangrado)'
           % (W, H, TRIM_W, TRIM_H, BLEED))
