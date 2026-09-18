@@ -244,8 +244,16 @@ PAGE = '''<title>Catálogo Tap Work</title>
   .item { display: flex; flex-direction: column; }
   /* No card chrome: the clip already carries the page's ground, so a border or a
      radius around it would draw a box around a thing that has no edge. */
-  .shot { width: 100%; max-width: 100%; aspect-ratio: 1; display: block;
-    background: var(--ground); object-fit: cover; }
+  /* height:auto is load-bearing. The width/height attributes on the media are
+     presentational hints, and an explicit height leaves aspect-ratio with nothing
+     to compute — the box stayed 480px tall at every column width, so a phone got
+     a 380x480 crop of a square clip. */
+  .shot { width: 100%; max-width: 100%; height: auto; aspect-ratio: 1; display: block;
+    object-fit: cover;
+    /* One step up from the ground, so a card whose media has not arrived reads as
+       a waiting frame instead of vanishing into the page. A loaded poster covers
+       it completely, and the clip still floats with no edge of its own. */
+    background: var(--raise); }
   .code { font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: .15em;
     color: var(--faint); margin: 14px 0 0; }
   .item h3 { font-size: 23px; font-weight: 700; letter-spacing: -.025em; margin: 7px 0 0; }
