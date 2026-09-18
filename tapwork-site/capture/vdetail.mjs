@@ -15,7 +15,10 @@ import fs from 'fs';
 const SCENES = {
   menu:       { h: 'harness3.html',  sel: '#tw-menu-canvas',       cycle: 11000, phase: 1200, secs: 5.0 },
   resenas:    { h: 'harness2.html',  sel: '#tw-resenas-canvas',    cycle:  9000, phase: 1200, secs: 5.0 },
-  asistencia: { h: 'harness.html',   sel: '#tw-asistencia-canvas', cycle:  8000, phase:  200, secs: 4.8 },
+  // Rendered and sampled at 4x rather than 3x: the hanging gafete leaves more
+  // empty space in the frame than any other scene, so an equal capture scale
+  // would leave its crop short of 1080 while every other clip cleared it.
+  asistencia: { h: 'harness.html',   sel: '#tw-asistencia-canvas', cycle:  8000, phase:  200, secs: 4.8, scale: 4 },
   wifi:       { h: 'harness4.html',  sel: '#tw-wifi-canvas',       cycle: 12000, phase: 1000, secs: 5.8 },
   gym:        { h: 'harness5.html',  sel: '#tw-gym-canvas',        cycle: 16000, phase: 1200, secs: 5.5 },
   pago:       { h: 'harness6.html',  sel: '#tw-pago-canvas',       cycle: 15000, phase: 1200, secs: 5.5 },
@@ -56,7 +59,8 @@ for (const [key, s] of Object.entries(SCENES)) {
   const dir = `vd/${key}`;
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
-  const page = await browser.newPage({ viewport: { width: 900, height: 900 }, deviceScaleFactor: SCALE });
+  const scale = s.scale || SCALE;
+  const page = await browser.newPage({ viewport: { width: 900, height: 900 }, deviceScaleFactor: scale });
   await page.addInitScript(virtualClock);
   const t0 = Date.now();
   try {
@@ -85,7 +89,7 @@ for (const [key, s] of Object.entries(SCENES)) {
     const step = 1000 / FPS;
     const total = Math.round(FPS * s.secs);
     for (let i = 0; i < total; i++) {
-      const { data } = await cdp.send('Page.captureScreenshot', { format: 'png', clip: { ...box, scale: SCALE } });
+      const { data } = await cdp.send('Page.captureScreenshot', { format: 'png', clip: { ...box, scale } });
       fs.writeFileSync(`${dir}/${String(i).padStart(4, '0')}.png`, Buffer.from(data, 'base64'));
       await page.evaluate((ms) => window.__advance(ms), step);
       // One frame for the scene's rAF to run on the new time, one to commit it.

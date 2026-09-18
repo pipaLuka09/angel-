@@ -9,7 +9,7 @@
 <div id="status" style="position:fixed;top:0;left:0;color:red;font:14px monospace;background:#fff;">loading</div>
 <script type="module">
 import * as ThreeModule from './three.module.js';
-window.__CAPTURE_SCALE = 3;
+window.__CAPTURE_SCALE = 4;  // this scene crops tighter than the others; see vdetail.mjs
 function PatchedRenderer(params) {
   const r = new ThreeModule.WebGLRenderer(params);
   const orig = r.setPixelRatio.bind(r);
@@ -31,8 +31,8 @@ class DCLogic {
     const vals = this.renderVals();
     const wrap = document.getElementById('badge-wrap');
     wrap.innerHTML = `<div style="${vals.lab.badgeCanvasStyle}">
-      <canvas id="tw-asistencia-canvas" width="640" height="642" style="display:block;width:300px;height:auto;"></canvas>
-      <img id="tw-asistencia-fallback" src="badge-seq-3.webp" style="display:none;width:300px;height:auto;">
+      <canvas id="tw-asistencia-canvas" width="640" height="642" style="display:block;width:440px;height:auto;"></canvas>
+      <img id="tw-asistencia-fallback" src="badge-seq-3.webp" style="display:none;width:440px;height:auto;">
     </div>`;
     window.__lastLab = vals.lab;
   }
