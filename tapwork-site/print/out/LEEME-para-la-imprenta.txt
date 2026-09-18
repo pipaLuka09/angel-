@@ -1,0 +1,41 @@
+TARJETA NFC — TAP WORK
+Especificaciones para impresión
+
+FORMATO
+  Tarjeta NFC estándar, ISO 7810 ID-1 (mismo tamaño que una tarjeta de crédito).
+  Orientación vertical.
+
+  Corte final ....... 54 x 85.6 mm
+  Archivo con sangrado 60 x 91.6 mm  (3 mm por cada lado)
+  Zona segura ....... 46 x 77.6 mm   (4 mm hacia adentro del corte)
+
+  Nada importante cruza la zona segura. Las franjas rojas de las esquinas
+  se salen del borde a propósito: para eso es el sangrado.
+
+ARCHIVOS
+  tapwork-tarjeta-nfc.pdf .............. 2 páginas: pág. 1 frente, pág. 2 reverso
+  tapwork-tarjeta-frente.pdf ........... solo el frente
+  tapwork-tarjeta-reverso.pdf .......... solo el reverso
+  tapwork-tarjeta-frente-600dpi.png .... 1417 x 2164 px a 600 dpi
+  tapwork-tarjeta-reverso-600dpi.png ... 1417 x 2164 px a 600 dpi
+  GUIA-medidas-no-imprimir.png ......... referencia visual, NO enviar a imprenta
+
+  Preferir el PDF: el texto y el logo van en vectores y no pixelan a ningún tamaño.
+  El PDF mide 60.37 x 91.69 mm en vez de 60 x 91.6 exactos porque el generador
+  redondea la pagina al punto entero mas cercano. La diferencia (0.37 mm) cae
+  entera dentro del sangrado y no afecta el corte, que va centrado.
+
+COLOR
+  Los archivos estan en RGB.
+  Rojo ....... #E30613   aprox. C0 M100 Y85 K0
+  Negro ...... #0D0D0D
+  Blanco ..... #FFFFFF
+
+  Para el fondo negro pedir NEGRO RICO (aprox. C60 M50 Y50 K100), no K100 solo:
+  en un area grande el negro plano sale lavado y gris.
+
+TIPOGRAFIA
+  Montserrat (Google Fonts, gratuita). Va incrustada en el PDF.
+
+ACABADO SUGERIDO
+  PVC mate o soft-touch. El diseno es casi todo negro: en brillante marca huellas.

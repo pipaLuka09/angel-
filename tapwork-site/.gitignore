@@ -14,3 +14,6 @@ dist/
 
 # Caché de Python.
 __pycache__/
+
+# Intermedios de card.py: el HTML se regenera, los PDF/PNG salen de él.
+print/out/*.html
