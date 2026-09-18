@@ -17,7 +17,7 @@ OUT = os.path.join(ROOT, 'webclips')
 WORK = os.path.join(ROOT, 'capture', '.workweb')
 
 FPS = 20
-SIZE = 480           # what a card shows at 2x on a phone
+SIZE = 1080          # full HD square: sharp on a retina phone and on a desktop
 GROUND = (11, 12, 15)  # the page's background, so the clip has no visible edge
 HOLD = 0.9           # seconds held on the last frame before the loop restarts
 
@@ -77,9 +77,9 @@ def build(key):
     made = []
     for ext, args in (
         ('mp4', ['-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
-                 '-crf', '28', '-preset', 'veryslow', '-movflags', '+faststart']),
+                 '-crf', '30', '-preset', 'veryslow', '-movflags', '+faststart']),
         # VP9 first in the page: some browser builds ship without an H.264 decoder.
-        ('webm', ['-c:v', 'libvpx-vp9', '-crf', '42', '-b:v', '0', '-row-mt', '1']),
+        ('webm', ['-c:v', 'libvpx-vp9', '-crf', '44', '-b:v', '0', '-row-mt', '1']),
     ):
         p = os.path.join(OUT, '%s.%s' % (key, ext))
         subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', str(FPS),
@@ -112,7 +112,7 @@ def build_footage(key):
     for ext, args in (
         ('mp4', ['-c:v', 'libx264', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
                  '-crf', '30', '-preset', 'veryslow', '-movflags', '+faststart']),
-        ('webm', ['-c:v', 'libvpx-vp9', '-crf', '42', '-b:v', '0', '-row-mt', '1']),
+        ('webm', ['-c:v', 'libvpx-vp9', '-crf', '44', '-b:v', '0', '-row-mt', '1']),
     ):
         path = os.path.join(OUT, '%s.%s' % (key, ext))
         # -an: the card autoplays, and the other eleven are silent.

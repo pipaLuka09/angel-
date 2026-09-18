@@ -33,7 +33,7 @@ FILMED = {'whatsapp': 'pedidos-whatsapp'}
 # Dropped from the catalogue at the merchant's request. They stay in build.py,
 # which still drives the older scroll page and the ad clips, so removing them
 # here is a decision about what this page sells, not a deletion of the work.
-DROPPED = {'llavero', 'stickers'}
+DROPPED = {'llavero', 'stickers', 'whatsapp'}
 
 HOW = [
     ('Acercas el celular',
@@ -121,8 +121,10 @@ def card(p):
         media = (
             '<video class="shot" muted loop playsinline preload="none" poster="v/%s.jpg"\n'
             '             aria-label="%s" width="480" height="480">\n'
-            '        <source src="v/%s.webm" type="video/webm">\n'
+            # H.264 first: it encodes these renders smaller than VP9 does, and a
+            # browser that cannot decode it simply falls through to the webm.
             '        <source src="v/%s.mp4" type="video/mp4">\n'
+            '        <source src="v/%s.webm" type="video/webm">\n'
             '      </video>' % (img, alt, img, img))
     # The credit names whose acrylic the still showed. The filmed card replaced
     # that still with footage from a different venue, so the old credit would sit

@@ -27,7 +27,11 @@ const SCENES = {
 };
 
 const FPS = Number(process.env.FPS || 20);
-const SCALE = Number(process.env.SCALE || 1);
+// The harness already renders the canvas at 3x its CSS size, so sampling the
+// screenshot at 3 captures what the scene actually drew rather than a third of
+// it. It costs almost nothing: the per-scene time is dominated by the mount, not
+// by the frames.
+const SCALE = Number(process.env.SCALE || 3);
 const only = process.argv.slice(2);
 
 // Same virtual clock as vcap.mjs: real rAF keeps committing frames, but every
