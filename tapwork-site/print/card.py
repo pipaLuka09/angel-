@@ -126,7 +126,7 @@ FRONT = '''<div class="card"><div class="sheen"></div>
   <div class="stack">
     <div class="mono">{mono}</div>
     <div class="word">TAP <b>WORK</b></div>
-    <div class="tag">INNOVACIÓN QUE<br>IMPULSA TU NEGOCIO</div>
+    <div class="tag">TU NEGOCIO<br>SIEMPRE CONECTADO</div>
   </div>
   <div class="nfc"><div class="sym">{nfc}</div><span>NFC</span></div>
 </div>'''
