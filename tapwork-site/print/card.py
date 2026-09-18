@@ -46,17 +46,11 @@ def font_face():
             "font-weight:100 900;src:url(data:font/woff2;base64,%s) format('woff2');}" % b64)
 
 
-# The monogram, redrawn. The mockup shows an angular T and P sharing a stem, with
-# 45-degree cuts throughout; these paths reproduce that construction rather than
-# tracing the photograph, which would carry its lighting into the artwork.
-MONOGRAM = '''<svg viewBox="0 0 108 96" width="100%" height="100%" aria-label="TP">
-  <defs><linearGradient id="plata" x1="0" y1="0" x2=".7" y2="1">{stops}</linearGradient></defs>
-  <path fill="{red}" d="M14,0 H58 V20 H44 V92 H24 V20 H0 Z"/>
-  <path fill="url(#plata)" fill-rule="evenodd"
-        d="M58,0 H80 A26,26 0 0 1 80,52 H78 V92 H58 Z
-           M78,20 H80 A6,6 0 0 1 80,32 H78 Z"/>
-</svg>'''.format(red=RED, stops=''.join(
-    '<stop offset="%s" stop-color="%s"/>' % (o, c) for o, c in SILVER_STOPS))
+# El monograma vive en monograma.py, reconstruido desde la foto de la tarjeta:
+# ahí están medidos los grosores, la rotación de 14 grados y los cortes a 45.
+from monograma import svg as monograma_svg
+
+MONOGRAM = monograma_svg(RED, 'plata', SILVER_STOPS)
 
 # The contactless mark: three arcs opening right, struck from one centre.
 NFC = '''<svg viewBox="0 0 44 44" width="100%" height="100%" aria-label="NFC">
@@ -93,8 +87,8 @@ body {{ font-family: 'Montserrat', sans-serif; -webkit-font-smoothing: antialias
 .stack {{ position: absolute; left: {bleed}mm; top: {bleed}mm;
   width: {tw}mm; height: {th}mm; display: flex; flex-direction: column;
   align-items: center; }}
-.mono {{ width: 24mm; margin-top: 12mm; }}
-.word {{ margin-top: 8.2mm; font-weight: 800; font-size: 6.4mm; letter-spacing: .20em;
+.mono {{ width: 33mm; margin-top: 10mm; }}
+.word {{ margin-top: 5.6mm; font-weight: 800; font-size: 6.4mm; letter-spacing: .20em;
   white-space: nowrap; text-indent: .20em;
   background: {silver}; -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; color: transparent; }}
