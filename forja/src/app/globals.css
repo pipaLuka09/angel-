@@ -1,0 +1,256 @@
+/* ===================================================================
+   FORJA — tokens y piezas de interfaz
+   Negro profundo + un solo acento lima. El lima se eligió sobre el
+   naranja porque se lee a un metro con la pantalla al 30% de brillo,
+   que es la condición real de un gimnasio.
+   =================================================================== */
+
+:root {
+  --negro:      #0A0B0D;
+  --carta:      #14161A;
+  --carta-2:    #1B1E23;
+  --borde:      #272B32;
+  --borde-2:    #1F2227;
+  --tinta:      #F2F4F7;
+  --tinta-2:    #A3ABB6;
+  --tinta-3:    #6E7681;
+  --tinta-4:    #4E545C;
+  --volt:       #D7FF3E;
+  --volt-claro: #E8FF7A;
+  --volt-medio: #7E9622;
+  --volt-tenue: rgba(215, 255, 62, 0.12);
+
+  --r-chico:  12px;
+  --r-medio:  15px;
+  --r-grande: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--negro);
+  color: var(--tinta);
+  font-family: var(--fuente-cuerpo), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a { color: var(--volt); text-decoration: none; }
+a:hover { color: var(--volt-claro); }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+:focus-visible {
+  outline: 2px solid var(--volt);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ------------------------------ estructura ------------------------ */
+
+.pantalla {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: 22px 20px calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+.crece { flex-grow: 1; }
+
+/* -------------------------------- marca --------------------------- */
+
+.marca { display: flex; align-items: center; gap: 9px; }
+.marca__cubo {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--volt); color: var(--negro);
+  font-family: var(--fuente-display), sans-serif; font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+}
+.marca__texto {
+  font-family: var(--fuente-display), sans-serif;
+  font-size: 16px; letter-spacing: 1.4px;
+}
+.marca--grande .marca__cubo { width: 34px; height: 34px; border-radius: 10px; font-size: 22px; }
+.marca--grande .marca__texto { font-size: 22px; letter-spacing: 1.8px; }
+
+/* ------------------------------- texto ---------------------------- */
+
+.titulo {
+  margin: 0;
+  font-family: var(--fuente-display), sans-serif;
+  font-size: 42px; line-height: 0.94; letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.titulo--chico { font-size: 34px; line-height: 0.98; }
+.numerote {
+  font-family: var(--fuente-display), sans-serif;
+  line-height: 0.85;
+}
+
+.rotulo {
+  font-size: 10px; letter-spacing: 1.6px; font-weight: 700;
+  color: var(--tinta-2); text-transform: uppercase;
+}
+.rotulo--tenue { color: var(--tinta-3); letter-spacing: 1.2px; font-size: 9.5px; }
+
+.apunte { font-size: 11.5px; color: var(--tinta-3); }
+.parrafo { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--tinta-2); }
+
+/* ------------------------------ tarjetas -------------------------- */
+
+.carta {
+  background: var(--carta);
+  border: 1px solid var(--borde);
+  border-radius: var(--r-grande);
+  padding: 18px;
+}
+.carta--acento { background: var(--volt-tenue); border-color: var(--volt); }
+.carta--vacia  { background: #0F1114; border-style: dashed; }
+
+.caja {
+  background: var(--carta-2);
+  border-radius: var(--r-chico);
+  padding: 9px 10px;
+}
+
+.fila { display: flex; align-items: center; gap: 8px; }
+.fila--entre { justify-content: space-between; }
+.fila--base { align-items: baseline; }
+
+/* ------------------------------- botones -------------------------- */
+
+.boton {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%; min-height: 56px; padding: 0 18px;
+  border: 1px solid transparent; border-radius: 17px;
+  font-size: 13px; font-weight: 600; text-align: center;
+}
+.boton--principal {
+  background: var(--volt); color: var(--negro); border-color: var(--volt);
+  font-family: var(--fuente-display), sans-serif;
+  font-size: 19px; letter-spacing: 1px;
+}
+.boton--principal:hover { background: var(--volt-claro); color: var(--negro); }
+.boton--fantasma {
+  background: var(--carta); color: var(--tinta); border-color: var(--borde);
+  min-height: 50px; font-size: 12.5px;
+}
+.boton--fantasma:hover { color: var(--tinta); border-color: var(--tinta-3); }
+.boton[disabled] { opacity: 0.55; cursor: not-allowed; }
+
+.boton-icono {
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: var(--r-chico);
+  background: var(--carta); border: 1px solid var(--borde);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.par { display: flex; gap: 10px; }
+.par > * { flex-grow: 1; flex-basis: 0; }
+
+/* ------------------------------ formulario ------------------------ */
+
+.campo {
+  width: 100%; height: 54px; padding: 0 16px;
+  background: var(--carta); border: 1px solid var(--borde);
+  border-radius: var(--r-medio); font-size: 15px;
+}
+.campo:focus { border-color: var(--volt); }
+.etiqueta { display: block; margin-bottom: 7px; }
+
+/* --------------------------- pastillas ---------------------------- */
+
+.pastillas { display: flex; gap: 8px; }
+.pastilla {
+  flex-grow: 1; flex-basis: 0; min-height: 46px;
+  border-radius: 13px; font-size: 14px; font-weight: 600;
+  background: var(--carta); border: 1px solid var(--borde); color: var(--tinta-2);
+}
+.pastilla[aria-pressed='true'] {
+  background: var(--volt); border-color: var(--volt); color: var(--negro);
+}
+
+.caras { display: flex; gap: 7px; }
+.cara-boton {
+  flex-grow: 1; flex-basis: 0; min-height: 56px;
+  border-radius: var(--r-medio);
+  background: var(--carta); border: 1px solid var(--borde); color: var(--tinta-3);
+  display: flex; align-items: center; justify-content: center;
+}
+.cara-boton[aria-pressed='true'] {
+  background: var(--volt-tenue); border-color: var(--volt); color: var(--volt);
+}
+
+/* -------------------------- barra de progreso --------------------- */
+
+.barra {
+  height: 8px; border-radius: 999px;
+  background: var(--borde); overflow: hidden;
+}
+.barra__relleno { height: 100%; border-radius: 999px; background: var(--volt); }
+.barra--fina { height: 6px; background: #20242A; }
+
+.insignia {
+  display: inline-block; border-radius: 999px; padding: 4px 10px;
+  font-size: 10.5px; font-weight: 700;
+}
+.insignia--volt { background: var(--volt-tenue); color: var(--volt); }
+.insignia--gris { background: #20242A; color: var(--tinta-2); }
+
+/* ------------------------------ avisos ---------------------------- */
+
+.aviso {
+  border-radius: var(--r-medio); padding: 13px 15px;
+  font-size: 12.5px; line-height: 1.5;
+  background: var(--carta); border: 1px solid var(--borde); color: var(--tinta-2);
+}
+.aviso--error { border-color: #7A3B3B; color: #F0C8C8; background: #1C1415; }
+
+/* ============================= panel ============================== */
+
+.panel { display: flex; min-height: 100dvh; }
+
+.panel__lateral {
+  width: 236px; flex-shrink: 0;
+  background: #0F1114; border-right: 1px solid var(--borde-2);
+  padding: 26px 18px; display: flex; flex-direction: column;
+}
+.panel__cuerpo { flex-grow: 1; min-width: 0; padding: 28px 32px; }
+
+.panel__nav { display: flex; flex-direction: column; gap: 3px; }
+.panel__nav a {
+  display: flex; align-items: center; gap: 11px;
+  min-height: 40px; padding: 0 12px; border-radius: 11px;
+  font-size: 13px; font-weight: 600; color: var(--tinta-2);
+}
+.panel__nav a[aria-current='page'] { background: var(--carta-2); color: var(--tinta); }
+
+.indicadores { display: flex; gap: 14px; flex-wrap: wrap; }
+.indicadores > * { flex-grow: 1; flex-basis: 180px; }
+
+.tabla { width: 100%; border-collapse: collapse; }
+.tabla th {
+  text-align: left; padding: 0 0 9px;
+  font-size: 9.5px; letter-spacing: 1.2px; font-weight: 700; color: var(--tinta-3);
+  text-transform: uppercase;
+}
+.tabla td { border-top: 1px solid var(--borde-2); padding: 11px 0; font-size: 12.5px; }
+.tabla .der { text-align: right; }
+.mono { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 12px; color: var(--tinta-3); }
+
+@media (max-width: 860px) {
+  .panel { flex-direction: column; }
+  .panel__lateral { width: 100%; border-right: none; border-bottom: 1px solid var(--borde-2); }
+  .panel__cuerpo { padding: 22px 18px; }
+}
