@@ -91,6 +91,18 @@ createdb forja
 psql -d forja -f supabase/test/00_supabase_stub.sql
 for f in supabase/migrations/*.sql; do psql -d forja -v ON_ERROR_STOP=1 -f "$f"; done
 psql -d forja -v ON_ERROR_STOP=1 -f supabase/test/01_flujo.sql
+psql -d forja -v ON_ERROR_STOP=1 -f supabase/test/02_panel.sql
 ```
 
 El stub **no** se aplica en Supabase: allá esas piezas ya existen.
+
+- `01_flujo.sql` — alta de gym, sticker, registro de series, meta cerrándose
+  sola al alcanzarse, y aislamiento entre socios.
+- `02_panel.sql` — que `gym_members` devuelva actividad y **ninguna** cifra de
+  entrenamiento, y que las funciones del panel rechacen a quien no es staff.
+
+La comprobación de privacidad de `02_panel.sql` lee los nombres de las columnas
+de `gym_members` desde `pg_proc.proargnames` y falla si aparece alguna que huela
+a peso, repetición, sensación o meta. Está verificada por mutación: agregando a
+propósito una columna `max_weight_kg` a la función, la prueba falla; quitándola,
+pasa. Una comprobación que no se puede hacer fallar no está comprobando nada.
