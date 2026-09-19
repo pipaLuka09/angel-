@@ -50,6 +50,24 @@ Los códigos NFC usan un alfabeto sin `l`, `i`, `o`, `0` ni `1`, para que nadie
 confunda un carácter al dictarlo por teléfono, y se generan al azar (no
 correlativos) para que no se puedan adivinar los de otras máquinas.
 
+## Permisos de las funciones
+
+Todas las funciones llevan `revoke ... from anon` explícito: nada de esto es
+alcanzable sin sesión. El linter de seguridad de Supabase confirmó que, tras
+`0006`, **no queda ninguna función ejecutable por el rol `anon`**.
+
+Las que sí puede llamar un usuario con sesión son la API de la app, y cada una
+se defiende por dentro: `gym_dashboard`, `gym_stations` y `assign_nfc_code`
+verifican `is_staff_of` antes de devolver o cambiar algo; `exercise_summary` y
+`set_goal` solo ven lo del propio `auth.uid()`; `is_member_of` e `is_staff_of`
+solo responden sobre quien llama.
+
+**Pendiente antes de producción:** `bootstrap_gym` la puede llamar cualquier
+usuario con sesión, lo que significa que cualquiera podría crear un gimnasio y
+quedar como su dueño. Para el MVP es la vía de alta; cuando haya gyms reales
+hay que restringirla (a una lista de invitaciones, o sacarla de la API y
+dejarla solo para el admin).
+
 ## Correr las pruebas
 
 ```bash
