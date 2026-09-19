@@ -30,6 +30,21 @@ con acceso al panel. El panel se alimenta de `gym_dashboard()` y
 Esto está probado: el paso 10 de `supabase/test/01_flujo.sql` verifica que el
 staff, dentro de su propio gym, ve `0` series.
 
+### La precisión que hubo que hacer (migración 0007)
+
+Para que recepción pueda hacer retención necesita ver **quién no está usando el
+sistema**, y eso es información por persona. Así que la regla se precisó en vez
+de estirarla a escondidas:
+
+> El gimnasio ve **si** y **cuándo** alguien entrenó. Nunca **qué** levantó.
+
+`gym_members()` devuelve nombre, correo, número de socio, fecha de la última
+sesión y cuántas sesiones lleva — y ni una sola cifra de peso, repetición,
+sensación o meta. Las políticas de `sets` y `goals` no cambiaron.
+
+El razonamiento: que un socio venga o no al gimnasio, recepción ya lo ve entrar
+por la puerta. Cuánto carga en la prensa, no — y eso es lo sensible.
+
 Si más adelante quieres que un entrenador sí vea el detalle de sus clientes,
 eso necesita una tabla de consentimiento explícito del socio, no un permiso
 nuevo del staff.
@@ -44,6 +59,7 @@ nuevo del staff.
 | `gym_dashboard(gym)` | Los indicadores del panel. | `DEFINER` + verifica `is_staff_of`. Solo agregados. |
 | `gym_stations(gym)` | Inventario de máquinas con su uso de 7 días. | `DEFINER` + verifica `is_staff_of`. |
 | `assign_nfc_code(estacion)` | Genera el código del sticker desde el panel. | `DEFINER` + verifica `is_staff_of`. |
+| `gym_members(gym)` | La lista de socios del panel: actividad, nunca pesos. | `DEFINER` + verifica `is_staff_of`. |
 | `bootstrap_gym(nombre, sucursal, prefijo)` | Alta de un gym nuevo: lo crea, te deja como dueño y genera sus estaciones desde el catálogo. | `DEFINER`. |
 
 Los códigos NFC usan un alfabeto sin `l`, `i`, `o`, `0` ni `1`, para que nadie
