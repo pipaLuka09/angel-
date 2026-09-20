@@ -7,6 +7,17 @@ import { entrar } from './acciones';
 const ERRORES: Record<string, string> = {
   faltan: 'Escribe tu usuario y tu contraseña.',
   credenciales: 'Usuario o contraseña incorrectos. Si no los recuerdas, pídelos en recepción.',
+  sin_confirmar: 'Esta cuenta todavía no está confirmada. Avísale a recepción.',
+  demasiados_intentos: 'Demasiados intentos seguidos. Espera un minuto y vuelve a probar.',
+  // Las tres siguientes no son culpa de quien entra: son del despliegue.
+  // Se distinguen a propósito, para no mandar a nadie a revisar su
+  // contraseña cuando el problema está en la configuración.
+  configuracion:
+    'La app no pudo autenticarse contra Supabase. Revisa NEXT_PUBLIC_SUPABASE_ANON_KEY en el despliegue: no es tu contraseña.',
+  sin_variables:
+    'Faltan las variables de Supabase en el despliegue (NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY).',
+  conexion: 'No se pudo contactar a Supabase. Revisa que el proyecto no esté pausado.',
+  desconocido: 'No pudimos entrar y no fue por la contraseña. Revisa el registro del servidor.',
 };
 
 export default async function Entrar({
