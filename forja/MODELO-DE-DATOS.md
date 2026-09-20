@@ -100,6 +100,25 @@ El stub **no** se aplica en Supabase: allá esas piezas ya existen.
   sola al alcanzarse, y aislamiento entre socios.
 - `02_panel.sql` — que `gym_members` devuelva actividad y **ninguna** cifra de
   entrenamiento, y que las funciones del panel rechacen a quien no es staff.
+- `03_datos_demo.sql` — un gimnasio con historial, para recorrer la app sin
+  registrar todo a mano. Este sí se ejecuta contra un Supabase real.
+
+### Si creas usuarios con SQL, cuidado con los tokens
+
+Insertar en `auth.users` a mano parece funcionar: el usuario aparece, y la
+contraseña incluso verifica con `crypt()`. Pero si `confirmation_token`,
+`recovery_token`, `email_change_token_new`, `email_change_token_current`,
+`email_change`, `phone_change`, `phone_change_token` o
+`reauthentication_token` quedan en `NULL`, **cualquier intento de iniciar
+sesión falla con un 500** antes de comparar nada.
+
+El servidor de autenticación de Supabase está escrito en Go y lee esas
+columnas como texto que no admite nulos. El síntoma —un 500 genérico— no
+apunta al problema por ningún lado, y lo natural es sospechar de la
+contraseña, que es justo lo único que está bien.
+
+Van en cadena vacía, que es lo que pone Supabase cuando crea un usuario por su
+propia API. `03_datos_demo.sql` ya lo hace así.
 
 La comprobación de privacidad de `02_panel.sql` lee los nombres de las columnas
 de `gym_members` desde `pg_proc.proargnames` y falla si aparece alguna que huela
