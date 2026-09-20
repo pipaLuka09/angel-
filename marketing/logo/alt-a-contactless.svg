@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Tap Work">
+  <rect x="4" y="4" width="112" height="112" rx="28" fill="#12D6DF"/>
+  <circle cx="40" cy="80" r="11" fill="#0B0F14"/>
+  <g stroke="#0B0F14" stroke-width="10" fill="none" stroke-linecap="round">
+    <path d="M40 57a23 23 0 0 1 23 23"/><path d="M40 38a42 42 0 0 1 42 42"/><path d="M40 19a61 61 0 0 1 61 61"/>
+  </g>
+</svg>

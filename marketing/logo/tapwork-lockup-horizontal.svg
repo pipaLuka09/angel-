@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" width="420" height="120" role="img" aria-label="Tap Work">
+  <g stroke="#12D6DF" stroke-width="13" fill="none" stroke-linecap="round">
+    <path d="M26 30h48"/><path d="M50 30v56"/>
+  </g>
+  <g stroke="#4A85F5" stroke-width="9" fill="none" stroke-linecap="round">
+    <path d="M80 44a20 20 0 0 1 0 28"/><path d="M94 32a38 38 0 0 1 0 52"/>
+  </g>
+  <!-- Texto en Space Grotesk 700. Conviértelo a curvas en Illustrator/Figma para el archivo final. -->
+  <text x="132" y="52" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="42" letter-spacing="-0.5" fill="#E7EEF6">TAP</text>
+  <text x="132" y="96" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="42" letter-spacing="-0.5" fill="#E7EEF6">WORK</text>
+</svg>
