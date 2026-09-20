@@ -55,3 +55,22 @@ contra otro elemento, pierde fuerza.
 
 **Lo que no hay que hacer:** no lo estires, no le cambies el grosor de línea, no le pongas
 sombra ni degradado, no rotes las ondas. Si necesita una variante que no está acá, pídemela.
+
+---
+
+## Ideas adicionales para la foto de perfil
+
+Ocho propuestas pensadas específicamente para el círculo de Instagram, en `perfil/`.
+Cada una probada a 110px (perfil) y a **38px (el tamaño real en el feed)**, que es donde
+la mayoría de la gente la va a ver.
+
+| | Idea | Veredicto |
+|---|---|---|
+| **G** | `g-t-negativo.svg` — la T calada sobre el círculo lleno | ⭐ **La más fuerte.** Máximo contraste del set y la única que a 38px se sigue leyendo como T y como onda |
+| **I** | `i-ligadura-tw.svg` — un trazo continuo: la T baja y se vuelve W | ⭐ Las dos iniciales en un gesto. Legible y propia |
+| **J** | `j-onda-sangre.svg` — las ondas llenan el círculo y se salen | ⭐ La más visible de lejos. Un poco genérica de cerca |
+| **E** | `e-antena-chip.svg` — la espiral real de la antena de un tag NFC | Técnica y de nadie más, pero a 38px se vuelve un bloque |
+| **F** | `f-ripple.svg` — punto y ondas concéntricas | Impecable a cualquier tamaño, pero parece diana o disco: no dice Tap Work |
+| **L** | `l-t-solida.svg` — solo la inicial, sin ondas | Perfectamente legible, pero no comunica nada de NFC |
+| **H** | `h-dedo.svg` — la mano haciendo el gesto | Linda a 110px, ilegible a 38px. Demasiado detalle |
+| **K** | `k-acercar.svg` — doble flecha bajando hacia el punto | ⚠️ **Problema:** la doble flecha hacia abajo es el ícono universal de "descargar". Se lee mal |
