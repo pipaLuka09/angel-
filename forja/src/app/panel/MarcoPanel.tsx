@@ -7,6 +7,7 @@ const NAV = [
   { clave: 'resumen',  href: '/panel',           texto: 'Resumen' },
   { clave: 'socios',   href: '/panel/socios',    texto: 'Socios' },
   { clave: 'maquinas', href: '/panel/maquinas',  texto: 'Máquinas' },
+  { clave: 'videos',   href: '/panel/videos',    texto: 'Videos' },
   { clave: 'stickers', href: '/panel/stickers',  texto: 'Stickers' },
 ] as const;
 

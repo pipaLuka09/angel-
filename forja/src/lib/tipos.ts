@@ -67,4 +67,6 @@ export type EstacionPanel = {
   status: EstadoEstacion;
   last_scan_at: string | null;
   sets_7d: number;
+  video_url: string | null;
+  video_source: 'tiktok' | 'instagram' | 'youtube' | 'own' | null;
 };
