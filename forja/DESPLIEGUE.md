@@ -4,6 +4,25 @@ La app necesita una URL pública por una razón concreta: **un sticker NFC no
 puede apuntar a `localhost`**. Para probar el flujo real —grabar un sticker y
 acercar el celular— hace falta una URL en internet.
 
+## La configuración que está en uso
+
+Proyecto de Vercel **`angel`**, conectado a este repositorio. Tres ajustes que
+no son los de fábrica y sin los cuales no compila:
+
+| Ajuste | Dónde | Valor |
+|---|---|---|
+| Root Directory | Settings → Build and Deployment | `forja` |
+| Production Branch | Settings → Environments → Production | `claude/admiring-brown-l8qtuc` |
+| Vercel Authentication | Settings → Deployment Protection | `Disabled` |
+
+El Root Directory es el que más muerde: sin él Vercel busca la app en la raíz
+del repositorio, donde solo está el tema de Shopify, y el despliegue termina en
+un 404 que no explica nada.
+
+Vercel Authentication viene activada de fábrica en los proyectos nuevos y hace
+que la URL pida iniciar sesión en Vercel. Desde el celular de un socio en el
+gimnasio, eso es un muro.
+
 ## Opción A — desde tu máquina, con el CLI de Vercel (la más rápida)
 
 ```bash
@@ -15,8 +34,29 @@ npx vercel --prod         # producción
 
 El CLI sube los archivos solo, sin necesidad de conectar GitHub con Vercel.
 
-Después, las dos variables de entorno (en el dashboard de Vercel →
-Settings → Environment Variables, o por CLI):
+### Cuáles hacen falta de verdad
+
+Solo dos para que la app funcione:
+
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+```
+
+Las otras dos son opcionales y cada una degrada una sola cosa, nunca la app
+entera:
+
+- **`SUPABASE_SERVICE_ROLE_KEY`** — solo el alta de socios desde el panel. Sin
+  ella ese formulario avisa con un mensaje claro y el resto sigue igual.
+- **`NEXT_PUBLIC_SITE_URL`** — solo la hoja de stickers, para saber qué
+  dirección imprimir. Sin ella usa el host desde donde abriste la página y te
+  avisa de que no está configurada.
+
+Está hecho así a propósito: ninguna variable que falte debe impedir ver la app.
+
+### Por CLI, si prefieres
+
+Las mismas, desde la terminal:
 
 ```bash
 npx vercel env add NEXT_PUBLIC_SUPABASE_URL production
