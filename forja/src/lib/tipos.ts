@@ -70,3 +70,18 @@ export type EstacionPanel = {
   video_url: string | null;
   video_source: 'tiktok' | 'instagram' | 'youtube' | 'own' | null;
 };
+
+export type MiEjercicio = {
+  exercise_id: string;
+  name: string;
+  muscle_group: string | null;
+  nfc_code: string;
+  label: string;
+  gym_name: string;
+  last_session: string | null;
+  last_weight: number | null;
+  best_weight: number | null;
+  session_count: number;
+  goal_weight: number | null;
+  goal_date: string | null;
+};

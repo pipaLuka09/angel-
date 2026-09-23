@@ -67,10 +67,19 @@ export default async function Maquina({ params }: { params: Promise<{ codigo: st
             </div>
 
             <div className="fila" style={{ alignItems: 'flex-end', gap: 10, marginTop: 10 }}>
-              <span className="numerote" style={{ fontSize: 58, color: 'var(--volt)' }}>
-                {peso(ultima.top_weight)}
-              </span>
-              <span className="numerote" style={{ fontSize: 20, color: 'var(--tinta-2)', paddingBottom: 5 }}>KG</span>
+              {Number(ultima.top_weight) === 0 ? (
+                // 0 kg en dominadas o fondos no es "cero": es peso corporal.
+                <span className="numerote" style={{ fontSize: 34, color: 'var(--volt)', lineHeight: 1 }}>
+                  PESO CORPORAL
+                </span>
+              ) : (
+                <>
+                  <span className="numerote" style={{ fontSize: 58, color: 'var(--volt)' }}>
+                    {peso(ultima.top_weight)}
+                  </span>
+                  <span className="numerote" style={{ fontSize: 20, color: 'var(--tinta-2)', paddingBottom: 5 }}>KG</span>
+                </>
+              )}
               {delta !== null && delta !== 0 && (
                 <span className="insignia insignia--volt" style={{ marginLeft: 'auto', marginBottom: 6 }}>
                   {delta > 0 ? '+' : ''}{peso(delta)} kg
