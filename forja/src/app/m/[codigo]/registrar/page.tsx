@@ -25,7 +25,7 @@ export default async function Registrar({
   const { supabase, estacion, usuario } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} />;
+  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} codigo={codigo} />;
 
   const resumen = await resumenDe(supabase, estacion.exercise_id);
   const hoy = new Date().toISOString().slice(0, 10);

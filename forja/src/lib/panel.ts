@@ -7,6 +7,7 @@ export type GymDelStaff = {
   nombre: string;
   sucursal: string | null;
   prefijo: string;
+  slug: string;
   sociosDeclarados: number | null;
   rol: 'staff' | 'owner';
 };
@@ -27,7 +28,7 @@ export async function gymDelStaff(destino = '/panel'): Promise<GymDelStaff | nul
 
   const { data } = await supabase
     .from('memberships')
-    .select('gym_id, role, gyms(name, branch_name, code_prefix, declared_member_count)')
+    .select('gym_id, role, gyms(name, branch_name, slug, code_prefix, declared_member_count)')
     .eq('status', 'active')
     .in('role', ['staff', 'owner']);
 
@@ -37,6 +38,7 @@ export async function gymDelStaff(destino = '/panel'): Promise<GymDelStaff | nul
   const gym = uno<{
     name: string;
     branch_name: string | null;
+    slug: string;
     code_prefix: string;
     declared_member_count: number | null;
   }>(membresia.gyms);
@@ -46,6 +48,7 @@ export async function gymDelStaff(destino = '/panel'): Promise<GymDelStaff | nul
     nombre: gym?.name ?? 'Gimnasio',
     sucursal: gym?.branch_name ?? null,
     prefijo: gym?.code_prefix ?? '',
+    slug: gym?.slug ?? '',
     sociosDeclarados: gym?.declared_member_count ?? null,
     rol: membresia.role as 'staff' | 'owner',
   };

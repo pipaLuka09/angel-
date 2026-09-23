@@ -1,24 +1,9 @@
-import { headers } from 'next/headers';
 import QRCode from 'qrcode';
 import { supabaseServidor } from '@/lib/supabase/server';
 import { gymDelStaff } from '@/lib/panel';
+import { baseUrl } from '@/lib/url';
 import type { EstacionPanel } from '@/lib/tipos';
 import { MarcoPanel, SinAcceso } from '../MarcoPanel';
-
-/**
- * La URL que se graba en el chip. En producción sale de
- * NEXT_PUBLIC_SITE_URL; si no está, se deduce del host de la petición
- * para que la hoja siga sirviendo en un preview sin configurar nada.
- */
-async function baseUrl(): Promise<string> {
-  const configurada = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '');
-  if (configurada) return configurada;
-
-  const h = await headers();
-  const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000';
-  const protocolo = h.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https');
-  return `${protocolo}://${host}`;
-}
 
 export default async function Stickers() {
   const gym = await gymDelStaff('/panel/stickers');

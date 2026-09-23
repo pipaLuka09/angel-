@@ -52,12 +52,19 @@ export default async function Inicio() {
 
   const [{ data: perfil }, { data: membresias }, { data: ejerciciosData }] = await Promise.all([
     supabase.from('profiles').select('full_name').eq('id', sesion.user.id).maybeSingle(),
-    supabase.from('memberships').select('role, gyms(name, branch_name)').eq('status', 'active'),
+    supabase.from('memberships').select('role, status, gyms(name, branch_name)'),
     supabase.rpc('my_exercises'),
   ]);
 
-  const esStaff = (membresias ?? []).some((m) => m.role === 'staff' || m.role === 'owner');
-  const gym = uno<{ name: string; branch_name: string | null }>((membresias ?? [])[0]?.gyms);
+  // Solo una membresía activa da acceso. Las demás se usan para explicarle
+  // a la persona por qué todavía no ve nada.
+  const todas = membresias ?? [];
+  const activas = todas.filter((m) => m.status === 'active');
+  const pendiente = todas.find((m) => m.status === 'pending');
+  const pausada = todas.find((m) => m.status === 'paused' || m.status === 'cancelled');
+
+  const esStaff = activas.some((m) => m.role === 'staff' || m.role === 'owner');
+  const gym = uno<{ name: string; branch_name: string | null }>((activas[0] ?? todas[0])?.gyms);
   const nombre = perfil?.full_name?.split(' ')[0] ?? '';
 
   const ejercicios = (ejerciciosData as MiEjercicio[] | null) ?? [];
@@ -89,10 +96,30 @@ export default async function Inicio() {
         {nombre ? `Hola, ${nombre}` : 'Hola'}
       </h1>
 
-      {(membresias ?? []).length === 0 ? (
-        <p className="aviso" style={{ marginTop: 20 }}>
-          Tu cuenta todavía no está ligada a ningún gimnasio. Pásate por recepción para que te den de alta.
-        </p>
+      {activas.length === 0 ? (
+        pendiente ? (
+          <div className="carta" style={{ marginTop: 20, borderColor: 'var(--volt)' }}>
+            <span className="rotulo" style={{ color: 'var(--volt)' }}>Cuenta en espera</span>
+            <p className="parrafo" style={{ marginTop: 8, fontSize: 13 }}>
+              Tu solicitud para entrar a{' '}
+              <strong style={{ color: 'var(--tinta)' }}>
+                {uno<{ name: string }>(pendiente.gyms)?.name ?? 'tu gimnasio'}
+              </strong>{' '}
+              ya llegó. En cuanto recepción la apruebe, aquí te van a aparecer tus ejercicios. No tienes que
+              hacer nada más.
+            </p>
+          </div>
+        ) : pausada ? (
+          <p className="aviso" style={{ marginTop: 20 }}>
+            Tu acceso a {uno<{ name: string }>(pausada.gyms)?.name ?? 'tu gimnasio'} está pausado. Habla con
+            recepción para reactivarlo: tu historial sigue guardado.
+          </p>
+        ) : (
+          <p className="aviso" style={{ marginTop: 20 }}>
+            Tu cuenta todavía no está ligada a ningún gimnasio. Acerca el celular al sticker de una máquina de
+            tu gimnasio para pedir acceso, o pásate por recepción.
+          </p>
+        )
       ) : (
         <>
           {/* ------------------- los que entrena ------------------- */}

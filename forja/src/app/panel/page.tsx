@@ -21,8 +21,16 @@ export default async function Resumen({
   if (!gym) return <SinAcceso />;
 
   const supabase = await supabaseServidor();
-  const { data } = await supabase.rpc('gym_dashboard', { p_gym_id: gym.gymId });
+  const [{ data }, { count: solicitudes }] = await Promise.all([
+    supabase.rpc('gym_dashboard', { p_gym_id: gym.gymId }),
+    supabase
+      .from('memberships')
+      .select('id', { count: 'exact', head: true })
+      .eq('gym_id', gym.gymId)
+      .eq('status', 'pending'),
+  ]);
   const panel = data as Panel | null;
+  const pendientes = solicitudes ?? 0;
 
   if (!panel) {
     return (
@@ -119,7 +127,20 @@ export default async function Resumen({
           <section className="carta" style={{ borderRadius: 17, padding: '18px 20px' }}>
             <span className="rotulo">Requiere atención</span>
             <div style={{ marginTop: 13, display: 'flex', flexDirection: 'column', gap: 11 }}>
-              {panel.alerts.stations_without_code === 0 && panel.alerts.stations_quiet === 0 && (
+              {pendientes > 0 && (
+                <a href="/panel/socios" style={{ display: 'flex', gap: 10, alignItems: 'flex-start', color: 'var(--tinta)' }}>
+                  <span style={{ flexShrink: 0, marginTop: 1, color: 'var(--volt)' }}><Alerta tam={16} /></span>
+                  <div>
+                    <div style={{ fontSize: 12.5, fontWeight: 600 }}>
+                      {pendientes} {pendientes === 1 ? 'persona espera' : 'personas esperan'} tu aprobación
+                    </div>
+                    <div className="apunte" style={{ marginTop: 2, lineHeight: 1.4 }}>
+                      Se registraron solas. Apruébalas en Socios.
+                    </div>
+                  </div>
+                </a>
+              )}
+              {pendientes === 0 && panel.alerts.stations_without_code === 0 && panel.alerts.stations_quiet === 0 && (
                 <p className="apunte" style={{ margin: 0 }}>
                   Nada pendiente. Todos los stickers respondieron esta semana.
                 </p>

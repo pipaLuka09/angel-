@@ -15,7 +15,7 @@ export default async function Tecnica({ params }: { params: Promise<{ codigo: st
   const { estacion } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member) return <NoEresSocio estacion={estacion} />;
+  if (!estacion.is_member) return <NoEresSocio estacion={estacion} codigo={codigo} />;
 
   const claves = estacion.cues ?? [];
   const errores = estacion.common_mistakes ?? [];

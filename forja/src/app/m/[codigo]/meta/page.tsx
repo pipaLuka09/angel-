@@ -24,7 +24,7 @@ export default async function MetaPagina({
   const { supabase, estacion } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} />;
+  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} codigo={codigo} />;
 
   const resumen = await resumenDe(supabase, estacion.exercise_id);
   const meta = resumen.goal;

@@ -91,3 +91,61 @@ export async function cambiarEstadoSocio(formData: FormData) {
   revalidatePath('/panel/socios');
   revalidatePath('/panel');
 }
+
+/** Aprueba una solicitud de registro: la membresía pasa de pendiente a activa. */
+export async function aprobarSolicitud(formData: FormData) {
+  const gym = await gymDelStaff('/panel/socios');
+  if (!gym) return;
+
+  const userId = String(formData.get('userId') ?? '');
+  if (!userId) return;
+
+  const supabase = await supabaseServidor();
+  await supabase
+    .from('memberships')
+    .update({ status: 'active' })
+    .eq('gym_id', gym.gymId)
+    .eq('user_id', userId)
+    .eq('status', 'pending');
+
+  revalidatePath('/panel/socios');
+  revalidatePath('/panel');
+}
+
+/**
+ * Rechaza una solicitud. Se borra la membresía pendiente y, si esa cuenta
+ * no pertenece a ningún otro gimnasio, también la cuenta: si no, quedaría
+ * huérfana y ese correo ya no podría volver a registrarse.
+ */
+export async function rechazarSolicitud(formData: FormData) {
+  const gym = await gymDelStaff('/panel/socios');
+  if (!gym) return;
+
+  const userId = String(formData.get('userId') ?? '');
+  if (!userId) return;
+
+  const supabase = await supabaseServidor();
+  const { data: borradas } = await supabase
+    .from('memberships')
+    .delete()
+    .eq('gym_id', gym.gymId)
+    .eq('user_id', userId)
+    .eq('status', 'pending')
+    .select('id');
+
+  if ((borradas ?? []).length > 0) {
+    try {
+      const admin = supabaseAdmin();
+      const { count } = await admin
+        .from('memberships')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      if ((count ?? 0) === 0) await admin.auth.admin.deleteUser(userId);
+    } catch {
+      // Sin clave de servicio la cuenta queda, pero sin acceso a nada.
+    }
+  }
+
+  revalidatePath('/panel/socios');
+  revalidatePath('/panel');
+}

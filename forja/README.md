@@ -36,6 +36,7 @@ decisión de privacidad.
 | Ruta | Qué es |
 |---|---|
 | `/entrar` | El login que pasa **una sola vez**, al inscribirse. |
+| `/registro` | Crear cuenta por cuenta propia. Queda **en espera** hasta que el gimnasio la apruebe. |
 | `/` | Inicio: recuerda que hay que acercar el celular a un sticker. |
 | `/m/[codigo]` | **La pantalla del tap.** Último peso, meta, últimas sesiones. |
 | `/m/[codigo]/registrar` | Anotar la serie: peso, reps y carita. |
@@ -79,9 +80,11 @@ Devuelve el código (`olm-a7k2p9`). El sticker se graba con
 
 Todo lo que el gimnasio necesita hacer a diario está ahí, sin tocar SQL:
 
-- **Socios**: dar de alta (crea la cuenta y devuelve una contraseña temporal
-  para dictarla en recepción), ver quién nunca ha registrado nada, quién dejó
-  de venir, y pausar el acceso de quien no renovó.
+- **Socios**: dos formas de sumar gente. Recepción puede dar de alta (crea la
+  cuenta y devuelve una contraseña temporal para dictarla), o compartir el
+  link de registro para que cada quien cree la suya y luego **aprobarla o
+  rechazarla**. Además: quién nunca ha registrado nada, quién dejó de venir,
+  y pausar el acceso de quien no renovó.
 - **Máquinas**: agregarlas, asignarles código de sticker, e **invalidar** el de
   un sticker perdido o despegado — deja de funcionar al instante y la máquina
   vuelve a pendientes, sin perder el historial de nadie.

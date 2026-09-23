@@ -11,7 +11,7 @@ export default async function Maquina({ params }: { params: Promise<{ codigo: st
   const { supabase, estacion, usuario } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member) return <NoEresSocio estacion={estacion} />;
+  if (!estacion.is_member) return <NoEresSocio estacion={estacion} codigo={codigo} />;
 
   // Se registra la lectura aunque no anote nada: es lo que deja
   // distinguir un sticker despegado de una máquina que nadie usa.

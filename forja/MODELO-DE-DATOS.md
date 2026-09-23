@@ -11,7 +11,7 @@ completo, para poder correr todo contra un Postgres normal.
 |---|---|---|
 | `gyms` | Una fila por sucursal. Es el cliente que paga. | `code_prefix` (`olm`) se antepone al código NFC para reconocer de un vistazo a qué gym pertenece un sticker. `declared_member_count` lo captura recepción: es el denominador de "214 de 260 socios tienen cuenta". |
 | `profiles` | Extiende `auth.users`. Nombre, teléfono, unidad preferida. | Se crea sola con un trigger cuando Auth da de alta al usuario. Los pesos **siempre** se guardan en kg; `unit` solo cambia cómo se muestran. |
-| `memberships` | Qué persona pertenece a qué gym y con qué permisos. | `role` = `member` / `staff` / `owner`. Es la tabla que decide todo el control de acceso. |
+| `memberships` | Qué persona pertenece a qué gym y con qué permisos. | `role` = `member` / `staff` / `owner`. `status` = `active` / `pending` / `paused` / `cancelled`: **solo `active` da acceso**, porque `is_member_of()` e `is_staff_of()` lo exigen y todas las políticas pasan por ellas. `pending` es quien se registró solo y espera aprobación. |
 | `exercises` | Catálogo de ejercicios con técnica y video. | `gym_id` en NULL = catálogo global compartido (22 ejercicios sembrados). Un gym puede crear los suyos. `video_source` distingue `tiktok`/`instagram`/`youtube`/`own`: el día que grabes biblioteca propia solo cambia ese campo. |
 | `stations` | **La máquina física que lleva el sticker.** | `nfc_code` es lo que va en la URL (`/m/olm-a7k2p9`). `last_scan_at` lo mantiene un trigger. |
 | `sets` | Cada serie registrada. El corazón del sistema. | `weight_kg`, `reps`, `feeling` (1–5, las caritas). `gym_id` y `exercise_id` van desnormalizados a propósito: si mañana reasignan la máquina a otro ejercicio, el histórico no debe cambiar de dueño. |
@@ -58,6 +58,8 @@ nuevo del staff.
 | `set_goal(ejercicio, kg, fecha)` | Fija la meta, guarda el peso de partida y cancela la anterior. | `INVOKER`. |
 | `delete_set(serie)` | Borra una serie, renumera las que quedan de ese día y reabre la meta si esa serie era la única que la cumplía. | `INVOKER`. |
 | `my_exercises()` | La lista de inicio: cada ejercicio del gimnasio con el historial propio al lado. | `INVOKER`. |
+| `gym_para_registro(ref)` | Encuentra el gimnasio de quien se registra, por slug (link), código corto (`OLM`) o código de sticker. | `DEFINER`, callable **sin sesión**: la pantalla de registro es anterior a tener cuenta. Solo devuelve el nombre. |
+| `request_membership(gym)` | Pide acceso: crea la membresía en `pending`. Si ya existe, no la toca. | `DEFINER`. |
 | `gym_dashboard(gym)` | Los indicadores del panel. | `DEFINER` + verifica `is_staff_of`. Solo agregados. |
 | `gym_stations(gym)` | Inventario de máquinas con su uso de 7 días. | `DEFINER` + verifica `is_staff_of`. |
 | `assign_nfc_code(estacion)` | Genera el código del sticker desde el panel. | `DEFINER` + verifica `is_staff_of`. |
@@ -106,6 +108,8 @@ El stub **no** se aplica en Supabase: allá esas piezas ya existen.
   registrar todo a mano. Este sí se ejecuta contra un Supabase real.
 - `04_borrar_serie.sql` — que borrar una serie renumere las del día, reabra la
   meta si ya nada la cumple, y que nadie pueda borrar series ajenas.
+- `05_registro.sql` — que el gimnasio se encuentre por link, código o sticker,
+  que una cuenta pendiente no vea ni registre nada, y que al aprobarla sí.
 
 ### Si creas usuarios con SQL, cuidado con los tokens
 

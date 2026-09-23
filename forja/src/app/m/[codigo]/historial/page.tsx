@@ -29,7 +29,7 @@ export default async function Historial({
   const { supabase, estacion, usuario } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} />;
+  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} codigo={codigo} />;
 
   const { data } = await supabase
     .from('sets')

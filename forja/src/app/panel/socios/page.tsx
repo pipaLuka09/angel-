@@ -3,7 +3,8 @@ import { gymDelStaff } from '@/lib/panel';
 import { haceCuanto } from '@/lib/formato';
 import { MarcoPanel, SinAcceso } from '../MarcoPanel';
 import { FormularioAlta } from './FormularioAlta';
-import { cambiarEstadoSocio } from './acciones';
+import { aprobarSolicitud, cambiarEstadoSocio, rechazarSolicitud } from './acciones';
+import { baseUrl } from '@/lib/url';
 
 type Socio = {
   user_id: string;
@@ -11,7 +12,7 @@ type Socio = {
   email: string | null;
   member_code: string | null;
   role: 'member' | 'staff' | 'owner';
-  status: 'active' | 'paused' | 'cancelled';
+  status: 'active' | 'paused' | 'cancelled' | 'pending';
   joined_at: string;
   last_session: string | null;
   session_count: number;
@@ -25,7 +26,10 @@ export default async function Socios() {
 
   const supabase = await supabaseServidor();
   const { data } = await supabase.rpc('gym_members', { p_gym_id: gym.gymId });
-  const socios = (data as Socio[] | null) ?? [];
+  const todos = (data as Socio[] | null) ?? [];
+  const pendientes = todos.filter((s) => s.status === 'pending');
+  const socios = todos.filter((s) => s.status !== 'pending');
+  const linkRegistro = `${await baseUrl()}/registro?gym=${gym.slug}`;
 
   const activos = socios.filter((s) => s.role === 'member' && s.status === 'active');
   const nuncaUsaron = activos.filter((s) => s.session_count === 0).length;
@@ -42,6 +46,41 @@ export default async function Socios() {
     >
       <div style={{ display: 'flex', gap: 14, marginTop: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
         <div style={{ flexGrow: 1, flexBasis: 480, minWidth: 0 }}>
+          {pendientes.length > 0 && (
+            <section className="carta" style={{ borderRadius: 17, padding: '18px 20px', marginBottom: 14, borderColor: 'var(--volt)' }}>
+              <div className="fila fila--entre">
+                <span className="rotulo" style={{ color: 'var(--volt)' }}>Solicitudes para entrar</span>
+                <span className="insignia insignia--volt">{pendientes.length}</span>
+              </div>
+              <p className="apunte" style={{ margin: '6px 0 0', lineHeight: 1.45 }}>
+                Se registraron solos. Hasta que las apruebes no ven ni registran nada.
+              </p>
+              <ul style={{ listStyle: 'none', margin: '12px 0 0', padding: 0 }}>
+                {pendientes.map((p, i) => (
+                  <li key={p.user_id} className="fila" style={{ gap: 10, flexWrap: 'wrap', padding: '10px 0', borderTop: i === 0 ? 'none' : '1px solid var(--borde-2)' }}>
+                    <div style={{ flexGrow: 1, minWidth: 180 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>{p.full_name}</div>
+                      <div className="mono" style={{ wordBreak: 'break-all' }}>{p.email ?? '—'}</div>
+                      <div className="apunte" style={{ fontSize: 10.5 }}>Se registró {haceCuanto(p.joined_at)}</div>
+                    </div>
+                    <form action={rechazarSolicitud}>
+                      <input type="hidden" name="userId" value={p.user_id} />
+                      <button type="submit" className="boton boton--fantasma" style={{ width: 'auto', minHeight: 44, padding: '0 14px' }}>
+                        Rechazar
+                      </button>
+                    </form>
+                    <form action={aprobarSolicitud}>
+                      <input type="hidden" name="userId" value={p.user_id} />
+                      <button type="submit" className="boton boton--principal" style={{ width: 'auto', minHeight: 44, padding: '0 18px', fontSize: 14 }}>
+                        APROBAR
+                      </button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {(nuncaUsaron > 0 || dormidos > 0) && (
             <p className="aviso" style={{ marginBottom: 14 }}>
               {nuncaUsaron > 0 && <>{nuncaUsaron} socios tienen cuenta pero nunca han registrado nada. </>}
@@ -120,7 +159,20 @@ export default async function Socios() {
           </section>
         </div>
 
-        <div style={{ width: 340, flexGrow: 1, flexBasis: 300 }}>
+        <div style={{ width: 340, flexGrow: 1, flexBasis: 300, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <section className="carta" style={{ borderRadius: 17, padding: '18px 20px' }}>
+            <span className="rotulo">Que se registren solos</span>
+            <p className="apunte" style={{ margin: '8px 0 0', lineHeight: 1.5 }}>
+              Comparte este link por WhatsApp o pégalo en recepción. Quien se registre te aparece arriba para aprobarlo.
+            </p>
+            <p className="mono" style={{ margin: '10px 0 0', padding: '10px 12px', background: 'var(--carta-2)', borderRadius: 10, wordBreak: 'break-all', color: 'var(--tinta)', userSelect: 'all' }}>
+              {linkRegistro}
+            </p>
+            <p className="apunte" style={{ margin: '10px 0 0', lineHeight: 1.5 }}>
+              Si alguien entra sin el link, le pide el código del gimnasio:{' '}
+              <strong className="mono" style={{ color: 'var(--volt)', fontSize: 13 }}>{gym.prefijo.toUpperCase()}</strong>
+            </p>
+          </section>
           <FormularioAlta />
         </div>
       </div>

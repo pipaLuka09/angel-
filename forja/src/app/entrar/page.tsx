@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Marca } from '@/components/Marca';
 import { Whatsapp } from '@/components/Iconos';
@@ -101,9 +102,12 @@ export default async function Entrar({
       </a>
 
       <p id="ayuda" className="apunte" style={{ textAlign: 'center', marginTop: 16, lineHeight: 1.5 }}>
-        ¿Aún no tienes cuenta? Pídela en recepción:
+        ¿Aún no tienes cuenta?{' '}
+        <Link href={`/registro?destino=${encodeURIComponent(destino ?? '/')}`} style={{ fontWeight: 600 }}>
+          Créala aquí
+        </Link>
         <br />
-        viene incluida con tu mensualidad.
+        o pídela en recepción: viene incluida con tu mensualidad.
       </p>
     </main>
   );
