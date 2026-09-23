@@ -71,6 +71,8 @@ button { cursor: pointer; }
 /* -------------------------------- marca --------------------------- */
 
 .marca { display: flex; align-items: center; gap: 9px; }
+/* Es un enlace, pero no debe pintarse de lima como los demás. */
+a.marca, a.marca:hover { color: var(--tinta); width: fit-content; }
 .marca__cubo {
   width: 26px; height: 26px; border-radius: 8px;
   background: var(--volt); color: var(--negro);
