@@ -27,6 +27,9 @@ export const Barras  = (p: Props) => <Svg {...p}><path d="M4 18V9" /><path d="M1
 export const Video   = (p: Props) => <Svg {...p}><rect x="3" y="4" width="18" height="16" rx="4" /><path d="M10 9v6l5-3z" /></Svg>;
 export const Alerta  = (p: Props) => <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 8v5" /><path d="M12 16.5h.01" /></Svg>;
 export const Equis   = (p: Props) => <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" /></Svg>;
+export const Basura  = (p: Props) => (
+  <Svg {...p}><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12" /><path d="M9 7V4h6v3" /></Svg>
+);
 export const Whatsapp = (p: Props) => (
   <Svg {...p}><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.7L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z" /></Svg>
 );

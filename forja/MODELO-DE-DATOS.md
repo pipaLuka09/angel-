@@ -56,6 +56,8 @@ nuevo del staff.
 | `station_by_code(codigo)` | El tap del sticker. Resuelve código → estación + ejercicio + técnica. | `DEFINER` a propósito: si quien toca el sticker todavía no es socio, queremos poder decirle de qué gym es y mandarlo a recepción, en vez de un 404 mudo. Devuelve `is_member` para que la pantalla decida qué mostrar. |
 | `exercise_summary(ejercicio)` | Todo lo que pinta la pantalla de la máquina en una sola llamada: última sesión, la anterior (para el delta), récord, historial y meta. | `INVOKER`: se apoya en las políticas de `sets`, solo puede devolver datos de quien llama. |
 | `set_goal(ejercicio, kg, fecha)` | Fija la meta, guarda el peso de partida y cancela la anterior. | `INVOKER`. |
+| `delete_set(serie)` | Borra una serie, renumera las que quedan de ese día y reabre la meta si esa serie era la única que la cumplía. | `INVOKER`. |
+| `my_exercises()` | La lista de inicio: cada ejercicio del gimnasio con el historial propio al lado. | `INVOKER`. |
 | `gym_dashboard(gym)` | Los indicadores del panel. | `DEFINER` + verifica `is_staff_of`. Solo agregados. |
 | `gym_stations(gym)` | Inventario de máquinas con su uso de 7 días. | `DEFINER` + verifica `is_staff_of`. |
 | `assign_nfc_code(estacion)` | Genera el código del sticker desde el panel. | `DEFINER` + verifica `is_staff_of`. |
@@ -102,6 +104,8 @@ El stub **no** se aplica en Supabase: allá esas piezas ya existen.
   entrenamiento, y que las funciones del panel rechacen a quien no es staff.
 - `03_datos_demo.sql` — un gimnasio con historial, para recorrer la app sin
   registrar todo a mano. Este sí se ejecuta contra un Supabase real.
+- `04_borrar_serie.sql` — que borrar una serie renumere las del día, reabra la
+  meta si ya nada la cumple, y que nadie pueda borrar series ajenas.
 
 ### Si creas usuarios con SQL, cuidado con los tokens
 

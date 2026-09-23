@@ -4,10 +4,13 @@ import { peso } from '@/lib/formato';
 import { estacionDelSticker, resumenDe } from '../datos';
 import { NoEresSocio, StickerDesconocido } from '../no-reconocido';
 import { FormularioSerie } from './FormularioSerie';
+import { BotonBorrarSerie } from '@/components/BotonBorrarSerie';
+import { Basura } from '@/components/Iconos';
 
 const ERRORES: Record<string, string> = {
   datos: 'Revisa el peso y las repeticiones.',
   guardar: 'No se pudo guardar la serie. Intenta otra vez.',
+  borrar: 'No se pudo borrar la serie. Intenta otra vez.',
 };
 
 export default async function Registrar({
@@ -29,7 +32,7 @@ export default async function Registrar({
 
   const { data: seriesDeHoy } = await supabase
     .from('sets')
-    .select('set_number, weight_kg, reps')
+    .select('id, set_number, weight_kg, reps')
     .eq('user_id', usuario.id)
     .eq('exercise_id', estacion.exercise_id)
     .eq('session_date', hoy)
@@ -72,15 +75,30 @@ export default async function Registrar({
 
       {hechas.length > 0 && (
         <section style={{ marginTop: 22 }}>
-          <span className="rotulo">Series de hoy</span>
-          <div className="fila" style={{ gap: 8, marginTop: 10 }}>
+          <div className="fila fila--entre fila--base">
+            <span className="rotulo">Series de hoy</span>
+            <span className="apunte" style={{ fontSize: 10.5 }}>Toca una para borrarla</span>
+          </div>
+          {/* Grilla y no fila: con seis o siete series una fila se aprieta. */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(78px, 1fr))', gap: 8, marginTop: 10 }}>
             {hechas.map((s) => (
-              <div key={s.set_number} className="carta" style={{ flexGrow: 1, flexBasis: 0, borderRadius: 13, padding: '10px 8px', textAlign: 'center' }}>
-                <div className="rotulo rotulo--tenue">S{s.set_number}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, marginTop: 3 }}>
-                  {peso(s.weight_kg)} × {s.reps}
-                </div>
-              </div>
+              <BotonBorrarSerie
+                key={s.id}
+                id={s.id}
+                codigo={codigo}
+                volver={`/m/${codigo}/registrar`}
+                descripcion={`la serie ${s.set_number} (${peso(s.weight_kg)} kg × ${s.reps})`}
+                className="carta"
+                style={{ borderRadius: 13, padding: '10px 8px', textAlign: 'center', minHeight: 56, color: 'var(--tinta)', position: 'relative' }}
+              >
+                <span style={{ position: 'absolute', top: 6, right: 6, color: 'var(--tinta-4)' }}>
+                  <Basura tam={11} grosor={2} />
+                </span>
+                <span className="rotulo rotulo--tenue" style={{ display: 'block' }}>S{s.set_number}</span>
+                <span style={{ display: 'block', fontSize: 13, fontWeight: 600, marginTop: 3 }}>
+                  {Number(s.weight_kg) === 0 ? 'PC' : peso(s.weight_kg)} × {s.reps}
+                </span>
+              </BotonBorrarSerie>
             ))}
           </div>
         </section>

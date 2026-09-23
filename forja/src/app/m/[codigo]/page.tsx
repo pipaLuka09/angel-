@@ -147,7 +147,7 @@ export default async function Maquina({ params }: { params: Promise<{ codigo: st
         <section style={{ marginTop: 14 }}>
           <div className="fila fila--entre">
             <span className="rotulo">Últimas sesiones</span>
-            <Link href={`/m/${codigo}/meta`} style={{ fontSize: 11.5, fontWeight: 600 }}>Ver todo</Link>
+            <Link href={`/m/${codigo}/historial`} style={{ fontSize: 11.5, fontWeight: 600 }}>Ver historial</Link>
           </div>
           <ul style={{ listStyle: 'none', margin: '9px 0 0', padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
             {[...resumen.sessions].reverse().slice(0, 3).map((s) => (
