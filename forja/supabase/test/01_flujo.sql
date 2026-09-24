@@ -10,14 +10,21 @@ insert into auth.users (id, email, raw_user_meta_data) values
   (:'ANDRES', 'andres@socio.test','{"full_name":"Andrés R."}'),
   (:'AJENO',  'ajeno@otro.test',  '{"full_name":"Persona Ajena"}');
 
+-- Desde 0014 los gimnasios los crea la administración de la plataforma,
+-- no el dueño. Esta cuenta hace ese papel.
+insert into auth.users (id, email, raw_user_meta_data)
+values ('44444444-4444-4444-4444-444444444444', 'admin@forja.test', '{"full_name":"Operación FORJA"}');
+insert into public.platform_admins (user_id) values ('44444444-4444-4444-4444-444444444444');
+
 \echo '--- 1. El trigger creó los perfiles'
 select count(*) as perfiles from public.profiles;
 
 -- ============ Laura (recepción) da de alta el gimnasio ============
 set role authenticated;
-set app.user_id = '11111111-1111-1111-1111-111111111111';
+set app.user_id = '44444444-4444-4444-4444-444444444444';
+select public.admin_create_gym('Gym Olimpo', 'Centro', 'olm', :'LAURA', true) as gym \gset
 
-select public.bootstrap_gym('Gym Olimpo', 'Centro', 'olm') as gym \gset
+set app.user_id = '11111111-1111-1111-1111-111111111111';
 
 \echo '--- 2. Gym creado con sus estaciones'
 select (select count(*) from public.stations where gym_id = :'gym'::uuid) as estaciones,

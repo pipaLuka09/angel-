@@ -8,7 +8,7 @@ import { claveTemporal, gymDelStaff } from '@/lib/panel';
 export type ResultadoAlta =
   | { estado: 'inicial' }
   | { estado: 'error'; mensaje: string }
-  | { estado: 'listo'; nombre: string; correo: string; clave: string };
+  | { estado: 'listo'; nombre: string; correo: string; clave: string; recepcion: boolean };
 
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -22,8 +22,15 @@ export async function darDeAltaSocio(
   const nombre = String(formData.get('nombre') ?? '').trim();
   const correo = String(formData.get('correo') ?? '').trim().toLowerCase();
   const numero = String(formData.get('numero') ?? '').trim();
+  // Solo el dueño crea cuentas de recepción. La política
+  // memberships_owner_write lo exige de todas formas; esto es para dar un
+  // mensaje claro en vez de un error de la base.
+  const recepcion = formData.get('tipo') === 'staff';
+  if (recepcion && gym.rol !== 'owner') {
+    return { estado: 'error', mensaje: 'Solo el dueño del gimnasio puede crear cuentas de recepción.' };
+  }
 
-  if (nombre.length < 3) return { estado: 'error', mensaje: 'Escribe el nombre completo del socio.' };
+  if (nombre.length < 3) return { estado: 'error', mensaje: 'Escribe el nombre completo.' };
   if (!CORREO.test(correo)) return { estado: 'error', mensaje: 'Ese correo no parece válido.' };
 
   const clave = claveTemporal();
@@ -51,14 +58,14 @@ export async function darDeAltaSocio(
     };
   }
 
-  // La membresía se inserta con la sesión de recepción, para que la
-  // política memberships_staff_write sea la que autorice y no la clave
-  // de servicio.
+  // La membresía se inserta con la sesión de quien da de alta, para que
+  // sean las políticas de memberships las que autoricen y no la clave de
+  // servicio.
   const supabase = await supabaseServidor();
   const { error: errorMembresia } = await supabase.from('memberships').insert({
     gym_id: gym.gymId,
     user_id: creado.user.id,
-    role: 'member',
+    role: recepcion ? 'staff' : 'member',
     status: 'active',
     member_code: numero || null,
   });
@@ -72,7 +79,7 @@ export async function darDeAltaSocio(
 
   revalidatePath('/panel/socios');
   revalidatePath('/panel');
-  return { estado: 'listo', nombre, correo, clave };
+  return { estado: 'listo', nombre, correo, clave, recepcion };
 }
 
 export async function cambiarEstadoSocio(formData: FormData) {
@@ -162,9 +169,10 @@ export type ResultadoClave =
  * genera una nueva y se la dicta. No hay correo de recuperación porque el
  * SMTP gratuito de Supabase solo envía a los miembros del proyecto.
  *
- * Solo sobre socios (role = member) de este mismo gimnasio. Si recepción
+ * Recepción solo sobre socios (role = member) de su mismo gimnasio: si
  * pudiera restablecer la contraseña del dueño o de otro miembro del
- * staff, podría entrar con sus permisos.
+ * staff, podría entrar con sus permisos. El dueño además sobre recepción.
+ * La del dueño no se toca desde aquí: la restablece la plataforma.
  */
 export async function nuevaClaveSocio(
   _previo: ResultadoClave,
@@ -186,8 +194,10 @@ export async function nuevaClaveSocio(
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (!membresia || membresia.role !== 'member') {
-    return { estado: 'error', mensaje: 'Solo se puede restablecer la contraseña de un socio de este gimnasio.' };
+  const permitido =
+    membresia?.role === 'member' || (membresia?.role === 'staff' && gym.rol === 'owner');
+  if (!permitido) {
+    return { estado: 'error', mensaje: 'No puedes restablecer la contraseña de esta cuenta.' };
   }
 
   let admin;

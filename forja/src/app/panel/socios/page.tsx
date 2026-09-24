@@ -128,7 +128,7 @@ export default async function Socios() {
                       {s.last_session ? haceCuanto(s.last_session) : 'nunca'}
                     </td>
                     <td className="der">
-                      {s.role === 'member' ? (
+                      {s.role === 'member' || (s.role === 'staff' && gym.rol === 'owner') ? (
                         // Solo un letrero: tocarlo no hace nada. Pausar es un
                         // botón aparte que pide confirmación, porque antes el
                         // letrero pausaba con un toque y era fácil hacerlo sin querer.
@@ -140,7 +140,8 @@ export default async function Socios() {
                       )}
                     </td>
                     <td className="der" style={{ paddingLeft: 10 }}>
-                      {s.role === 'member' && (
+                      {/* El dueño gestiona también a recepción; recepción solo a los socios. */}
+                      {(s.role === 'member' || (s.role === 'staff' && gym.rol === 'owner')) && (
                         <span style={{ display: 'inline-flex', gap: 6, alignItems: 'flex-start', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                           <BotonNuevaClave userId={s.user_id} nombre={s.full_name} />
                           <BotonEstado userId={s.user_id} nombre={s.full_name} activo={s.status === 'active'} />
@@ -178,7 +179,7 @@ export default async function Socios() {
               <strong className="mono" style={{ color: 'var(--volt)', fontSize: 13 }}>{gym.prefijo.toUpperCase()}</strong>
             </p>
           </section>
-          <FormularioAlta />
+          <FormularioAlta puedeCrearRecepcion={gym.rol === 'owner'} />
         </div>
       </div>
     </MarcoPanel>

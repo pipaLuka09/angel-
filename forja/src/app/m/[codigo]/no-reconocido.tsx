@@ -25,7 +25,8 @@ export function StickerDesconocido() {
 /**
  * Alguien con sesión tocó un sticker de un gimnasio donde no tiene acceso
  * activo. Lo que ve depende de en qué punto está: sin solicitud, con la
- * solicitud en espera, o con el acceso pausado.
+ * solicitud en espera, con el acceso pausado, o con el gimnasio entero
+ * suspendido en la plataforma.
  */
 export async function NoEresSocio({ estacion, codigo }: { estacion: Estacion; codigo: string }) {
   const gym = estacion.gym_branch ? `${estacion.gym_name} · ${estacion.gym_branch}` : estacion.gym_name;
@@ -50,6 +51,11 @@ export async function NoEresSocio({ estacion, codigo }: { estacion: Estacion; co
   } else if (estado === 'paused' || estado === 'cancelled') {
     titulo = <>Tu acceso<br />está pausado</>;
     texto = <>Tu cuenta en {gym} está pausada. Habla con recepción para reactivarla: tu historial sigue guardado.</>;
+  } else if (estado === 'active') {
+    // Membresía activa pero sin acceso: el gimnasio está suspendido en la
+    // plataforma.
+    titulo = <>FORJA está<br />en pausa aquí</>;
+    texto = <>{gym} tiene FORJA en pausa por el momento. Tu historial sigue guardado y vuelve tal cual en cuanto se reactive.</>;
   } else {
     titulo = <>Este sticker es<br />de {estacion.gym_name}</>;
     texto = <>Tu cuenta todavía no tiene acceso a {gym}. Pídelo aquí y recepción lo aprueba.</>;

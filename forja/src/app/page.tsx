@@ -50,16 +50,22 @@ export default async function Inicio() {
   const { data: sesion } = await supabase.auth.getUser();
   if (!sesion.user) redirect('/entrar');
 
-  const [{ data: perfil }, { data: membresias }, { data: ejerciciosData }] = await Promise.all([
+  const [{ data: perfil }, { data: membresias }, { data: ejerciciosData }, { data: esAdmin }] = await Promise.all([
     supabase.from('profiles').select('full_name').eq('id', sesion.user.id).maybeSingle(),
-    supabase.from('memberships').select('role, status, gyms(name, branch_name)'),
+    supabase.from('memberships').select('role, status, gyms(name, branch_name, status)'),
     supabase.rpc('my_exercises'),
+    supabase.rpc('is_platform_admin'),
   ]);
 
   // Solo una membresía activa da acceso. Las demás se usan para explicarle
   // a la persona por qué todavía no ve nada.
   const todas = membresias ?? [];
-  const activas = todas.filter((m) => m.status === 'active');
+  // Un gimnasio suspendido por la plataforma no da acceso aunque la
+  // membresía siga activa: la base ya le niega todo.
+  const gymActivo = (m: (typeof todas)[number]) =>
+    uno<{ status: string }>(m.gyms)?.status !== 'suspended';
+  const activas = todas.filter((m) => m.status === 'active' && gymActivo(m));
+  const suspendida = todas.find((m) => m.status === 'active' && !gymActivo(m));
   const pendiente = todas.find((m) => m.status === 'pending');
   const pausada = todas.find((m) => m.status === 'paused' || m.status === 'cancelled');
 
@@ -123,6 +129,11 @@ export default async function Inicio() {
               hacer nada más.
             </p>
           </div>
+        ) : suspendida ? (
+          <p className="aviso" style={{ marginTop: 20 }}>
+            {uno<{ name: string }>(suspendida.gyms)?.name ?? 'Tu gimnasio'} tiene FORJA en pausa por el
+            momento. Tu historial sigue guardado y vuelve tal cual en cuanto se reactive.
+          </p>
         ) : pausada ? (
           <p className="aviso" style={{ marginTop: 20 }}>
             Tu acceso a {uno<{ name: string }>(pausada.gyms)?.name ?? 'tu gimnasio'} está pausado. Habla con
@@ -222,6 +233,12 @@ export default async function Inicio() {
       </div>
 
       <div className="crece" style={{ minHeight: 20 }} />
+
+      {esAdmin === true && (
+        <Link href="/admin" className="boton boton--fantasma" style={{ marginBottom: 10, borderColor: 'var(--volt)' }}>
+          Administración de FORJA
+        </Link>
+      )}
 
       {esStaff && (
         <Link href="/panel" className="boton boton--fantasma" style={{ marginBottom: 10 }}>

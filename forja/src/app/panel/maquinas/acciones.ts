@@ -85,3 +85,33 @@ export async function agregarMaquina(formData: FormData) {
   revalidatePath('/panel');
   volver();
 }
+
+/**
+ * Quita una máquina que el gimnasio ya no tiene. El historial de los
+ * socios no se pierde: sus series guardan el ejercicio y el gimnasio por
+ * su cuenta, y solo sueltan la referencia a la máquina (on delete set
+ * null). Lo que sí se va son las lecturas del sticker, que solo servían
+ * para saber si estaba pegado.
+ */
+export async function quitarMaquina(formData: FormData) {
+  const gym = await gymDelStaff();
+  if (!gym) volver();
+
+  const id = String(formData.get('id') ?? '');
+  if (!id) volver('Falta la máquina.');
+
+  const supabase = await supabaseServidor();
+  const { error } = await supabase
+    .from('stations')
+    .delete()
+    .eq('id', id)
+    .eq('gym_id', gym.gymId);
+
+  if (error) volver(error.message);
+
+  revalidatePath('/panel/maquinas');
+  revalidatePath('/panel/stickers');
+  revalidatePath('/panel/videos');
+  revalidatePath('/panel');
+  volver();
+}

@@ -4,6 +4,7 @@ import { haceCuanto } from '@/lib/formato';
 import type { EstacionPanel } from '@/lib/tipos';
 import { MarcoPanel, SinAcceso } from '../MarcoPanel';
 import { agregarMaquina, asignarCodigo, quitarCodigo } from './acciones';
+import { BotonQuitar } from './BotonQuitar';
 
 export default async function Maquinas({
   searchParams,
@@ -58,6 +59,7 @@ export default async function Maquinas({
                 <th className="der">Series 7d</th>
                 <th className="der">Último tap</th>
                 <th className="der">Sticker</th>
+                <th className="der" />
               </tr>
             </thead>
             <tbody>
@@ -94,6 +96,9 @@ export default async function Maquinas({
                         </button>
                       </form>
                     )}
+                  </td>
+                  <td className="der" style={{ paddingLeft: 8 }}>
+                    <BotonQuitar id={e.id} etiqueta={e.label} />
                   </td>
                 </tr>
               ))}
@@ -144,6 +149,10 @@ export default async function Maquinas({
               Si un sticker se despega o se lo llevan, invalida su código: deja de funcionar al
               instante y la máquina vuelve a la lista de pendientes para imprimir uno nuevo. El
               historial de los socios no se pierde.
+            </p>
+            <p className="apunte" style={{ margin: '8px 0 0', lineHeight: 1.5 }}>
+              Si la máquina ya no está en el gimnasio, quítala. Tampoco se pierde nada del historial:
+              cada serie guarda su ejercicio aparte de la máquina.
             </p>
           </section>
         </div>

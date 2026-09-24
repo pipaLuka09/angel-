@@ -95,6 +95,21 @@ que hace que la URL pida iniciar sesión en Vercel para abrirse. Para probar
 desde un celular ajeno hay que desactivarla en Settings → Deployment
 Protection, o la pantalla que verás será la de Vercel, no la de FORJA.
 
+## La cuenta de administración de la plataforma
+
+`/admin` solo lo ve quien está en la tabla `platform_admins`, y esa tabla no
+se puede escribir desde la app a propósito. Para dar acceso a alguien que ya
+tiene cuenta de FORJA, desde el SQL Editor de Supabase:
+
+```sql
+insert into public.platform_admins (user_id)
+select id from auth.users where email = 'correo@ejemplo.com';
+```
+
+Y para quitárselo, `delete from public.platform_admins where user_id = ...`.
+`SUPABASE_SERVICE_ROLE_KEY` tiene que estar configurada en Vercel: crear el
+gimnasio crea también la cuenta del dueño.
+
 ## Grabar el sticker
 
 Con la URL en mano, cualquier app de escritura NFC (NFC Tools, en Android o

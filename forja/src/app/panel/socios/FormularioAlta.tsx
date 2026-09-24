@@ -14,7 +14,7 @@ function Boton() {
   );
 }
 
-export function FormularioAlta() {
+export function FormularioAlta({ puedeCrearRecepcion }: { puedeCrearRecepcion: boolean }) {
   const [resultado, accion] = useActionState<ResultadoAlta, FormData>(
     darDeAltaSocio,
     { estado: 'inicial' },
@@ -22,7 +22,7 @@ export function FormularioAlta() {
 
   return (
     <section className="carta" style={{ borderRadius: 17, padding: '18px 20px' }}>
-      <span className="rotulo">Dar de alta un socio</span>
+      <span className="rotulo">{puedeCrearRecepcion ? 'Dar de alta una cuenta' : 'Dar de alta un socio'}</span>
 
       {resultado.estado === 'listo' ? (
         <>
@@ -32,7 +32,9 @@ export function FormularioAlta() {
           >
             <div className="fila" style={{ gap: 8, color: 'var(--volt)' }}>
               <Check tam={17} grosor={2.6} />
-              <span style={{ fontSize: 13, fontWeight: 700 }}>{resultado.nombre} ya tiene cuenta</span>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>
+                {resultado.nombre} ya tiene cuenta{resultado.recepcion ? ' de recepción' : ''}
+              </span>
             </div>
             <p className="apunte" style={{ margin: '10px 0 0', lineHeight: 1.5, color: 'var(--tinta-2)' }}>
               Anótale estos datos. La contraseña <strong style={{ color: 'var(--tinta)' }}>no se
@@ -56,6 +58,18 @@ export function FormularioAlta() {
         </>
       ) : (
         <form action={accion} style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {puedeCrearRecepcion && (
+            <div>
+              <label className="rotulo etiqueta" htmlFor="tipo">Tipo de cuenta</label>
+              <select id="tipo" name="tipo" className="campo" defaultValue="member">
+                <option value="member">Socio</option>
+                <option value="staff">Recepción (entra al panel)</option>
+              </select>
+              <p className="apunte" style={{ marginTop: 6 }}>
+                Recepción da de alta y aprueba socios, pero no ve cuánto levanta nadie ni puede crear otras cuentas de recepción.
+              </p>
+            </div>
+          )}
           <div>
             <label className="rotulo etiqueta" htmlFor="nombre">Nombre completo</label>
             <input id="nombre" name="nombre" type="text" className="campo" required autoComplete="off" />

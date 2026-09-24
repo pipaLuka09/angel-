@@ -59,23 +59,37 @@ Si alguien toca un sticker sin sesión, `/m/<codigo>` lo manda a `/entrar`
 recordando a dónde iba: al entrar aterriza en la máquina correcta, no en
 una pantalla genérica.
 
-## Dar de alta un gimnasio
+## Vender FORJA a un gimnasio
 
-Con una sesión iniciada, desde el SQL Editor:
+FORJA es multi-gimnasio: cada gym ve solo lo suyo (lo garantizan las políticas
+RLS de la base, no la app). Hay tres niveles de cuenta:
 
-```sql
-select public.bootstrap_gym('Gym Olimpo', 'Centro', 'olm');
-```
+| Quién | Qué hace | Dónde |
+|---|---|---|
+| **Administración de FORJA** (tú) | Crea gimnasios, les da su cuenta de dueño, los suspende si no pagan. | `/admin` |
+| **Dueño del gimnasio** | Todo el panel, más: crear cuentas de recepción, restablecer sus contraseñas y cambiar nombre/sucursal. | `/panel` |
+| **Recepción** | Da de alta, aprueba y pausa socios; máquinas, videos y stickers. No puede crear otras cuentas de staff ni tocar al dueño. | `/panel` |
 
-Crea el gym, te deja como dueño y genera una estación por cada ejercicio
-del catálogo global, todas sin sticker. Después, por cada máquina:
+El flujo al cerrar una venta:
 
-```sql
-select public.assign_nfc_code('<id de la estación>');
-```
+1. Entras con tu cuenta de administración y vas a **Administración de FORJA →
+   Nuevo gimnasio**.
+2. Llenas nombre, sucursal, un **código corto** de 2 a 5 letras (`olm`, va
+   impreso en cada sticker y no se cambia después) y el correo del dueño.
+   Con la casilla del catálogo marcada, el gym arranca con una máquina por cada
+   ejercicio del catálogo, todas sin sticker.
+3. La pantalla te da el usuario y una contraseña temporal del dueño. Se la
+   pasas; al entrar se le pide cambiarla.
+4. El dueño entra a `/panel`: ajusta sus máquinas, imprime stickers, crea la
+   cuenta de recepción y comparte el link de registro con sus socios.
 
-Devuelve el código (`olm-a7k2p9`). El sticker se graba con
-`<NEXT_PUBLIC_SITE_URL>/m/olm-a7k2p9`.
+**Suspender** (desde `/admin`) corta el acceso de todo el gimnasio al instante —
+panel, socios y stickers— sin borrar nada. Cada quien ve un mensaje de que el
+servicio está en pausa. **Reactivar** lo deja exactamente como estaba.
+
+Pendiente del lado del negocio, no del código: cobro (hoy se lleva fuera de la
+app, y la suspensión es la palanca), contrato y aviso de privacidad con cada
+gimnasio.
 
 ## El panel
 
@@ -86,12 +100,15 @@ Todo lo que el gimnasio necesita hacer a diario está ahí, sin tocar SQL:
   link de registro para que cada quien cree la suya y luego **aprobarla o
   rechazarla**. Además: quién nunca ha registrado nada, quién dejó de venir,
   y pausar el acceso de quien no renovó.
-- **Máquinas**: agregarlas, asignarles código de sticker, e **invalidar** el de
+- **Máquinas**: agregarlas, asignarles código de sticker, **invalidar** el de
   un sticker perdido o despegado — deja de funcionar al instante y la máquina
-  vuelve a pendientes, sin perder el historial de nadie.
+  vuelve a pendientes — y **quitar** las que el gym ya no tiene. En ningún caso
+  se pierde el historial de nadie: cada serie guarda su ejercicio aparte.
 - **Stickers**: hoja lista para imprimir. Cada etiqueta lleva el número de
   estación, el ejercicio, un QR y la dirección en texto. El QR no es adorno: es
   el respaldo para cuando el chip falla o el celular no lee NFC.
+- **Ajustes**: nombre y sucursal tal como los ven los socios (solo el dueño),
+  el código del gimnasio y el link de registro.
 
 El alta de socios es lo único que necesita `SUPABASE_SERVICE_ROLE_KEY`, porque
 crear cuentas de Auth es una operación de administración. Sin esa variable el
@@ -103,8 +120,11 @@ No hay correo de recuperación: el SMTP gratuito de Supabase solo envía a los
 miembros del proyecto, así que a un socio nunca le llegaría. En su lugar:
 
 - Recepción genera una **contraseña nueva** desde Panel → Socios, sin tocar el
-  historial. Solo sobre socios: el panel no deja restablecer la de otro miembro
-  del staff ni la del dueño, porque eso permitiría entrar con sus permisos.
+  historial. Solo sobre socios: recepción no puede restablecer la de otro
+  miembro del staff ni la del dueño, porque eso permitiría entrar con sus
+  permisos. El dueño sí puede con las de recepción.
+- Si el que olvida la contraseña es el dueño, se la restableces tú desde el
+  panel de Supabase (Authentication → Users).
 - El socio la cambia por una suya en **Mi cuenta**. Mientras use una contraseña
   que le dio recepción, el inicio se lo recuerda.
 
@@ -115,5 +135,6 @@ se podría agregar el "olvidé mi contraseña" por correo.
 
 - Ligar a un gimnasio a alguien que ya tenga cuenta de FORJA de otro gym.
 - Campo de video por ejercicio, editable por el gym desde el panel.
-- Restringir `bootstrap_gym`: hoy cualquier usuario con sesión puede crear un
-  gimnasio y quedar como su dueño.
+- Cobro dentro de la app (hoy se cobra por fuera y se suspende a mano).
+- Que un dueño con varias sucursales las vea todas desde un mismo panel (hoy
+  el panel toma la primera).

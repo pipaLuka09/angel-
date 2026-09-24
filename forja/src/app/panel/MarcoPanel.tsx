@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Marca } from '@/components/Marca';
 import { salir } from '../entrar/acciones';
-import type { GymDelStaff } from '@/lib/panel';
+import { gymSuspendido, type GymDelStaff } from '@/lib/panel';
 
 const NAV = [
   { clave: 'resumen',  href: '/panel',           texto: 'Resumen' },
@@ -9,6 +9,7 @@ const NAV = [
   { clave: 'maquinas', href: '/panel/maquinas',  texto: 'Máquinas' },
   { clave: 'videos',   href: '/panel/videos',    texto: 'Videos' },
   { clave: 'stickers', href: '/panel/stickers',  texto: 'Stickers' },
+  { clave: 'ajustes',  href: '/panel/ajustes',   texto: 'Ajustes' },
 ] as const;
 
 export type ClaveNav = (typeof NAV)[number]['clave'];
@@ -73,13 +74,19 @@ export function MarcoPanel({
   );
 }
 
-export function SinAcceso() {
+export async function SinAcceso() {
+  const suspendido = await gymSuspendido();
+
   return (
     <main className="pantalla">
       <Marca />
-      <h1 className="titulo titulo--chico" style={{ marginTop: 40 }}>Sin acceso</h1>
+      <h1 className="titulo titulo--chico" style={{ marginTop: 40 }}>
+        {suspendido ? 'Cuenta suspendida' : 'Sin acceso'}
+      </h1>
       <p className="parrafo" style={{ marginTop: 14 }}>
-        Tu cuenta no tiene permisos de administración en ningún gimnasio.
+        {suspendido
+          ? `El acceso de ${suspendido} a FORJA está suspendido. Los datos siguen guardados: en cuanto se reactive, todo vuelve a estar como estaba. Escríbenos para resolverlo.`
+          : 'Tu cuenta no tiene permisos de administración en ningún gimnasio.'}
       </p>
       <div className="crece" />
       <Link href="/" className="boton boton--fantasma">Ir al inicio</Link>

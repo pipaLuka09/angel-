@@ -28,11 +28,16 @@ export async function gymDelStaff(destino = '/panel'): Promise<GymDelStaff | nul
 
   const { data } = await supabase
     .from('memberships')
-    .select('gym_id, role, gyms(name, branch_name, slug, code_prefix, declared_member_count)')
+    .select('gym_id, role, gyms(name, branch_name, slug, code_prefix, declared_member_count, status)')
     .eq('status', 'active')
     .in('role', ['staff', 'owner']);
 
-  const membresia = (data ?? [])[0];
+  // Un gimnasio suspendido por la plataforma no cuenta: la base ya le
+  // niega todo (is_staff_of), así que mostrarle el panel solo daría
+  // pantallas vacías y errores. SinAcceso explica qué pasó.
+  const membresia = (data ?? []).find(
+    (m) => uno<{ status: string }>(m.gyms)?.status === 'active',
+  );
   if (!membresia) return null;
 
   const gym = uno<{
@@ -52,6 +57,25 @@ export async function gymDelStaff(destino = '/panel'): Promise<GymDelStaff | nul
     sociosDeclarados: gym?.declared_member_count ?? null,
     rol: membresia.role as 'staff' | 'owner',
   };
+}
+
+/**
+ * Nombre del gimnasio suspendido al que pertenece quien está viendo, si
+ * lo hay. Sirve para decirle por qué no puede entrar en vez de un
+ * genérico "sin acceso".
+ */
+export async function gymSuspendido(): Promise<string | null> {
+  const supabase = await supabaseServidor();
+  const { data } = await supabase
+    .from('memberships')
+    .select('gyms(name, status)')
+    .eq('status', 'active');
+
+  for (const m of data ?? []) {
+    const g = uno<{ name: string; status: string }>(m.gyms);
+    if (g?.status === 'suspended') return g.name;
+  }
+  return null;
 }
 
 /** Contraseña temporal legible, para que recepción la pueda dictar o anotar. */
