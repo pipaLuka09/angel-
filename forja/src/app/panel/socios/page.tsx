@@ -4,7 +4,8 @@ import { haceCuanto } from '@/lib/formato';
 import { MarcoPanel, SinAcceso } from '../MarcoPanel';
 import { FormularioAlta } from './FormularioAlta';
 import { BotonNuevaClave } from './BotonNuevaClave';
-import { aprobarSolicitud, cambiarEstadoSocio, rechazarSolicitud } from './acciones';
+import { aprobarSolicitud, rechazarSolicitud } from './acciones';
+import { BotonEstado } from './BotonEstado';
 import { baseUrl } from '@/lib/url';
 
 type Socio = {
@@ -128,24 +129,23 @@ export default async function Socios() {
                     </td>
                     <td className="der">
                       {s.role === 'member' ? (
-                        <form action={cambiarEstadoSocio} style={{ display: 'inline' }}>
-                          <input type="hidden" name="userId" value={s.user_id} />
-                          <input type="hidden" name="estado" value={s.status === 'active' ? 'paused' : 'active'} />
-                          <button
-                            type="submit"
-                            className={s.status === 'active' ? 'insignia insignia--volt' : 'insignia insignia--gris'}
-                            style={{ border: 0, cursor: 'pointer' }}
-                            title={s.status === 'active' ? 'Pausar el acceso' : 'Reactivar el acceso'}
-                          >
-                            {s.status === 'active' ? 'Activo' : s.status === 'paused' ? 'Pausado' : 'Cancelado'}
-                          </button>
-                        </form>
+                        // Solo un letrero: tocarlo no hace nada. Pausar es un
+                        // botón aparte que pide confirmación, porque antes el
+                        // letrero pausaba con un toque y era fácil hacerlo sin querer.
+                        <span className={s.status === 'active' ? 'insignia insignia--volt' : 'insignia insignia--gris'}>
+                          {s.status === 'active' ? 'Activo' : s.status === 'paused' ? 'Pausado' : 'Cancelado'}
+                        </span>
                       ) : (
                         <span className="insignia insignia--gris">{ROL[s.role]}</span>
                       )}
                     </td>
                     <td className="der" style={{ paddingLeft: 10 }}>
-                      {s.role === 'member' && <BotonNuevaClave userId={s.user_id} nombre={s.full_name} />}
+                      {s.role === 'member' && (
+                        <span style={{ display: 'inline-flex', gap: 6, alignItems: 'flex-start', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                          <BotonNuevaClave userId={s.user_id} nombre={s.full_name} />
+                          <BotonEstado userId={s.user_id} nombre={s.full_name} activo={s.status === 'active'} />
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
