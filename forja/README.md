@@ -37,6 +37,7 @@ decisión de privacidad.
 |---|---|
 | `/entrar` | El login que pasa **una sola vez**, al inscribirse. |
 | `/registro` | Crear cuenta por cuenta propia. Queda **en espera** hasta que el gimnasio la apruebe. |
+| `/cuenta` | Mi cuenta: datos y cambiar contraseña. |
 | `/` | Inicio: recuerda que hay que acercar el celular a un sticker. |
 | `/m/[codigo]` | **La pantalla del tap.** Último peso, meta, últimas sesiones. |
 | `/m/[codigo]/registrar` | Anotar la serie: peso, reps y carita. |
@@ -96,11 +97,23 @@ El alta de socios es lo único que necesita `SUPABASE_SERVICE_ROLE_KEY`, porque
 crear cuentas de Auth es una operación de administración. Sin esa variable el
 resto del panel funciona igual y solo ese formulario avisa que falta.
 
+## Contraseñas olvidadas
+
+No hay correo de recuperación: el SMTP gratuito de Supabase solo envía a los
+miembros del proyecto, así que a un socio nunca le llegaría. En su lugar:
+
+- Recepción genera una **contraseña nueva** desde Panel → Socios, sin tocar el
+  historial. Solo sobre socios: el panel no deja restablecer la de otro miembro
+  del staff ni la del dueño, porque eso permitiría entrar con sus permisos.
+- El socio la cambia por una suya en **Mi cuenta**. Mientras use una contraseña
+  que le dio recepción, el inicio se lo recuerda.
+
+Con un proveedor de correo propio (Resend, SendGrid…) configurado en Supabase
+se podría agregar el "olvidé mi contraseña" por correo.
+
 ## Lo que falta para producción
 
-- Recuperación de acceso por WhatsApp (hoy el botón es solo visual).
 - Ligar a un gimnasio a alguien que ya tenga cuenta de FORJA de otro gym.
-- Regenerar la contraseña de un socio desde el panel.
 - Campo de video por ejercicio, editable por el gym desde el panel.
 - Restringir `bootstrap_gym`: hoy cualquier usuario con sesión puede crear un
   gimnasio y quedar como su dueño.

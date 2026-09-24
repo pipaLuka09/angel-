@@ -96,6 +96,20 @@ export default async function Inicio() {
         {nombre ? `Hola, ${nombre}` : 'Hola'}
       </h1>
 
+      {sesion.user.user_metadata?.clave_temporal === true && (
+        <Link
+          href="/cuenta"
+          className="carta"
+          style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 14, borderColor: 'var(--volt)', color: 'var(--tinta)' }}
+        >
+          <span style={{ flexGrow: 1, fontSize: 12.5, lineHeight: 1.45 }}>
+            <strong>Estás usando una contraseña temporal.</strong>{' '}
+            <span style={{ color: 'var(--tinta-2)' }}>Cámbiala por una tuya.</span>
+          </span>
+          <span style={{ color: 'var(--volt)' }}><Chevron /></span>
+        </Link>
+      )}
+
       {activas.length === 0 ? (
         pendiente ? (
           <div className="carta" style={{ marginTop: 20, borderColor: 'var(--volt)' }}>
@@ -216,11 +230,16 @@ export default async function Inicio() {
         </Link>
       )}
 
-      <form action={salir}>
-        <button type="submit" className="boton boton--fantasma" style={{ minHeight: 44, fontSize: 12 }}>
-          Cerrar sesión
-        </button>
-      </form>
+      <div className="par">
+        <Link href="/cuenta" className="boton boton--fantasma" style={{ minHeight: 44, fontSize: 12 }}>
+          Mi cuenta
+        </Link>
+        <form action={salir} style={{ display: 'flex' }}>
+          <button type="submit" className="boton boton--fantasma" style={{ minHeight: 44, fontSize: 12 }}>
+            Cerrar sesión
+          </button>
+        </form>
+      </div>
     </main>
   );
 }

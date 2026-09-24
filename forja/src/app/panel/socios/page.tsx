@@ -3,6 +3,7 @@ import { gymDelStaff } from '@/lib/panel';
 import { haceCuanto } from '@/lib/formato';
 import { MarcoPanel, SinAcceso } from '../MarcoPanel';
 import { FormularioAlta } from './FormularioAlta';
+import { BotonNuevaClave } from './BotonNuevaClave';
 import { aprobarSolicitud, cambiarEstadoSocio, rechazarSolicitud } from './acciones';
 import { baseUrl } from '@/lib/url';
 
@@ -103,6 +104,7 @@ export default async function Socios() {
                   <th className="der">Sesiones</th>
                   <th className="der">Última</th>
                   <th className="der">Estado</th>
+                  <th className="der">Acceso</th>
                 </tr>
               </thead>
               <tbody>
@@ -141,6 +143,9 @@ export default async function Socios() {
                       ) : (
                         <span className="insignia insignia--gris">{ROL[s.role]}</span>
                       )}
+                    </td>
+                    <td className="der" style={{ paddingLeft: 10 }}>
+                      {s.role === 'member' && <BotonNuevaClave userId={s.user_id} nombre={s.full_name} />}
                     </td>
                   </tr>
                 ))}

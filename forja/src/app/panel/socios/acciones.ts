@@ -36,7 +36,9 @@ export async function darDeAltaSocio(
     email: correo,
     password: clave,
     email_confirm: true,
-    user_metadata: { full_name: nombre },
+    // La contraseña la eligió el sistema, no la persona: al entrar se le
+    // sugiere cambiarla.
+    user_metadata: { full_name: nombre, clave_temporal: true },
   });
 
   if (errorAuth || !creado.user) {
@@ -148,4 +150,69 @@ export async function rechazarSolicitud(formData: FormData) {
 
   revalidatePath('/panel/socios');
   revalidatePath('/panel');
+}
+
+export type ResultadoClave =
+  | { estado: 'inicial' }
+  | { estado: 'error'; mensaje: string }
+  | { estado: 'listo'; clave: string };
+
+/**
+ * Recuperar el acceso de un socio que olvidó su contraseña: recepción le
+ * genera una nueva y se la dicta. No hay correo de recuperación porque el
+ * SMTP gratuito de Supabase solo envía a los miembros del proyecto.
+ *
+ * Solo sobre socios (role = member) de este mismo gimnasio. Si recepción
+ * pudiera restablecer la contraseña del dueño o de otro miembro del
+ * staff, podría entrar con sus permisos.
+ */
+export async function nuevaClaveSocio(
+  _previo: ResultadoClave,
+  formData: FormData,
+): Promise<ResultadoClave> {
+  const gym = await gymDelStaff('/panel/socios');
+  if (!gym) return { estado: 'error', mensaje: 'No administras ningún gimnasio.' };
+
+  const userId = String(formData.get('userId') ?? '');
+  if (!userId) return { estado: 'error', mensaje: 'Falta el socio.' };
+
+  // La comprobación se hace con la sesión de recepción, así que RLS
+  // también la respalda: solo ve membresías de su propio gimnasio.
+  const supabase = await supabaseServidor();
+  const { data: membresia } = await supabase
+    .from('memberships')
+    .select('role')
+    .eq('gym_id', gym.gymId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (!membresia || membresia.role !== 'member') {
+    return { estado: 'error', mensaje: 'Solo se puede restablecer la contraseña de un socio de este gimnasio.' };
+  }
+
+  let admin;
+  try {
+    admin = supabaseAdmin();
+  } catch {
+    return { estado: 'error', mensaje: 'Falta la clave de servicio en el despliegue.' };
+  }
+
+  // Se leen los metadatos para no perder el nombre: el update los reemplaza.
+  const { data: actual, error: errorLeer } = await admin.auth.admin.getUserById(userId);
+  if (errorLeer || !actual.user) {
+    return { estado: 'error', mensaje: 'No se encontró la cuenta.' };
+  }
+
+  const clave = claveTemporal();
+  const { error } = await admin.auth.admin.updateUserById(userId, {
+    password: clave,
+    user_metadata: { ...(actual.user.user_metadata ?? {}), clave_temporal: true },
+  });
+
+  if (error) {
+    console.error('[nuevaClaveSocio]', error.status, error.message);
+    return { estado: 'error', mensaje: 'No se pudo cambiar la contraseña. Intenta otra vez.' };
+  }
+
+  return { estado: 'listo', clave };
 }

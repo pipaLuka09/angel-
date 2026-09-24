@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Marca } from '@/components/Marca';
-import { Whatsapp } from '@/components/Iconos';
 import { supabaseServidor } from '@/lib/supabase/server';
 import { entrar } from './acciones';
 
@@ -96,10 +95,13 @@ export default async function Entrar({
 
       <div className="crece" />
 
-      <a className="boton boton--fantasma" href="#ayuda" style={{ marginTop: 20 }}>
-        <Whatsapp tam={17} color="#D7FF3E" />
-        Recuperar mi acceso por WhatsApp
-      </a>
+      <details className="carta" style={{ marginTop: 20, padding: '14px 16px' }}>
+        <summary style={{ fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>¿Olvidaste tu contraseña?</summary>
+        <p className="apunte" style={{ margin: '10px 0 0', lineHeight: 1.5 }}>
+          Pídele a recepción una contraseña nueva. Te la genera en un momento y tu historial no se pierde. Después
+          puedes cambiarla por una tuya en <strong style={{ color: 'var(--tinta-2)' }}>Mi cuenta</strong>.
+        </p>
+      </details>
 
       <p id="ayuda" className="apunte" style={{ textAlign: 'center', marginTop: 16, lineHeight: 1.5 }}>
         ¿Aún no tienes cuenta?{' '}
