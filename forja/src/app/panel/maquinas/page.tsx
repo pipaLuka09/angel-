@@ -5,13 +5,14 @@ import type { EstacionPanel } from '@/lib/tipos';
 import { MarcoPanel, SinAcceso } from '../MarcoPanel';
 import { agregarMaquina, asignarCodigo, quitarCodigo } from './acciones';
 import { BotonQuitar } from './BotonQuitar';
+import { FormularioEjercicio } from './FormularioEjercicio';
 
 export default async function Maquinas({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ejercicio?: string; ok?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, ejercicio: elegido, ok } = await searchParams;
   const gym = await gymDelStaff('/panel/maquinas');
   if (!gym) return <SinAcceso />;
 
@@ -42,6 +43,11 @@ export default async function Maquinas({
       }
     >
       {error && <p className="aviso aviso--error" style={{ marginTop: 20 }}>{decodeURIComponent(error)}</p>}
+      {ok === 'ejercicio' && !error && (
+        <p className="aviso" style={{ marginTop: 20, borderColor: 'var(--volt)', color: 'var(--volt)' }}>
+          Ejercicio creado. Ya está elegido en &quot;Agregar una máquina&quot;.
+        </p>
+      )}
 
       {sinEjercicio.size > 0 && (
         <p className="aviso" style={{ marginTop: 20 }}>
@@ -139,7 +145,10 @@ export default async function Maquinas({
               </div>
               <div>
                 <label className="rotulo etiqueta" htmlFor="ejercicio">Ejercicio</label>
-                <select id="ejercicio" name="ejercicio" className="campo" defaultValue="" required>
+                <select
+                  id="ejercicio" name="ejercicio" className="campo" required
+                  defaultValue={ejercicios.some((ej) => ej.id === elegido) ? elegido : ''}
+                >
                   <option value="" disabled>Elige el ejercicio</option>
                   {ejercicios.map((ej) => (
                     <option key={ej.id} value={ej.id}>
@@ -157,6 +166,8 @@ export default async function Maquinas({
               </button>
             </form>
           </section>
+
+          <FormularioEjercicio volverA="/panel/maquinas" />
 
           <section className="carta" style={{ borderRadius: 17, padding: '18px 20px' }}>
             <span className="rotulo">Sobre invalidar</span>

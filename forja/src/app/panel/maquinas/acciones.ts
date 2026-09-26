@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { supabaseServidor } from '@/lib/supabase/server';
 import { gymDelStaff } from '@/lib/panel';
+import { GRUPOS } from '@/lib/ejercicios';
 
 function volver(error?: string): never {
   redirect(error ? `/panel/maquinas?error=${encodeURIComponent(error)}` : '/panel/maquinas');
@@ -156,4 +157,60 @@ export async function editarMaquina(formData: FormData) {
   revalidatePath('/panel/videos');
   revalidatePath('/panel');
   volver();
+}
+
+/**
+ * Un ejercicio que no está en el catálogo. Queda solo para este gimnasio
+ * (gym_id), y la política exercises_staff_write es la que autoriza.
+ * Después vuelve a donde estaba con el ejercicio ya elegido.
+ */
+export async function crearEjercicio(formData: FormData) {
+  const gym = await gymDelStaff();
+  if (!gym) volver();
+
+  const nombre = String(formData.get('nombre_ejercicio') ?? '').trim().replace(/\s+/g, ' ');
+  const grupo = String(formData.get('grupo') ?? '');
+  // Solo se vuelve a pantallas de máquinas: es un campo del formulario y
+  // no debe poder mandar a ninguna otra parte.
+  const pedido = String(formData.get('volver_a') ?? '');
+  const destino = /^\/panel\/maquinas(\/[0-9a-f-]{36})?$/.test(pedido) ? pedido : '/panel/maquinas';
+  const irA = (params: string): never => redirect(`${destino}?${params}`);
+
+  if (nombre.length < 3 || nombre.length > 60) {
+    irA(`error=${encodeURIComponent('El nombre del ejercicio debe tener entre 3 y 60 caracteres.')}`);
+  }
+  if (!(GRUPOS as readonly string[]).includes(grupo)) {
+    irA(`error=${encodeURIComponent('Elige el grupo muscular.')}`);
+  }
+
+  const supabase = await supabaseServidor();
+
+  // Evitar duplicados con el catálogo o con los que ya creó el gym: el
+  // RLS solo deja ver esos dos, así que la búsqueda cubre justo lo que
+  // aparece en la lista.
+  const { data: iguales } = await supabase.from('exercises').select('id').ilike('name', nombre).limit(1);
+  if (iguales && iguales.length > 0) {
+    irA(`ejercicio=${iguales[0].id}&error=${encodeURIComponent(`"${nombre}" ya está en la lista: lo dejé elegido.`)}`);
+  }
+
+  const base = nombre
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  const slug = `${base || 'ejercicio'}-${Math.random().toString(36).slice(2, 7)}`;
+
+  const { data: creado, error } = await supabase
+    .from('exercises')
+    .insert({ gym_id: gym.gymId, slug, name: nombre, muscle_group: grupo })
+    .select('id')
+    .single();
+
+  if (error || !creado) {
+    return irA(`error=${encodeURIComponent(error?.message ?? 'No se pudo crear el ejercicio.')}`);
+  }
+
+  revalidatePath('/panel/maquinas');
+  irA(`ejercicio=${creado.id}&ok=ejercicio`);
 }
