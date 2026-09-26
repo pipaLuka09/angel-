@@ -4,7 +4,7 @@ import { Cara } from '@/components/Cara';
 import { BotonBorrarSerie } from '@/components/BotonBorrarSerie';
 import { fechaCorta, haceCuanto, peso } from '@/lib/formato';
 import { estacionDelSticker } from '../datos';
-import { NoEresSocio, StickerDesconocido } from '../no-reconocido';
+import { NoEresSocio, SinEjercicio, StickerDesconocido } from '../no-reconocido';
 
 type Serie = {
   id: string;
@@ -29,7 +29,8 @@ export default async function Historial({
   const { supabase, estacion, usuario } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} codigo={codigo} />;
+  if (!estacion.is_member) return <NoEresSocio estacion={estacion} codigo={codigo} />;
+  if (!estacion.exercise_id) return <SinEjercicio estacion={estacion} />;
 
   const { data } = await supabase
     .from('sets')

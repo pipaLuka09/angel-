@@ -23,6 +23,37 @@ export function StickerDesconocido() {
 }
 
 /**
+ * La máquina existe y la persona es socia, pero en el panel no le
+ * asignaron ejercicio: sin ejercicio no hay dónde guardar la serie.
+ * Antes caía en NoEresSocio y decía "FORJA está en pausa", que no era
+ * cierto.
+ */
+export function SinEjercicio({ estacion }: { estacion: Estacion }) {
+  return (
+    <main className="pantalla">
+      <Marca />
+      <h1 className="titulo titulo--chico" style={{ marginTop: 40 }}>
+        Esta máquina
+        <br />
+        no tiene ejercicio
+      </h1>
+      <p className="parrafo" style={{ marginTop: 14 }}>
+        Todavía no le asignaron un ejercicio en el panel, así que aquí no se pueden registrar series.
+        Avísale a recepción: se arregla en Panel → Máquinas → Editar, y el sticker sigue sirviendo.
+      </p>
+      <div className="carta" style={{ marginTop: 22 }}>
+        <div className="rotulo">Máquina</div>
+        <p style={{ margin: '6px 0 0', fontSize: 15, fontWeight: 600 }}>
+          {estacion.label} · {estacion.gym_name}
+        </p>
+      </div>
+      <div className="crece" />
+      <a className="boton boton--fantasma" href="/">Ir al inicio</a>
+    </main>
+  );
+}
+
+/**
  * Alguien con sesión tocó un sticker de un gimnasio donde no tiene acceso
  * activo. Lo que ve depende de en qué punto está: sin solicitud, con la
  * solicitud en espera, con el acceso pausado, o con el gimnasio entero

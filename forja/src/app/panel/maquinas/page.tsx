@@ -16,10 +16,12 @@ export default async function Maquinas({
   if (!gym) return <SinAcceso />;
 
   const supabase = await supabaseServidor();
-  const [{ data: estacionesData }, { data: ejerciciosData }] = await Promise.all([
+  const [{ data: estacionesData }, { data: ejerciciosData }, { data: asignadas }] = await Promise.all([
     supabase.rpc('gym_stations', { p_gym_id: gym.gymId }),
     supabase.from('exercises').select('id, name, muscle_group').order('name'),
+    supabase.from('stations').select('id').eq('gym_id', gym.gymId).is('exercise_id', null),
   ]);
+  const sinEjercicio = new Set((asignadas ?? []).map((a) => a.id as string));
 
   const estaciones = (estacionesData as EstacionPanel[] | null) ?? [];
   const ejercicios = (ejerciciosData as { id: string; name: string; muscle_group: string | null }[] | null) ?? [];
@@ -40,6 +42,14 @@ export default async function Maquinas({
       }
     >
       {error && <p className="aviso aviso--error" style={{ marginTop: 20 }}>{decodeURIComponent(error)}</p>}
+
+      {sinEjercicio.size > 0 && (
+        <p className="aviso" style={{ marginTop: 20 }}>
+          {sinEjercicio.size === 1 ? 'Una máquina no tiene' : `${sinEjercicio.size} máquinas no tienen`} ejercicio
+          asignado: quien toque su sticker no puede registrar series. Tócala en la lista para asignárselo; el
+          sticker sigue sirviendo.
+        </p>
+      )}
 
       <div style={{ display: 'flex', gap: 14, marginTop: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
         <section className="carta" style={{ flexGrow: 1, flexBasis: 520, borderRadius: 17, padding: '18px 20px', minWidth: 0 }}>
@@ -67,7 +77,9 @@ export default async function Maquinas({
                 <tr key={e.id}>
                   <td style={{ fontWeight: 600 }}>{e.label}</td>
                   <td style={{ color: 'var(--tinta-2)' }}>
-                    {e.name}
+                    {sinEjercicio.has(e.id) ? (
+                      <a href={`/panel/maquinas/${e.id}`} className="insignia insignia--volt">Falta ejercicio</a>
+                    ) : e.name}
                     {e.zone && <div className="apunte" style={{ fontSize: 10.5 }}>{e.zone}</div>}
                   </td>
                   <td className="mono">{e.nfc_code ?? '—'}</td>
@@ -97,7 +109,10 @@ export default async function Maquinas({
                       </form>
                     )}
                   </td>
-                  <td className="der" style={{ paddingLeft: 8 }}>
+                  <td className="der" style={{ paddingLeft: 8, whiteSpace: 'nowrap' }}>
+                    <a href={`/panel/maquinas/${e.id}`} className="insignia insignia--gris" style={{ marginRight: 6 }}>
+                      Editar
+                    </a>
                     <BotonQuitar id={e.id} etiqueta={e.label} />
                   </td>
                 </tr>
@@ -124,8 +139,8 @@ export default async function Maquinas({
               </div>
               <div>
                 <label className="rotulo etiqueta" htmlFor="ejercicio">Ejercicio</label>
-                <select id="ejercicio" name="ejercicio" className="campo" defaultValue="">
-                  <option value="">— sin asignar —</option>
+                <select id="ejercicio" name="ejercicio" className="campo" defaultValue="" required>
+                  <option value="" disabled>Elige el ejercicio</option>
                   {ejercicios.map((ej) => (
                     <option key={ej.id} value={ej.id}>
                       {ej.name}{ej.muscle_group ? ` · ${ej.muscle_group}` : ''}

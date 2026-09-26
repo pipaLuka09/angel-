@@ -4,7 +4,7 @@ import { Cara } from '@/components/Cara';
 import { Barras, Mas, Nfc, Video } from '@/components/Iconos';
 import { fechaCorta, haceCuanto, peso, progresoMeta, diasHasta } from '@/lib/formato';
 import { estacionDelSticker, resumenDe } from './datos';
-import { NoEresSocio, StickerDesconocido } from './no-reconocido';
+import { NoEresSocio, SinEjercicio, StickerDesconocido } from './no-reconocido';
 
 export default async function Maquina({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params;
@@ -16,6 +16,8 @@ export default async function Maquina({ params }: { params: Promise<{ codigo: st
   // Se registra la lectura aunque no anote nada: es lo que deja
   // distinguir un sticker despegado de una máquina que nadie usa.
   await supabase.from('scans').insert({ station_id: estacion.station_id, user_id: usuario.id });
+
+  if (!estacion.exercise_id) return <SinEjercicio estacion={estacion} />;
 
   const resumen = estacion.exercise_id ? await resumenDe(supabase, estacion.exercise_id) : null;
   const ultima = resumen?.last ?? null;

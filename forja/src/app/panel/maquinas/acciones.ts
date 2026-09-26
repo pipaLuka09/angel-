@@ -63,11 +63,14 @@ export async function agregarMaquina(formData: FormData) {
   const zona = String(formData.get('zona') ?? '').trim();
 
   if (!etiqueta) volver('Ponle una etiqueta a la máquina, como "#23".');
+  // Sin ejercicio el socio toca el sticker y no tiene dónde guardar la
+  // serie.
+  if (!ejercicio) volver('Elige qué ejercicio se hace en esta máquina.');
 
   const supabase = await supabaseServidor();
   const { error } = await supabase.from('stations').insert({
     gym_id: gym.gymId,
-    exercise_id: ejercicio || null,
+    exercise_id: ejercicio,
     label: etiqueta,
     zone: zona || null,
     status: 'no_sticker',
@@ -108,6 +111,45 @@ export async function quitarMaquina(formData: FormData) {
     .eq('gym_id', gym.gymId);
 
   if (error) volver(error.message);
+
+  revalidatePath('/panel/maquinas');
+  revalidatePath('/panel/stickers');
+  revalidatePath('/panel/videos');
+  revalidatePath('/panel');
+  volver();
+}
+
+/**
+ * Corrige etiqueta, ejercicio o zona sin tocar el código: el sticker ya
+ * grabado sigue funcionando. Las series que ya se registraron conservan
+ * su ejercicio original (van desnormalizadas en sets.exercise_id).
+ */
+export async function editarMaquina(formData: FormData) {
+  const gym = await gymDelStaff();
+  if (!gym) volver();
+
+  const id = String(formData.get('id') ?? '');
+  const etiqueta = String(formData.get('etiqueta') ?? '').trim();
+  const ejercicio = String(formData.get('ejercicio') ?? '');
+  const zona = String(formData.get('zona') ?? '').trim();
+
+  const aqui = (error: string): never =>
+    redirect(`/panel/maquinas/${id}?error=${encodeURIComponent(error)}`);
+
+  if (!id) volver('Falta la máquina.');
+  if (!etiqueta) aqui('Ponle una etiqueta a la máquina, como "#23".');
+  if (!ejercicio) aqui('Elige qué ejercicio se hace en esta máquina.');
+
+  const supabase = await supabaseServidor();
+  const { error } = await supabase
+    .from('stations')
+    .update({ label: etiqueta, exercise_id: ejercicio, zone: zona || null })
+    .eq('id', id)
+    .eq('gym_id', gym.gymId);
+
+  if (error) {
+    aqui(error.code === '23505' ? `Ya existe otra máquina con la etiqueta ${etiqueta}.` : error.message);
+  }
 
   revalidatePath('/panel/maquinas');
   revalidatePath('/panel/stickers');

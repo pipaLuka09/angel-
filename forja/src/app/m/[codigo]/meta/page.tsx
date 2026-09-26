@@ -3,7 +3,7 @@ import { GraficaProgreso } from '@/components/GraficaProgreso';
 import { Atras, Flecha } from '@/components/Iconos';
 import { diasHasta, fechaCorta, fechaLarga, peso, progresoMeta } from '@/lib/formato';
 import { estacionDelSticker, resumenDe } from '../datos';
-import { NoEresSocio, StickerDesconocido } from '../no-reconocido';
+import { NoEresSocio, SinEjercicio, StickerDesconocido } from '../no-reconocido';
 import { fijarMeta } from './acciones';
 
 function enTresMeses(): string {
@@ -24,7 +24,8 @@ export default async function MetaPagina({
   const { supabase, estacion } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} codigo={codigo} />;
+  if (!estacion.is_member) return <NoEresSocio estacion={estacion} codigo={codigo} />;
+  if (!estacion.exercise_id) return <SinEjercicio estacion={estacion} />;
 
   const resumen = await resumenDe(supabase, estacion.exercise_id);
   const meta = resumen.goal;

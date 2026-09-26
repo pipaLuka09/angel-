@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Atras } from '@/components/Iconos';
 import { peso } from '@/lib/formato';
 import { estacionDelSticker, resumenDe } from '../datos';
-import { NoEresSocio, StickerDesconocido } from '../no-reconocido';
+import { NoEresSocio, SinEjercicio, StickerDesconocido } from '../no-reconocido';
 import { FormularioSerie } from './FormularioSerie';
 import { BotonBorrarSerie } from '@/components/BotonBorrarSerie';
 import { Basura } from '@/components/Iconos';
@@ -25,7 +25,8 @@ export default async function Registrar({
   const { supabase, estacion, usuario } = await estacionDelSticker(codigo);
 
   if (!estacion) return <StickerDesconocido />;
-  if (!estacion.is_member || !estacion.exercise_id) return <NoEresSocio estacion={estacion} codigo={codigo} />;
+  if (!estacion.is_member) return <NoEresSocio estacion={estacion} codigo={codigo} />;
+  if (!estacion.exercise_id) return <SinEjercicio estacion={estacion} />;
 
   const resumen = await resumenDe(supabase, estacion.exercise_id);
   const hoy = new Date().toISOString().slice(0, 10);
