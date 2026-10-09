@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<title>Compositor Tap Work</title>
+<link rel="stylesheet" href="fonts-video/local.css">
+<style>
+/* Lienzo de 1080x1920 a escala 1: lo que se ve aquí es exactamente el cuadro del
+   video. Nada se anima con CSS: renderAt(t) calcula cada propiedad a partir del
+   tiempo, así cada cuadro se puede capturar las veces que haga falta y sale igual. */
+:root{
+  --bg:#0b0c0f; --ink:#f2f3f4; --mute:#9aa0a6; --dim:#6b7076; --red:#ec3013;
+  --green:#1f9d6a; --mint:#63e6a8; --line:#24282c;
+  --sans:'Archivo',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;background:var(--bg);overflow:hidden}
+body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}
+.scene{position:absolute;inset:0;opacity:0}
+
+/* ── gancho ── */
+.hook{padding:0 84px;display:flex;flex-direction:column;justify-content:center}
+.hook .q{font-weight:800;font-size:112px;line-height:1.02;letter-spacing:-.038em}
+.hook .q .ln{display:block;white-space:nowrap}
+.hook .w{display:inline-block;margin-right:.24em}
+.hook .last{position:relative;display:inline-block;white-space:nowrap}
+.hook .strike{position:absolute;left:-4px;right:-6px;top:56%;height:11px;border-radius:6px;
+  background:var(--red);transform-origin:left center}
+.hook .sub{margin-top:54px;font-weight:500;font-size:44px;color:var(--mute);letter-spacing:-.01em}
+
+/* ── toque: el clip 3D a sangre ── */
+.tap img{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover}
+.tap .shade{position:absolute;left:0;right:0;top:0;height:420px;
+  background:linear-gradient(#0b0c0fcc,#0b0c0f00)}
+
+/* ── rótulos con barra roja ── */
+.lbl{position:absolute;left:62px;top:118px;display:flex;align-items:stretch;gap:24px}
+.lbl .bar{width:9px;border-radius:5px;background:var(--red);flex:none}
+.lbl .tx{font-weight:800;font-size:66px;line-height:1.08;letter-spacing:-.03em}
+.lbl.box{background:rgba(13,14,17,.86);border-radius:18px;padding:26px 34px 28px 28px;
+  box-shadow:0 18px 50px rgba(0,0,0,.35)}
+
+/* ── el teléfono ── */
+.phone{position:absolute;left:206px;top:400px;width:668px;height:1330px;border-radius:92px;
+  background:#16181a;padding:15px;border:2px solid #2c2f33;
+  box-shadow:0 50px 140px rgba(0,0,0,.65), inset 0 0 0 2px #0e0f11}
+.screen{position:relative;width:100%;height:100%;border-radius:78px;overflow:hidden;
+  background:radial-gradient(120% 70% at 50% 18%,#13201a 0%,#0e1311 55%,#0c0f0e 100%)}
+.screen.cool{background:radial-gradient(120% 70% at 50% 18%,#151b22 0%,#0f1216 55%,#0c0e11 100%)}
+.screen.warm{background:radial-gradient(120% 70% at 50% 18%,#221813 0%,#140f0d 55%,#0e0c0b 100%)}
+.notch{position:absolute;left:50%;top:30px;width:180px;height:48px;margin-left:-90px;
+  border-radius:24px;background:#000}
+.foot{position:absolute;left:0;right:0;bottom:62px;display:flex;align-items:center;
+  justify-content:center;gap:14px;font-weight:700;font-size:30px;color:#d8dbde}
+.foot svg{width:40px;height:40px}
+.in{position:absolute;left:54px;right:54px;top:150px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.in.left{align-items:stretch;text-align:left}
+
+.ic{width:236px;height:236px;border-radius:50%;display:grid;place-items:center;background:var(--green);
+  box-shadow:0 0 0 18px rgba(31,157,106,.12)}
+.ic svg{width:118px;height:118px}
+.h{margin-top:64px;font-weight:800;font-size:76px;letter-spacing:-.03em;line-height:1.05}
+.big{margin-top:22px;font-family:var(--mono);font-weight:700;font-size:104px;color:var(--mint);letter-spacing:-.02em}
+.nm{margin-top:42px;font-weight:700;font-size:46px;letter-spacing:-.01em}
+.meta{margin-top:12px;font-family:var(--mono);font-weight:500;font-size:28px;color:var(--mute);letter-spacing:.02em}
+.pill{margin-top:40px;align-self:center;display:inline-flex;align-items:center;gap:12px;padding:16px 30px;border-radius:999px;
+  background:rgba(31,157,106,.16);color:var(--mint);font-weight:700;font-size:34px}
+.pill i{width:14px;height:14px;border-radius:50%;background:currentColor}
+.eyb{font-family:var(--mono);font-weight:500;font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.ttl{margin-top:14px;font-weight:800;font-size:72px;letter-spacing:-.03em;line-height:1.02}
+.rows{margin-top:44px;display:flex;flex-direction:column}
+.row{display:flex;align-items:baseline;gap:20px;padding:24px 0;border-top:2px solid var(--line)}
+.row:first-child{border-top:0}
+.row .a{flex:1;min-width:0}
+.row .a b{display:block;font-weight:700;font-size:40px;letter-spacing:-.01em}
+.row .a span{display:block;margin-top:6px;font-size:27px;color:var(--mute)}
+.row .v{font-family:var(--mono);font-weight:700;font-size:38px;white-space:nowrap}
+.row .ok{color:var(--mint);font-size:28px;letter-spacing:.08em}
+.row .warn{color:#ff7a5a;font-size:28px;letter-spacing:.08em}
+.btn{margin-top:46px;padding:32px;border-radius:26px;text-align:center;font-weight:800;font-size:38px;
+  background:var(--ink);color:#0b0c0f}
+.btn.red{background:var(--red);color:#fff}
+.btn.ghost{background:transparent;border:3px solid #3a3e43;color:var(--ink)}
+.tag{align-self:flex-start;padding:10px 20px;border-radius:8px;background:var(--red);color:#fff;
+  font-family:var(--mono);font-weight:700;font-size:24px;letter-spacing:.12em}
+.alert{margin-top:34px;padding:26px 30px;border-radius:20px;background:#b8240e}
+.alert small{display:block;font-family:var(--mono);font-size:24px;letter-spacing:.14em;opacity:.85}
+.alert b{display:block;margin-top:6px;font-weight:800;font-size:40px}
+.stars{margin-top:46px;display:flex;justify-content:center;gap:16px}
+.stars svg{width:96px;height:96px}
+.chips{margin-top:40px;display:flex;gap:16px}
+.chip{flex:1;padding:26px 0;border-radius:22px;border:3px solid #33373c;text-align:center}
+.chip b{display:block;font-weight:800;font-size:40px}
+.chip span{display:block;margin-top:4px;font-family:var(--mono);font-size:26px;color:var(--mute)}
+.chip.on{border-color:#ff3ea5;background:rgba(255,62,165,.12)}
+.mono-xl{margin-top:30px;font-family:var(--mono);font-weight:700;font-size:96px;letter-spacing:.06em;color:#4a4f55;position:relative}
+.mono-xl .x{position:absolute;left:-10px;right:-10px;top:52%;height:9px;border-radius:5px;background:var(--red);transform-origin:left}
+.old{font-family:var(--mono);font-weight:700;font-size:58px;color:#5a5f65;position:relative;display:inline-block}
+.old .x{position:absolute;left:-6px;right:-6px;top:52%;height:7px;border-radius:4px;background:var(--red);transform-origin:left}
+.mono{font-family:var(--mono)}
+.monog{font-family:Georgia,'Times New Roman',serif;font-size:150px;line-height:1;color:#c8a96a;letter-spacing:-.04em}
+.serif-name{margin-top:18px;font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:70px;letter-spacing:-.01em}
+.radio{width:40px;height:40px;border-radius:50%;border:4px solid #4a4f55;flex:none;align-self:center}
+.radio.on{border-color:var(--mint);box-shadow:inset 0 0 0 8px #0e1311;background:var(--mint)}
+
+/* ── cierre ── */
+.end{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.end svg.mk{width:230px;height:230px}
+.end .brand{margin-top:6px;font-weight:800;font-size:96px;letter-spacing:-.035em}
+.end .tl{margin-top:44px;font-weight:800;font-size:66px;letter-spacing:-.03em}
+.end .tl em{font-style:normal;color:var(--red)}
+.end .sb{margin-top:22px;font-weight:500;font-size:38px;color:var(--mute);max-width:860px;line-height:1.3}
+.end .wa{margin-top:70px;padding:26px 64px 30px;border-radius:999px;background:#fff;color:#0b0c0f}
+.end .wa small{display:block;font-weight:700;font-size:24px;letter-spacing:.18em;color:#6b7076}
+.end .wa b{display:block;margin-top:4px;font-weight:800;font-size:58px;letter-spacing:-.02em}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+
+<script>
+"use strict";
+var FPS = 24;
+// Duración de cada bloque. Los cruces de 0,3 s se montan encima del corte.
+var T = {hook:[0,3.6], tap:[3.6,7.0], r1:[7.0,10.6], r2:[10.6,14.0], end:[14.0,17.6]};
+var XF = 0.32, TOTAL = 17.6;
+
+var MARK = '<svg class="mk" viewBox="0 0 100 100" aria-hidden="true">'
+  + '<rect x="15" y="26" width="48" height="13.5" rx="1.5" fill="#f2f3f4"/>'
+  + '<rect x="32.2" y="26" width="13.6" height="45" rx="1.5" fill="#f2f3f4"/>'
+  + '<g fill="none" stroke="#f2f3f4" stroke-width="7.5" stroke-linecap="round">'
+  + '<path d="M69 37.5a16.5 16.5 0 0 1 0 22"/><path d="M81 30a30 30 0 0 1 0 37"/></g>'
+  + '<rect x="15" y="79" width="70" height="7.5" rx="3.75" fill="#ec3013"/></svg>';
+var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+var STAR = function(c){ return '<svg viewBox="0 0 24 24"><path fill="'+c+'" d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z"/></svg>'; };
+var WIFI = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M2.5 9a14 14 0 0 1 19 0"/><path d="M5.8 12.5a9.4 9.4 0 0 1 12.4 0"/><path d="M9.2 16a4.6 4.6 0 0 1 5.6 0"/><circle cx="12" cy="19.4" r="1.2" fill="#fff"/></svg>';
+var PHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h3.2l1.6 4.2-2 1.4a11 11 0 0 0 5.1 5.1l1.4-2 4.2 1.6V17a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 3 5.7 2 2 0 0 1 5 3.5z"/></svg>';
+var FOOT = '<div class="foot">'+MARK.replace('class="mk"','')+'Tap Work</div>';
+
+/* Cada elemento con data-d aparece d segundos después de que arranca su bloque;
+   data-pop además rebota la escala. data-x dibuja una tachadura de izquierda a derecha. */
+var P = {
+ menu:{
+  hook:['¿Todavía','cambias los','precios','con corrector?'],
+  tap:'Acerca el celular.',
+  r1:{l:['Se abre','el menú.'], s:'warm', h:
+   '<div class="in left">'
+   +'<div class="eyb" data-d=".35">Menú del día</div>'
+   +'<div class="ttl" data-d=".42">Almuerzos</div>'
+   +'<div class="rows">'
+   +'<div class="row" data-d=".55"><div class="a"><b>Encebollado</b><span>Albacora, yuca, chifle</span></div><div class="v">$4,50</div></div>'
+   +'<div class="row" data-d=".65"><div class="a"><b>Seco de pollo</b><span>Arroz, maduro, ensalada</span></div><div class="v">$5,50</div></div>'
+   +'<div class="row" data-d=".75"><div class="a"><b>Bolón mixto</b><span>Queso y chicharrón</span></div><div class="v">$3,00</div></div>'
+   +'<div class="row" data-d=".85"><div class="a"><b>Jugo natural</b><span>Fruta del día</span></div><div class="v">$1,50</div></div>'
+   +'</div></div>'},
+  r2:{l:['Cambias un precio','desde tu celular.'], s:'warm', h:
+   '<div class="in">'
+   +'<div class="eyb" data-d=".35">Editar precio</div>'
+   +'<div class="ttl" data-d=".42">Seco de pollo</div>'
+   +'<div style="margin-top:70px" data-d=".6"><span class="old">$5,50<span class="x" data-x="1.05"></span></span></div>'
+   +'<div class="big" data-pop="1.4" style="color:#fff">$6,00</div>'
+   +'<div class="pill" data-d="1.8"><i></i>Ya se ve en todas las mesas</div>'
+   +'</div>'},
+  end:'Menú digital por NFC para tu restaurante'
+ },
+ resenas:{
+  hook:['¿Todavía','pides','reseñas','de palabra?'],
+  tap:'Acerca el celular.',
+  r1:{l:['Se abre','tu Google.'], s:'cool', h:
+   '<div class="in">'
+   +'<div class="eyb" data-d=".35">Google · Reseñas</div>'
+   +'<div class="ttl" data-d=".42" style="font-size:62px">Cafetería · Machala</div>'
+   +'<div class="stars"><span data-pop=".8">'+STAR('#fbbc04')+'</span><span data-pop=".95">'+STAR('#fbbc04')+'</span><span data-pop="1.1">'+STAR('#fbbc04')+'</span><span data-pop="1.25">'+STAR('#fbbc04')+'</span><span data-pop="1.4">'+STAR('#fbbc04')+'</span></div>'
+   +'<div class="meta" data-d=".6" style="margin-top:34px">Califica tu experiencia</div>'
+   +'<div class="btn" data-d="1.7" style="align-self:stretch;margin-top:90px;background:#4a8af4;color:#fff">Publicar reseña</div>'
+   +'</div>'},
+  r2:{l:['Una reseña','en diez segundos.'], s:'', h:
+   '<div class="in">'
+   +'<div class="ic" data-pop=".4">'+CHECK+'</div>'
+   +'<div class="h" data-d=".6">¡Gracias!</div>'
+   +'<div class="nm" data-d=".7">Tu reseña se publicó</div>'
+   +'<div class="stars" style="gap:10px;margin-top:30px" data-d=".8">'+[1,2,3,4,5].map(function(){return '<span style="width:62px;height:62px;display:inline-block">'+STAR('#fbbc04')+'</span>';}).join('')+'</div>'
+   +'<div class="pill" data-d="1.0"><i></i>Visible en Google</div>'
+   +'</div>'},
+  end:'Reseñas de Google por NFC para tu negocio'
+ },
+ tarjeta:{
+  hook:['¿Todavía','repartes','tarjetas','de papel?'],
+  tap:'Acerca el celular.',
+  r1:{l:['Tu contacto,','en su celular.'], s:'warm', h:
+   '<div class="in left">'
+   +'<div class="monog" data-d=".35">TS</div>'
+   +'<div class="serif-name" data-d=".45">Tania Sánchez</div>'
+   +'<div class="eyb" data-d=".52" style="margin-top:10px">Asesora de seguros</div>'
+   +'<div class="rows" style="margin-top:34px">'
+   +'<div class="row" data-d=".65"><div class="a"><b>Seguro de vida</b></div><div class="v ok" style="color:var(--mute)">FAMILIAR</div></div>'
+   +'<div class="row" data-d=".75"><div class="a"><b>Salud y medicina</b></div><div class="v ok" style="color:var(--mute)">INDIVIDUAL</div></div>'
+   +'<div class="row" data-d=".85"><div class="a"><b>Vehículos</b></div><div class="v ok" style="color:var(--mute)">TODO RIESGO</div></div>'
+   +'</div>'
+   +'<div class="btn red" data-d="1.05">Escribir por WhatsApp</div>'
+   +'</div>'},
+  r2:{l:['Lo guarda','con un toque.'], s:'', h:
+   '<div class="in">'
+   +'<div class="ic" data-pop=".4">'+CHECK+'</div>'
+   +'<div class="h" data-d=".6">Contacto guardado</div>'
+   +'<div class="nm" data-d=".7">Tania Sánchez</div>'
+   +'<div class="meta" data-d=".75">Asesora de seguros</div>'
+   +'<div class="pill" data-d=".95"><i></i>Ya está en sus contactos</div>'
+   +'</div>'},
+  end:'Tarjeta de presentación NFC para profesionales'
+ },
+ wifi:{
+  hook:['¿El Wi-Fi','todavía','se pide','al mesero?'],
+  tap:'Acerca el celular.',
+  r1:{l:['Se conecta','solo.'], s:'cool', h:
+   '<div class="in">'
+   +'<div class="ic" data-pop=".4" style="background:#1e7fa8;box-shadow:0 0 0 18px rgba(30,127,168,.14)">'+WIFI+'</div>'
+   +'<div class="h" data-d=".6">¡Conectado!</div>'
+   +'<div class="meta" data-d=".68" style="margin-top:18px">Sin escribir la contraseña</div>'
+   +'<div class="rows" style="align-self:stretch;margin-top:60px">'
+   +'<div class="row" data-d=".85"><div class="a"><b>INVITADOS</b><span>Conectado</span></div><div class="v ok">EXCELENTE</div></div>'
+   +'</div></div>'},
+  r2:{l:['Ni pedirla','al mesero.'], s:'cool', h:
+   '<div class="in">'
+   +'<div class="eyb" data-d=".35">Contraseña</div>'
+   +'<div class="mono-xl" data-d=".5">••••••••<span class="x" data-x="1.0"></span></div>'
+   +'<div class="h" data-d="1.3" style="margin-top:70px">No hace falta.</div>'
+   +'<div class="pill" data-d="1.55"><i></i>Se conecta con un toque</div>'
+   +'</div>'},
+  end:'Wi-Fi por NFC para tu local'
+ },
+ pago:{
+  hook:['¿Para pagar','todavía hay','que llamar','al mesero?'],
+  tap:'Acerca el celular.',
+  r1:{l:['Paga desde','su celular.'], s:'', h:
+   '<div class="in">'
+   +'<div class="ic" data-pop=".4">'+CHECK+'</div>'
+   +'<div class="h" data-d=".6">Pago enviado</div>'
+   +'<div class="big" data-d=".7">$ 48,90</div>'
+   +'<div class="rows" style="align-self:stretch;margin-top:30px">'
+   +'<div class="row" data-d=".85"><div class="a"><b>Para</b></div><div class="v" style="font-size:32px">Restaurante · Mesa 4</div></div>'
+   +'<div class="row" data-d=".95"><div class="a"><b>Hora</b></div><div class="v" style="font-size:32px">12:25</div></div>'
+   +'</div></div>'},
+  r2:{l:['Y deja','la propina.'], s:'', h:
+   '<div class="in left">'
+   +'<div class="eyb" data-d=".35">Propina</div>'
+   +'<div class="ttl" data-d=".42">¿Cuánto dejas?</div>'
+   +'<div class="chips">'
+   +'<div class="chip" data-d=".6"><b>10%</b><span>$4,89</span></div>'
+   +'<div class="chip on" data-d=".7"><b>15%</b><span>$7,34</span></div>'
+   +'<div class="chip" data-d=".8"><b>Otro</b><span>—</span></div>'
+   +'</div>'
+   +'<div class="big" data-pop="1.15" style="color:#fff;text-align:center;margin-top:70px">$ 7,34</div>'
+   +'<div class="btn" data-d="1.4" style="background:#ff3ea5;color:#fff">Confirmar propina</div>'
+   +'</div>'},
+  end:'Pagos y propinas por NFC para tu negocio'
+ },
+ gym:{
+  hook:['¿Tus socios','todavía','anotan','en papel?'],
+  tap:'Acerca el celular.',
+  r1:{l:['Su rutina,','en la máquina.'], s:'', h:
+   '<div class="in left">'
+   +'<div class="eyb" data-d=".35">Ejercicio 07 · Pierna</div>'
+   +'<div class="ttl" data-d=".42">Prensa de pierna</div>'
+   +'<div class="rows">'
+   +'<div class="row" data-d=".6"><div class="a"><b>Serie 1</b><span>12 repeticiones</span></div><div class="v">40 kg</div></div>'
+   +'<div class="row" data-d=".7"><div class="a"><b>Serie 2</b><span>10 repeticiones</span></div><div class="v">50 kg</div></div>'
+   +'<div class="row" data-d=".8"><div class="a"><b>Serie 3</b><span>8 repeticiones</span></div><div class="v">60 kg</div></div>'
+   +'</div>'
+   +'<div class="btn ghost" data-d="1.0">Ver cómo se hace</div>'
+   +'</div>'},
+  r2:{l:['Cada serie,','registrada.'], s:'', h:
+   '<div class="in">'
+   +'<div class="ic" data-pop=".4">'+CHECK+'</div>'
+   +'<div class="h" data-d=".6">Serie registrada</div>'
+   +'<div class="big" style="white-space:nowrap" data-d=".7">8 × 60<small style="font-size:.55em"> kg</small></div>'
+   +'<div class="nm" data-d=".8">Prensa de pierna</div>'
+   +'<div class="pill" data-d="1.0"><i></i>Serie 3 de 3</div>'
+   +'</div>'},
+  end:'Registro de rutinas por NFC para tu gimnasio'
+ },
+ mascotas:{
+  hook:['¿La placa','de tu perro','solo dice','su nombre?'],
+  tap:'Acerca el celular.',
+  r1:{l:['Su ficha,','completa.'], s:'warm', h:
+   '<div class="in left">'
+   +'<div class="tag" data-d=".35">FICHA ABIERTA POR NFC</div>'
+   +'<div class="ttl" data-d=".42" style="margin-top:26px">Milo</div>'
+   +'<div class="meta" data-d=".48" style="margin-top:6px">Golden Retriever · 4 años · 28 kg</div>'
+   +'<div class="rows" style="margin-top:26px">'
+   +'<div class="row" data-d=".6"><div class="a"><b>Rabia</b></div><div class="v ok">AL DÍA</div></div>'
+   +'<div class="row" data-d=".68"><div class="a"><b>Parvovirus</b></div><div class="v ok">AL DÍA</div></div>'
+   +'<div class="row" data-d=".76"><div class="a"><b>Refuerzo múltiple</b></div><div class="v warn">EN 2 MESES</div></div>'
+   +'</div>'
+   +'<div class="alert" data-d=".95"><small>ALERGIAS</small><b>Pollo · Antiinflamatorios</b></div>'
+   +'</div>'},
+  r2:{l:['Y cómo','avisarte.'], s:'warm', h:
+   '<div class="in">'
+   +'<div class="ic" data-pop=".4" style="background:var(--red);box-shadow:0 0 0 18px rgba(236,48,19,.14)">'+PHONE+'</div>'
+   +'<div class="h" data-d=".6">¿Encontraste a Milo?</div>'
+   +'<div class="meta" data-d=".68" style="margin-top:18px">Avísale a su familia</div>'
+   +'<div class="btn" data-d=".9" style="align-self:stretch;margin-top:70px;background:var(--green);color:#fff">Llamar a su familia</div>'
+   +'<div class="btn ghost" data-d="1.05" style="align-self:stretch;margin-top:22px">Escribir por WhatsApp</div>'
+   +'</div>'},
+  end:'Collar NFC para tu mascota'
+ },
+ acrilico:{
+  hook:['¿Tus acrílicos','todavía','solo tienen','un QR?'],
+  tap:'Acerca el celular.',
+  r1:{l:['El acrílico','que ya tienes.'], s:'cool', h:
+   '<div class="in">'
+   +'<div class="eyb" data-d=".35" style="color:#5fd4d4">Acrílico actualizado</div>'
+   +'<div class="ttl" data-d=".42">Menú del día</div>'
+   +'<div class="meta" data-d=".5" style="margin-top:18px">Mismo acrílico, ahora con NFC</div>'
+   +'<div class="ic" data-pop=".75" style="margin-top:80px;background:#1e8a8a;box-shadow:0 0 0 18px rgba(30,138,138,.14)">'+CHECK+'</div>'
+   +'<div class="btn" data-d="1.0" style="align-self:stretch;margin-top:80px;background:#5fd4d4;color:#0b0c0f">Abrir menú</div>'
+   +'</div>'},
+  r2:{l:['Abre lo que','tú decidas.'], s:'cool', h:
+   '<div class="in left">'
+   +'<div class="eyb" data-d=".35">Este acrílico abre</div>'
+   +'<div class="rows" style="margin-top:20px">'
+   +'<div class="row" data-d=".55" style="align-items:center"><div class="radio on"></div><div class="a"><b>El menú</b><span>Carta actualizada</span></div></div>'
+   +'<div class="row" data-d=".65" style="align-items:center"><div class="radio"></div><div class="a"><b>El pago</b><span>Transferencia o propina</span></div></div>'
+   +'<div class="row" data-d=".75" style="align-items:center"><div class="radio"></div><div class="a"><b>Tu reseña</b><span>Google</span></div></div>'
+   +'</div>'
+   +'<div class="pill" data-d="1.0"><i></i>Lo cambias cuando quieras</div>'
+   +'</div>'},
+  end:'Chip NFC para el acrílico que ya tienes'
+ }
+};
+
+/* ── utilidades de tiempo ── */
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+function ramp(t,a,b){ return clamp((t-a)/(b-a), 0, 1); }
+function out3(p){ return 1 - Math.pow(1-p, 3); }
+function back(p){ var c=1.55; return 1 + (c+1)*Math.pow(p-1,3) + c*Math.pow(p-1,2); }
+
+var KEY = new URLSearchParams(location.search).get('k') || 'menu';
+var D = P[KEY];
+var stage = document.getElementById('stage');
+var clipImgs = [];
+
+function label(lines, boxed){
+  return '<div class="lbl'+(boxed?' box':'')+'"><div class="bar"></div><div class="tx">'
+    + lines.map(function(l){ return '<div>'+l+'</div>'; }).join('') + '</div></div>';
+}
+
+function build(){
+  var lines = D.hook;
+  var words = [];
+  var q = lines.map(function(ln, i){
+    var last = i === lines.length - 1;
+    if (last) {
+      words.push(null);
+      return '<span class="ln"><span class="last" data-w="'+(words.length-1)+'">'+ln+'<span class="strike" id="strike"></span></span></span>';
+    }
+    return '<span class="ln">' + ln.split(' ').map(function(w){
+      words.push(w); return '<span class="w" data-w="'+(words.length-1)+'">'+w+'</span>';
+    }).join('') + '</span>';
+  }).join('');
+
+  stage.innerHTML =
+    '<div class="scene hook" id="s-hook"><div class="q">'+q+'</div><div class="sub" id="hsub">Hay una forma más simple.</div></div>'
+  + '<div class="scene tap" id="s-tap"><img id="clip" alt=""><div class="shade"></div>'+label([D.tap], true)+'</div>'
+  + '<div class="scene" id="s-r1">'+label(D.r1.l)+'<div class="phone"><div class="screen '+D.r1.s+'"><div class="notch"></div>'+D.r1.h+FOOT+'</div></div></div>'
+  + '<div class="scene" id="s-r2">'+label(D.r2.l)+'<div class="phone"><div class="screen '+D.r2.s+'"><div class="notch"></div>'+D.r2.h+FOOT+'</div></div></div>'
+  + '<div class="scene end" id="s-end">'+MARK
+  + '<div class="brand" id="e1">Tap Work</div>'
+  + '<div class="tl" id="e2">Un toque hace <em>el trabajo</em>.</div>'
+  + '<div class="sb" id="e3">'+D.end+'</div>'
+  + '<div class="wa" id="e4"><small>ESCRÍBENOS POR WHATSAPP</small><b>096 779 4882</b></div></div>';
+}
+
+function preload(){
+  var ps = [];
+  for (var i = 1; i <= 78; i++){
+    var im = new Image();
+    im.src = 'frames/'+KEY+'/f'+String(i).padStart(4,'0')+'.jpg';
+    clipImgs.push(im);
+    ps.push(im.decode().catch(function(){}));
+  }
+  return Promise.all(ps).then(function(){ return document.fonts.ready; });
+}
+
+function sceneOpacity(t, k){
+  var s = T[k][0], e = T[k][1];
+  var a = (k === 'hook') ? 1 : ramp(t, s, s + XF);
+  var b = (k === 'end') ? 1 : 1 - ramp(t, e, e + XF);
+  return a * b;
+}
+
+function animateInside(scene, t, s){
+  [].forEach.call(scene.querySelectorAll('[data-d]'), function(el){
+    var d = parseFloat(el.getAttribute('data-d'));
+    var p = out3(ramp(t, s + d, s + d + 0.42));
+    el.style.opacity = p;
+    el.style.transform = 'translateY(' + ((1-p)*22).toFixed(2) + 'px)';
+  });
+  [].forEach.call(scene.querySelectorAll('[data-pop]'), function(el){
+    var d = parseFloat(el.getAttribute('data-pop'));
+    var r = ramp(t, s + d, s + d + 0.5);
+    el.style.opacity = clamp(r*2.2, 0, 1);
+    el.style.transform = 'scale(' + (0.55 + 0.45*back(r)).toFixed(4) + ')';
+    if (!el.style.display) el.style.display = el.tagName === 'SPAN' ? 'inline-block' : '';
+  });
+  [].forEach.call(scene.querySelectorAll('[data-x]'), function(el){
+    var d = parseFloat(el.getAttribute('data-x'));
+    el.style.transform = 'scaleX(' + out3(ramp(t, s + d, s + d + 0.38)).toFixed(4) + ')';
+  });
+}
+
+window.renderAt = function(t){
+  ['hook','tap','r1','r2','end'].forEach(function(k){
+    document.getElementById('s-'+k).style.opacity = sceneOpacity(t, k).toFixed(4);
+  });
+
+  // gancho: palabra por palabra, de borroso a nítido
+  [].forEach.call(document.querySelectorAll('#s-hook [data-w]'), function(el){
+    var i = parseInt(el.getAttribute('data-w'), 10);
+    var p = out3(ramp(t, 0.08 + i*0.07, 0.08 + i*0.07 + 0.5));
+    el.style.opacity = p;
+    el.style.filter = 'blur(' + ((1-p)*9).toFixed(2) + 'px)';
+    el.style.transform = 'translateY(' + ((1-p)*34).toFixed(2) + 'px)';
+  });
+  document.getElementById('strike').style.transform = 'scaleX(' + out3(ramp(t, 1.45, 1.9)).toFixed(4) + ')';
+  var hs = out3(ramp(t, 2.1, 2.6));
+  var sub = document.getElementById('hsub');
+  sub.style.opacity = hs; sub.style.transform = 'translateY(' + ((1-hs)*18).toFixed(2) + 'px)';
+
+  // toque: el clip 3D cuadro por cuadro; se queda en el último si el bloque es más largo
+  var fi = clamp(Math.floor((t - T.tap[0]) * FPS), 0, clipImgs.length - 1);
+  var img = document.getElementById('clip');
+  if (img.getAttribute('src') !== clipImgs[fi].src) img.src = clipImgs[fi].src;
+  var lt = out3(ramp(t, T.tap[0] + 0.15, T.tap[0] + 0.6));
+  var lb = document.querySelector('#s-tap .lbl');
+  lb.style.opacity = lt; lb.style.transform = 'translateX(' + ((1-lt)*-40).toFixed(2) + 'px)';
+
+  // resultado y beneficio
+  ['r1','r2'].forEach(function(k){
+    var s = T[k][0], sc = document.getElementById('s-'+k);
+    var l = out3(ramp(t, s + 0.1, s + 0.55));
+    var lab = sc.querySelector('.lbl');
+    lab.style.opacity = l; lab.style.transform = 'translateX(' + ((1-l)*-40).toFixed(2) + 'px)';
+    var ph = out3(ramp(t, s + 0.05, s + 0.65));
+    var phone = sc.querySelector('.phone');
+    phone.style.opacity = ph; phone.style.transform = 'translateY(' + ((1-ph)*90).toFixed(2) + 'px)';
+    animateInside(sc, t, s);
+  });
+
+  // cierre
+  var s = T.end[0];
+  var mk = out3(ramp(t, s + 0.12, s + 0.62));
+  var m = document.querySelector('#s-end svg.mk');
+  m.style.opacity = mk; m.style.transform = 'scale(' + (0.82 + 0.18*mk).toFixed(4) + ')';
+  [['e1',.3],['e2',.48],['e3',.62],['e4',.8]].forEach(function(x){
+    var p = out3(ramp(t, s + x[1], s + x[1] + 0.45)), el = document.getElementById(x[0]);
+    el.style.opacity = p; el.style.transform = 'translateY(' + ((1-p)*24).toFixed(2) + 'px)';
+  });
+};
+
+window.__total = TOTAL;
+window.__ready = (function(){ build(); return preload().then(function(){ window.renderAt(0); return true; }); })();
+</script>
+</body></html>

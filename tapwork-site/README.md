@@ -74,3 +74,13 @@ archivos o las capturas salen de una copia vieja. El script hace justo eso:
 ## Pendiente
 
 - Faltan los enlaces de Instagram / TikTok / Facebook (hoy dicen "pendiente").
+
+## Página de reels (`buildreels.py`)
+
+    python3 buildreels.py   # reels/v/ + assets/*.min.js -> sitio/
+
+Un video vertical por producto (ver `reels/README.md`), en una pared de tres
+columnas, con la capa de movimiento del tema ShopNow (`reels/motion.js`, mismos
+tiempos que `assets/motion.js`). `sitio/` es la carpeta que se arrastra a
+Netlify Drop; `sitio/preview.html` es la misma página sin el `<html>`, para la
+vista previa en claude.ai.
