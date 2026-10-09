@@ -92,6 +92,10 @@ Cuatro páginas sobre un mismo fondo:
   especificaciones están en `SPECS` de `buildsitio.py`: solo datos ciertos
   (formato, qué abre, NFC); medidas, materiales y demás se agregan ahí.
 - El collar para mascotas sale como "Aún estamos trabajando en ello" (`SOON`).
+- La tienda vende productos; los sistemas (asistencia, gimnasios) quedan fuera
+  (`NOT_IN_SHOP`) porque tienen su propia página.
+- `fotos/`: fotos y videos reales de los productos, en 4:5. Donde existen
+  (`REAL` en `buildsitio.py`) reemplazan al render 3D y al reel generado.
 - Arriba a la izquierda va el logo real: el monograma TP de `print/monograma.py`
   con el wordmark en Montserrat, como en la tarjeta.
 

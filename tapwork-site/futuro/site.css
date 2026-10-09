@@ -124,6 +124,7 @@ main { overflow-x: hidden; overflow-x: clip; }
 .h2 { margin: 0; font-size: clamp(36px, 5.2vw, 76px); font-weight: 800; font-stretch: 118%; letter-spacing: -.045em;
   line-height: .98; text-wrap: balance; }
 .h2 .it { font-size: 1.08em; letter-spacing: -.02em; }
+.intro a { color: var(--cream); }
 .intro { margin: 20px 0 0; max-width: 54ch; font-size: 17px; line-height: 1.6; color: var(--soft); }
 .panel { padding: clamp(26px, 4vw, 52px); }
 .narrow { max-width: 920px; }
@@ -331,7 +332,7 @@ dialog.sheet::backdrop { background: rgba(3, 10, 26, .7); backdrop-filter: blur(
 .sheet__in { display: grid; gap: 26px; padding: 16px; border-radius: 28px; background: rgba(8, 22, 48, .82); border: 1px solid var(--edge);
   backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); max-height: calc(100dvh - 24px); overflow: auto; }
 @media (min-width: 860px) { .sheet__in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 20px 36px 20px 20px; gap: 36px; } }
-.sheet__view { position: relative; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: #0b0c0f; }
+.sheet__view { position: relative; aspect-ratio: 4 / 5; max-height: 72dvh; margin-inline: auto; border-radius: 20px; overflow: hidden; background: #0b0c0f; }
 .sheet__view img, .sheet__view video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .sheet__view video { object-fit: contain; background: #000; }
 .sheet__thumbs { display: flex; gap: 10px; margin-top: 10px; }

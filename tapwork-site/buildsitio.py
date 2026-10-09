@@ -32,6 +32,7 @@ SRC = os.path.join(ROOT, 'futuro')
 OUT = os.path.join(ROOT, 'sitio')
 REELS = os.path.join(ROOT, 'reels', 'v')
 STILLS = os.path.join(ROOT, 'img1080')
+PHOTOS = os.path.join(ROOT, 'fotos')
 FONTS = os.path.join(ROOT, 'reels', 'fonts')
 
 REEL = {'pagos': 'pago', 'gimnasios': 'gym'}
@@ -136,6 +137,17 @@ SPECS = {
     'acrilico': [('Formato', 'Chip NFC que va detrás de tu acrílico actual'),
                  ('Abre', 'Tu menú, tu pago o tu reseña, lo que tú decidas')],
 }
+# The shop sells products; the systems (attendance, gyms) have their own pages.
+NOT_IN_SHOP = {'asistencia', 'gimnasios'}
+
+# Real photos and footage of the product, in fotos/ (4:5). They replace the 3D
+# render and the generated reel wherever they exist.
+REAL = {
+    'menu': {'img': 'menu.jpg', 'reel': 'menu.mp4'},          # the "Carta Digital" acrylic, tapped
+    'tarjeta': {'img': 'tarjeta.jpg', 'reel': 'tarjeta.mp4'},  # Tania Sánchez's card, tapped
+    'resenas': {'img': 'resenas.jpg'},                         # the Google reviews acrylic
+}
+
 # Products with a page of their own.
 PAGE_OF = {'asistencia': 'asistencia.html', 'gimnasios': 'gimnasio.html'}
 
@@ -216,35 +228,40 @@ def build(out=OUT, fondo=None):
 
     # The shop: one card per product, and the full sheet as JSON for the drawer.
     shop, sheet = [], {}
-    for (sid, label, sname, _), pid in order:
+    shop_order = [(seg, pid) for seg, pid in order if pid not in NOT_IN_SHOP]
+    for (sid, label, sname, _), pid in shop_order:
         p = byid[pid]
         v = REEL.get(pid, p['img'])
         name = cat.sentence(p['label'])
         soon = pid in SOON
+        real = REAL.get(pid, {})
+        photo = 'v/real-' + real['img'] if 'img' in real else 'v/p-%s.webp' % p['img']
+        reel = 'v/real-' + real['reel'] if 'reel' in real else 'v/%s.mp4' % v
         sheet[pid] = dict(
             name=name, code=p['code'].upper(), kind=cat.sentence(p['kind']), seg=sname,
             client=p['client'][0].upper() + p['client'][1:], text=cat.sentence(p['benefit']),
-            specs=SPECS[pid] + COMMON_SPECS, img='v/p-%s.webp' % p['img'], reel='v/%s.mp4' % v,
-            poster='v/%s.jpg' % v, soon=soon, page=PAGE_OF.get(pid, ''),
+            specs=SPECS[pid] + COMMON_SPECS, img=photo, reel=reel,
+            poster=photo if 'reel' in real else 'v/%s.jpg' % v, soon=soon, page=PAGE_OF.get(pid, ''),
             cta='Avísame cuando esté listo' if soon else cat.sentence(p['cta']),
             wa=cat.wa_link('Hola, me interesa el collar NFC para mascotas, avísenme cuando esté listo' if soon
                            else 'Hola, ' + p['cta']))
         shop.append(
             '        <article class="item%s" data-seg="%s" data-id="%s">\n'
             '          <button class="item__media" type="button" aria-label="Ver detalles de %s">\n'
-            '            <img src="v/p-%s.webp" width="1080" height="1080" loading="lazy" alt="%s: %s">\n'
-            '            <video muted loop playsinline preload="none" aria-hidden="true"><source src="v/%s.mp4" type="video/mp4"></video>\n'
+            '            <img src="%s" loading="lazy" alt="%s: %s">\n'
+            '            <video muted loop playsinline preload="none" aria-hidden="true"><source src="%s" type="video/mp4"></video>\n'
             '            <span class="item__tag mono">%s</span>%s\n'
             '          </button>\n'
             '          <div class="item__body"><h3>%s</h3><p>%s</p>\n'
             '            <button class="item__more" type="button">Ver detalles %s</button></div>\n'
             '        </article>' % (
-                ' is-soon' if soon else '', sid, pid, esc(name), p['img'], esc(name), esc(cat.sentence(p['kind'])),
-                v, esc(p['code'].upper()), ' <span class="item__soon mono">Próximamente</span>' if soon else '',
+                ' is-soon' if soon else '', sid, pid, esc(name), photo, esc(name), esc(cat.sentence(p['kind'])),
+                reel, esc(p['code'].upper()), ' <span class="item__soon mono">Próximamente</span>' if soon else '',
                 esc(name), esc(cat.sentence(p['kind'])), ARROW))
+    in_shop = [(sid, label, [i for i in ids if i not in NOT_IN_SHOP]) for sid, label, _, ids in SEGMENTS]
     shop_segs = '\n'.join(
         '        <button type="button" data-seg="%s">%s <small>%d</small></button>' % (sid, label, len(ids))
-        for sid, label, _, ids in SEGMENTS)
+        for sid, label, ids in in_shop if ids)
 
     logo = ('<span class="logo"><span class="logo__mark">%s</span><span class="logo__word">TAP <b>WORK</b></span></span>'
             % monograma.svg('#E30613', 'plata-logo', [('0%', '#F4F6F8'), ('46%', '#C3CAD1'), ('100%', '#E6EAED')]))
@@ -267,7 +284,7 @@ def build(out=OUT, fondo=None):
         leftsm=svg('M19 12H5M11 6l-6 6 6 6', 16), badge=BADGE,
         walink=esc(cat.wa_link('Hola, quiero cotizar productos NFC de Tap Work')),
         walink_asis=esc(cat.wa_link('Hola, quiero una demostración del control de asistencia de Tap Work')),
-        steps=steps, segs=segs, slides='\n'.join(slides), n=str(n), bg=bg,
+        steps=steps, segs=segs, slides='\n'.join(slides), n=str(n), shop_n=str(len(shop_order)), bg=bg,
         bg_sky=bg.replace('class="bg"', 'class="bg bg--sky"'), asis_steps=asis_steps, asis_feats=asis_feats)
 
     def render(name):
@@ -304,6 +321,8 @@ def build(out=OUT, fondo=None):
         base = os.path.splitext(fondo)[0]
         shutil.copy(base + '.mp4', os.path.join(out, 'v', 'fondo.mp4'))
         shutil.copy(base + '.jpg', os.path.join(out, 'v', 'fondo.jpg'))
+    for f in os.listdir(PHOTOS):
+        shutil.copy(os.path.join(PHOTOS, f), os.path.join(out, 'v', 'real-' + f))
     for _, pid in order:
         img = byid[pid]['img']
         shutil.copy(os.path.join(STILLS, img + '.webp'), os.path.join(out, 'v', 'p-%s.webp' % img))
