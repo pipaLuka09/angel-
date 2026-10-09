@@ -221,11 +221,12 @@ main { overflow-x: hidden; overflow-x: clip; }
 .screen-d, .screen-m, .promo { margin: 0; padding: 10px; border-radius: 26px; }
 .screen-d img, .screen-m img { display: block; width: 100%; height: auto; border-radius: 16px; }
 .screen-m { max-width: 320px; }
-.promo video { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 18px; background: #000; object-fit: cover; }
+.promo video { display: block; width: 100%; height: auto; border-radius: 18px; background: #000; object-fit: cover; }
 .cap { display: block; margin: 12px 6px 4px; color: var(--dim); }
 @media (max-width: 979px) { .agrid .screen-m { justify-self: center; } }
 .acols { display: grid; gap: 22px; margin-top: 22px; }
 @media (min-width: 980px) { .acols { grid-template-columns: 300px minmax(0, 1fr); } }
+@media (min-width: 980px) { .acols--45 { grid-template-columns: 440px minmax(0, 1fr); } }
 
 .shot { margin: 30px 0 0; border-radius: 18px; padding: 8px; background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .16); }
 .shot img { display: block; width: 100%; height: auto; border-radius: 12px; }

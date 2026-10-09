@@ -18,7 +18,11 @@ generado. Formato 4:5.
   toma real todavía: la foto del acrílico (reseñas), la animación 3D del toque
   y las pantallas del celular sin textos (`herramientas/pantallas.js` las saca
   de `../reels/composer.html`). Cuando haya video real, se rehacen como los del
-  menú y la tarjeta. Las versiones en 1080 × 1350,
+  menú y la tarjeta.
+- `gym-venta.mp4` (y su póster `gym-venta.jpg`): el video de la página del
+  sistema para gimnasios, hecho con la grabación de pantalla real del sistema
+  dentro de un celular (la grabación es de baja resolución). Se saltó el tramo
+  del video de TikTok, que es contenido de terceros. Las versiones en 1080 × 1350,
   para redes, están en `../reels/1080/*-venta.mp4`.
 
 Las fotos y videos originales están en el historial de git.

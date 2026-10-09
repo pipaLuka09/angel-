@@ -4,7 +4,7 @@ const FF=path.resolve(__dirname,'../bin/ffmpeg');
 for(const k of process.argv.slice(2)){
  const dir=path.join(__dirname,'rf',k);fs.rmSync(dir,{recursive:true,force:true});fs.mkdirSync(dir,{recursive:true});
  const p=await b.newPage({viewport:{width:1080,height:1350}});
- await p.goto('http://localhost:8818/composer.html?k='+k);await p.evaluate(()=>window.__ready);
+ await p.goto('http://localhost:8818/video-venta.html?k='+k);await p.evaluate(()=>window.__ready);
  const n=Math.round(await p.evaluate(()=>window.__total)*24);
  for(let i=0;i<n;i++){await p.evaluate(t=>renderAt(t),i/24);await p.screenshot({path:path.join(dir,`f${String(i+1).padStart(4,'0')}.jpg`),type:'jpeg',quality:92});}
  await p.close();

@@ -92,19 +92,19 @@ ASIS_FEATS = [
     ('Lo instalamos nosotros', 'Te lo dejamos funcionando en tu local.'),
 ]
 
-# The gym page: only what the reel shows the system doing.
+# The gym page: only what the screen recording of the system shows it doing.
 GYM_HOW = [
-    ('Un lector en cada máquina', 'Ponemos el lector NFC en la máquina, con el ejercicio que le corresponde.'),
-    ('Tu socio acerca el celular', 'Se abre el ejercicio de esa máquina: sus series, el peso y cómo se hace.'),
-    ('Registra su serie', 'Con un toque la serie queda registrada, al instante y sin papel.'),
+    ('Un sticker en cada máquina', 'Ponemos el sticker NFC en la máquina, con su número de estación y su ejercicio.'),
+    ('Tu socio acerca el celular', 'Se abre esa máquina en el navegador, con lo que hizo la última vez.'),
+    ('Registra su serie', 'Peso, repeticiones y cómo se sintió. La próxima vez, lo está esperando.'),
 ]
 GYM_FEATS = [
-    ('El ejercicio de la máquina', 'Nombre, grupo muscular y número de la estación.'),
-    ('Series y peso', 'Cada serie con sus repeticiones y los kilos.'),
-    ('Cómo se hace', 'El socio ve la técnica antes de empezar.'),
-    ('Serie registrada', 'Queda guardada en el momento en que la marca.'),
-    ('Sin app ni papel', 'Se abre en el navegador del celular del socio.'),
-    ('Lo cambias cuando quieras', 'El lector se queda igual; la rutina la actualizas tú.'),
+    ('Registro de series', 'El peso con + y −, las repeticiones y cómo se sintió.'),
+    ('Su última vez', 'Ve lo que hizo la vez pasada y el historial de sus sesiones.'),
+    ('Cómo se hace', 'Las claves de la técnica y los errores comunes de cada máquina.'),
+    ('Su progreso', 'Peso máximo por sesión, su récord, cuánto mejoró y cuántas sesiones lleva.'),
+    ('Metas', 'Se pone un peso objetivo y una fecha, y ve cuántos kilos le faltan.'),
+    ('Todo el gimnasio', 'Sus ejercicios y todas las máquinas, ordenadas por grupo muscular.'),
 ]
 
 # Products still being built: they show, but say so instead of taking orders.

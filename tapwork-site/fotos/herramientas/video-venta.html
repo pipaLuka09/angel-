@@ -8,6 +8,13 @@ html,body{width:1080px;height:1350px;overflow:hidden;background:#0b0c0f}
 #stage{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:'Archivo',sans-serif;color:#fff}
 .layer{position:absolute;inset:0}
 #foot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* device mode: the recording inside a phone, on the studio ground */
+#stage.dev{background:radial-gradient(60% 45% at 50% 55%,#2b2f37,#0b0c0f 75%)}
+#dev{position:absolute;left:50%;top:236px;width:520px;height:1100px;margin-left:-260px;border-radius:64px;padding:14px;
+  background:linear-gradient(160deg,#30343b,#121418 45%,#1d2025);box-shadow:0 60px 120px -40px rgba(0,0,0,.9),inset 0 0 0 2px rgba(255,255,255,.07)}
+#dev .scr{position:relative;width:100%;height:100%;border-radius:50px;overflow:hidden;background:#000}
+#stage.dev #foot{object-fit:cover;object-position:50% 0%}
+#stage.dev .lbl{top:64px}
 #shade{background:rgba(5,8,14,.0)}
 #grad{background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 30%,transparent 62%,rgba(0,0,0,.55))}
 /* hook */
@@ -102,6 +109,21 @@ const P = {
     ],
     end: { img: 'wifi.jpg', name: 'Wi-Fi NFC' },
   },
+  // A real screen recording (384 x 832): shown inside a phone on the studio
+  // ground rather than stretched to fill the frame. The TikTok part is left out.
+  gym: {
+    frames: 2329, device: true, hook: ['¿Tus socios todavía', '<span class="x">anotan en papel?<i></i></span>'], hookAt: 16,
+    scenes: [
+      { len: 2.2, src: 9.6, speed: 1.0, lbl: 'Acerca el celular', sub: 'al sticker de la máquina.' },
+        { len: 1.8, src: 15.1, speed: 1.0, lbl: 'Se abre su máquina.', sub: 'Sin descargar ninguna app.' },
+      { len: 3.4, src: 20.0, speed: 3.2, lbl: 'Registra su serie:', sub: 'peso, repeticiones y cómo se sintió.' },
+      { len: 2.0, src: 32.0, speed: 1.0, lbl: 'La próxima vez,', sub: 'lo está esperando.' },
+      { len: 2.0, src: 35.5, speed: 0.8, lbl: 'Ve cómo se hace.', sub: 'Las claves y los errores comunes.' },
+      { len: 2.6, src: 67.5, speed: 1.5, lbl: 'Su progreso y su meta.', sub: 'Récord, sesiones y kilos que faltan.' },
+      { len: 3.0, src: 78.0, speed: 3.0, lbl: 'Todo el gimnasio,', sub: 'máquina por máquina.' },
+    ],
+    end: { img: 'gym.jpg', name: 'Sistema para gimnasios' },
+  },
 };
 const KEY = new URLSearchParams(location.search).get('k') || 'menu';
 const C = P[KEY];
@@ -115,6 +137,11 @@ const back = x => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c *
 
 const imgs = [], stills = {};
 function build() {
+  if (C.device) {
+    $('#stage').classList.add('dev');
+    const dev = document.createElement('div'); dev.id = 'dev'; dev.innerHTML = '<div class="scr"></div>';
+    $('#stage').insertBefore(dev, $('#shade')); dev.firstChild.appendChild($('#foot'));
+  }
   $('#foot').style.objectPosition = C.pos;
   $('#hook').innerHTML = '<h1>' + C.hook.map((l, i) => '<span data-w="' + i + '">' + l + '</span>').join('<br>') +
     '</h1><p>Hay una forma más simple.</p>';
@@ -143,7 +170,8 @@ window.renderAt = function (t) {
   } else { const s = C.scenes[C.scenes.length - 1]; src = s.src + s.len * s.speed; }
   const sc = C.scenes.find(s => t >= s.t0 && t < s.t0 + s.len);
   if (!(sc && sc.img && t >= HOOK && t < ENDAT)) { setFrame(frameAt(src)); $('#foot').style.objectPosition = C.pos; }
-  $('#foot').style.transform = 'scale(' + scale.toFixed(4) + ')';
+  $('#foot').style.transform = 'scale(' + (C.device ? 1 : scale).toFixed(4) + ')';
+  if (C.device) $('#dev').style.transform = 'scale(' + (1 + (scale - 1) * .6).toFixed(4) + ')';
   $('#foot').style.filter = blur > .2 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
   $('#shade').style.background = 'rgba(5,8,14,' + dark.toFixed(3) + ')';
 
