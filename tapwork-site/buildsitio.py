@@ -322,6 +322,8 @@ def build(out=OUT, fondo=None):
         shutil.copy(base + '.mp4', os.path.join(out, 'v', 'fondo.mp4'))
         shutil.copy(base + '.jpg', os.path.join(out, 'v', 'fondo.jpg'))
     for f in os.listdir(PHOTOS):
+        if not f.endswith(('.jpg', '.mp4')):
+            continue
         shutil.copy(os.path.join(PHOTOS, f), os.path.join(out, 'v', 'real-' + f))
     for _, pid in order:
         img = byid[pid]['img']

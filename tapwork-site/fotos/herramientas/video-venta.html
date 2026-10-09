@@ -1,0 +1,148 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/local.css">
+<style>
+@font-face{font-family:'Montserrat';src:url('fonts/montserrat.woff2') format('woff2');font-weight:100 900}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1350px;overflow:hidden;background:#0b0c0f}
+#stage{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:'Archivo',sans-serif;color:#fff}
+.layer{position:absolute;inset:0}
+#foot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#shade{background:rgba(5,8,14,.0)}
+#grad{background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 30%,transparent 62%,rgba(0,0,0,.55))}
+/* hook */
+#hook{display:flex;flex-direction:column;justify-content:center;padding:0 90px}
+#hook h1{font-size:104px;font-weight:800;line-height:1.02;letter-spacing:-.035em}
+#hook h1 span{display:inline-block}
+#hook .x{position:relative}
+#hook .x i{position:absolute;left:-2%;right:-2%;top:54%;height:12px;background:#ec3013;border-radius:6px;transform-origin:left}
+#hook p{margin-top:34px;font-size:38px;font-weight:500;color:rgba(255,255,255,.82)}
+/* labels */
+.lbl{position:absolute;left:64px;top:96px;padding:20px 28px 22px 34px;background:rgba(8,10,14,.72);border-radius:18px;
+  font-size:58px;font-weight:800;line-height:1.08;letter-spacing:-.025em;backdrop-filter:blur(8px)}
+.lbl::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:8px;border-radius:4px;background:#ec3013}
+.lbl small{display:block;font-size:34px;font-weight:600;color:rgba(255,255,255,.8);margin-top:8px;letter-spacing:-.01em}
+/* end */
+#end{background:#1f2229}
+#end img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(transparent,#000 14%)}
+#end .top{position:absolute;left:0;right:0;top:64px;display:flex;flex-direction:column;align-items:center;gap:22px}
+.logo{display:flex;align-items:center;gap:22px}
+.logo .m{width:120px;height:100px}
+.logo .w{font-family:'Montserrat',sans-serif;font-weight:800;font-size:46px;letter-spacing:.2em;color:#EDF0F2}
+.logo .w b{color:#ff3a2a}
+#end .name{font-size:62px;font-weight:800;letter-spacing:-.03em}
+#end .cta{position:absolute;left:50%;bottom:110px;transform:translateX(-50%);background:#fff;color:#0b0c0f;border-radius:999px;
+  padding:26px 54px;text-align:center;white-space:nowrap}
+#end .cta small{display:block;font-family:'JetBrains Mono',monospace;font-size:22px;letter-spacing:.16em;color:#555}
+#end .cta b{display:block;font-size:56px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+</style></head><body>
+<div id="stage">
+  <img id="foot" alt="">
+  <div class="layer" id="shade"></div>
+  <div class="layer" id="grad"></div>
+  <div class="layer" id="hook"></div>
+  <div id="labels"></div>
+  <div class="layer" id="end">
+    <img class="ph" alt="">
+    <div class="top"><div class="logo"><div class="m" id="mono"></div><div class="w">TAP <b>WORK</b></div></div>
+      <div class="name"></div></div>
+    <div class="cta"><small>COTIZA POR WHATSAPP</small><b>096 779 4882</b></div>
+  </div>
+</div>
+<script>
+// Each video: a hook over a frozen, blurred first frame, then the real footage
+// in scenes (source window and speed), each with its label, then the end card.
+const P = {
+  menu: {
+    frames: 304, hook: ['¿Tu carta todavía', '<span class="x">es de papel?<i></i></span>'], hookAt: 0.3, pos: '50% 38%',
+    scenes: [
+      { len: 2.8, src: 0.6, speed: 1.5, lbl: 'Acerca el celular.' },
+      { len: 2.8, src: 5.0, speed: 1.3, lbl: 'Se abre la carta.', sub: 'Sin app. Sin QR.' },
+      { len: 3.4, src: 9.0, speed: 1.08, lbl: 'Tus precios,', sub: 'siempre al día.' },
+    ],
+    end: { img: 'menu.jpg', name: 'Menú digital NFC', drop: 36 },
+  },
+  tarjeta: {
+    frames: 394, hook: ['¿Todavía repartes', '<span class="x">tarjetas de papel?<i></i></span>'], hookAt: 0.5, pos: '50% 46%',
+    scenes: [
+      { len: 2.6, src: 0.0, speed: 0.34, lbl: 'Una tarjeta.', sub: 'Un toque.' },
+      { len: 2.8, src: 6.2, speed: 1.3, lbl: 'Acerca el celular.' },
+      { len: 3.6, src: 10.4, speed: 1.55, lbl: 'Se abre tu perfil:', sub: 'WhatsApp, redes y contacto.' },
+    ],
+    end: { img: 'tarjeta.jpg', name: 'Tarjeta de presentación NFC' },
+  },
+};
+const KEY = new URLSearchParams(location.search).get('k') || 'menu';
+const C = P[KEY];
+const HOOK = 2.4, END = 3.4, XF = 0.22;
+let t0 = HOOK; C.scenes.forEach(s => { s.t0 = t0; t0 += s.len; });
+const ENDAT = t0, TOTAL = ENDAT + END;
+const $ = s => document.querySelector(s);
+const ramp = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
+const out3 = x => 1 - Math.pow(1 - x, 3);
+const back = x => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+
+const imgs = [];
+function build() {
+  $('#foot').style.objectPosition = C.pos;
+  $('#hook').innerHTML = '<h1>' + C.hook.map((l, i) => '<span data-w="' + i + '">' + l + '</span>').join('<br>') +
+    '</h1><p>Hay una forma más simple.</p>';
+  $('#labels').innerHTML = C.scenes.map((s, i) => '<div class="lbl" data-s="' + i + '">' + s.lbl +
+    (s.sub ? '<small>' + s.sub + '</small>' : '') + '</div>').join('');
+  $('#end .ph').src = C.end.img; $('#end .name').textContent = C.end.name;
+  return fetch('mono.svg').then(r => r.text()).then(svg => { $('#mono').innerHTML = svg; });
+}
+function frameAt(src) { return Math.max(1, Math.min(C.frames, Math.round(src * 24) + 1)); }
+function setFrame(n) { const im = imgs[n]; if ($('#foot').src !== im.src) $('#foot').src = im.src; }
+
+window.renderAt = function (t) {
+  // footage
+  let src = C.hookAt, scale = 1.04, blur = 0, dark = 0;
+  if (t < HOOK) { blur = 16; dark = .55; scale = 1.08 + t * .01; }
+  else if (t < ENDAT) {
+    const s = C.scenes.find(s => t >= s.t0 && t < s.t0 + s.len) || C.scenes[C.scenes.length - 1];
+    const k = t - s.t0; src = s.src + k * s.speed; scale = 1.02 + .05 * (k / s.len);
+    blur = 16 * (1 - out3(ramp(t, HOOK, HOOK + .45))); dark = .55 * (1 - ramp(t, HOOK, HOOK + .45));
+  } else { const s = C.scenes[C.scenes.length - 1]; src = s.src + s.len * s.speed; }
+  setFrame(frameAt(src));
+  $('#foot').style.transform = 'scale(' + scale.toFixed(4) + ')';
+  $('#foot').style.filter = blur > .2 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+  $('#shade').style.background = 'rgba(5,8,14,' + dark.toFixed(3) + ')';
+
+  // hook
+  const hk = $('#hook'); const hOut = 1 - ramp(t, HOOK - .25, HOOK + .1);
+  hk.style.opacity = hOut;
+  hk.querySelectorAll('[data-w]').forEach((w, i) => {
+    const k = out3(ramp(t, .1 + i * .28, .7 + i * .28));
+    w.style.opacity = k; w.style.transform = 'translateY(' + (40 * (1 - k)).toFixed(1) + 'px)';
+    w.style.filter = k < 1 ? 'blur(' + (10 * (1 - k)).toFixed(1) + 'px)' : 'none';
+  });
+  const x = hk.querySelector('.x i'); if (x) x.style.transform = 'scaleX(' + out3(ramp(t, 1.25, 1.6)).toFixed(3) + ')';
+  hk.querySelector('p').style.opacity = ramp(t, 1.55, 1.95);
+
+  // labels
+  C.scenes.forEach((s, i) => {
+    const el = document.querySelector('[data-s="' + i + '"]');
+    const a = ramp(t, s.t0 + .1, s.t0 + .45), b = 1 - ramp(t, s.t0 + s.len - .25, s.t0 + s.len);
+    const k = Math.min(a, b);
+    el.style.opacity = k;
+    el.style.transform = 'translateX(' + (-40 * (1 - out3(a))).toFixed(1) + 'px)';
+  });
+
+  // end card
+  const e = $('#end'); const ek = ramp(t, ENDAT - XF, ENDAT + .2);
+  e.style.opacity = ek;
+  e.querySelector('.ph').style.transform = 'translateY(' + (C.end.drop || 0) + 'px) scale(' + (1.08 - .08 * out3(ramp(t, ENDAT - XF, TOTAL))).toFixed(4) + ')';
+  const lg = e.querySelector('.top'), lk = back(ramp(t, ENDAT + .1, ENDAT + .7));
+  lg.style.opacity = ramp(t, ENDAT + .1, ENDAT + .45); lg.style.transform = 'translateY(' + (30 * (1 - lk)).toFixed(1) + 'px)';
+  const ct = e.querySelector('.cta'), ck = back(ramp(t, ENDAT + .45, ENDAT + 1.05));
+  ct.style.opacity = ramp(t, ENDAT + .45, ENDAT + .8);
+  ct.style.transform = 'translateX(-50%) scale(' + (.85 + .15 * ck).toFixed(3) + ')';
+};
+window.__total = TOTAL;
+window.__ready = build().then(() => Promise.all(Array.from({ length: C.frames }, (_, i) => {
+  const im = new Image(); im.src = 'fr/' + KEY + '/f' + String(i + 1).padStart(4, '0') + '.jpg'; imgs[i + 1] = im;
+  return im.decode().catch(() => {});
+}))).then(() => Promise.all([$('#end .ph').decode().catch(() => {}), document.fonts.ready]));
+</script>
+</body></html>
