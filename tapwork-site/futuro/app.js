@@ -1,8 +1,9 @@
 /*
-  Page behaviour: the camera that follows the sections, the product carousel,
-  the decoding headings, the reveals and the tap at the close. Runs as soon as it is parsed; the 3D scene and the
-  smooth scroll are fetched only after window.load so they never compete with
-  the first paint.
+  Page behaviour, shared by the home page and the asistencia page: the
+  background that pushes into the sky, the product carousel, the decoding
+  headings, the reveals and the card at the close. Each part checks that its
+  elements exist, so either page can load the same file. Runs as soon as it is
+  parsed; only the smooth scroll waits for window.load.
 */
 (function () {
   var doc = document.documentElement;
@@ -13,28 +14,23 @@
   function clamp(x, a, b) { return Math.min(Math.max(x, a), b); }
   function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
 
-  /* ------------------------------------------------------- world camera */
-  // Which section is on screen, as a float: 1.5 means halfway from the second
-  // section's centre to the third's. The scene turns its camera by it.
-  var shots = [].slice.call(document.querySelectorAll('[data-shot]'));
-  var scene = null, ticking = false;
-  function section() {
-    var mid = innerHeight / 2;
-    var cs = shots.map(function (el) { var r = el.getBoundingClientRect(); return r.top + r.height / 2; });
-    if (mid <= cs[0]) return 0;
-    for (var i = 0; i < cs.length - 1; i++) if (mid <= cs[i + 1]) return i + (mid - cs[i]) / (cs[i + 1] - cs[i]);
-    return cs.length - 1;
+  /* ----------------------------------------------------------- background */
+  // One clip behind the page. Scrolling the first screen pushes it in toward
+  // its sky (--z from 0 to 1), so the rest of the page sits on that same sky.
+  var bg = document.querySelector('.bg:not(.bg--sky)');
+  var ticking = false;
+  function paint() {
+    ticking = false;
+    if (!bg || still) return;
+    var z = ease(scrollY / (innerHeight * 0.95));
+    bg.style.setProperty('--z', z.toFixed(4));
   }
-  function paint() { ticking = false; if (scene && !still) scene.setSection(section()); }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', onScroll);
-
-  if (fine) {
-    addEventListener('mousemove', function (e) {
-      if (scene) scene.setPointer(e.clientX / innerWidth * 2 - 1, e.clientY / innerHeight * 2 - 1);
-    }, { passive: true });
-  }
+  paint();
+  var bgv = document.querySelector('.bg video');
+  if (bgv && still) { bgv.removeAttribute('autoplay'); bgv.pause(); }
 
   /* ------------------------------------------------- word-by-word titles */
   // The big italic lines rise word by word out of a blur. Words stay visible
@@ -51,15 +47,36 @@
   if (hero) hero.classList.add('go');
 
   /* ------------------------------------------------------------ the tap */
+  // The real card: tap it and it jumps, sends out NFC rings and turns over,
+  // and the contact appears. Left alone on screen, it turns itself.
   var close = document.querySelector('.close');
-  var tapBtn = document.querySelector('.tapzone');
+  var tcard = document.querySelector('.tcard');
   var tapped = false, autoTap = null;
   function doTap() {
     clearTimeout(autoTap);
-    if (scene) scene.tap();
+    tcard.classList.toggle('is-flipped');
+    tcard.classList.remove('bump'); void tcard.offsetWidth; tcard.classList.add('bump');
     if (!tapped) { tapped = true; close.classList.add('tapped'); }
   }
-  if (tapBtn) tapBtn.addEventListener('click', doTap);
+  if (tcard) {
+    tcard.addEventListener('click', doTap);
+    if (fine) {
+      tcard.addEventListener('mousemove', function (e) {
+        var r = tcard.getBoundingClientRect();
+        tcard.style.setProperty('--tx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3));
+        tcard.style.setProperty('--ty', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3));
+      });
+      tcard.addEventListener('mouseleave', function () { tcard.style.setProperty('--tx', 0); tcard.style.setProperty('--ty', 0); });
+    }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        clearTimeout(autoTap);
+        if (es[0].isIntersecting && !tapped) autoTap = setTimeout(doTap, 4500);
+        var h = close.querySelector('[data-split]');
+        if (es[0].isIntersecting && h) h.classList.add('go');
+      }, { threshold: 0.45 }).observe(close);
+    }
+  }
 
   /* -------------------------------------------------- decoding headings */
   var GLYPHS = '▮▯▪/\\<>_=+*#01';
@@ -234,7 +251,18 @@
     layout(); fill(); syncToggle();
   })();
 
-  /* ------------------------------------------- deferred: 3D scene, Lenis */
+  /* ------------------------------------------------------------ back link */
+  // Coming from the home page, "Volver" goes back in history, so the visitor
+  // lands where they left the carousel instead of at the top.
+  document.querySelectorAll('a.back').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      if (history.length > 1 && document.referrer && document.referrer.indexOf(location.host) !== -1) {
+        e.preventDefault(); history.back();
+      }
+    });
+  });
+
+  /* ----------------------------------------------- deferred: smooth scroll */
   function load(src) {
     return new Promise(function (ok, no) {
       var el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = no;
@@ -242,45 +270,18 @@
     });
   }
   addEventListener('load', function () {
-    var canvas = document.querySelector('.world canvas');
-    load('js/three.min.js').then(function () { return load('js/scene.js'); }).then(function () {
-      if (!window.TWScene) return;
-      scene = window.TWScene.create(canvas, {});
-      if (!scene) return;
-      scene.setSection(still ? 0 : section());
-      scene.frame();
-      doc.classList.add('gl-on');
-      // The contact waits behind the card only once there is a card to tap.
-      close.classList.add('gl-ready');
-      if ('IntersectionObserver' in window) {
-        // Left alone on the close for a few seconds, the card taps itself.
-        new IntersectionObserver(function (es) {
-          clearTimeout(autoTap);
-          if (es[0].isIntersecting && !tapped) autoTap = setTimeout(doTap, 4500);
-          var h = close.querySelector('[data-split]');
-          if (es[0].isIntersecting && h) h.classList.add('go');
-        }, { threshold: 0.45 }).observe(close);
-      }
-      if (still) return;
-      scene.start();
-      document.addEventListener('visibilitychange', function () {
-        if (document.hidden) scene.stop(); else scene.start();
+    if (!fine || still) return;
+    load('js/lenis.min.js').then(function () {
+      if (!window.Lenis) return;
+      var lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+      (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
+      document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          var id = a.getAttribute('href'), el = id.length > 1 && document.querySelector(id);
+          if (!el) return;
+          e.preventDefault(); lenis.scrollTo(el, { offset: -70 });
+        });
       });
     }).catch(function () {});
-
-    if (fine && !still) {
-      load('js/lenis.min.js').then(function () {
-        if (!window.Lenis) return;
-        var lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
-        (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
-        document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-          a.addEventListener('click', function (e) {
-            var id = a.getAttribute('href'), el = id.length > 1 && document.querySelector(id);
-            if (!el) return;
-            e.preventDefault(); lenis.scrollTo(el, { offset: -70 });
-          });
-        });
-      }).catch(function () {});
-    }
   });
 })();

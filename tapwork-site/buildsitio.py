@@ -1,18 +1,22 @@
-"""Build the Tap Work site: one 3D street behind the whole page, sections over it.
+"""Build the Tap Work site: two pages over one moving sky.
 
-The world is a three.js scene (futuro/scene.js), fixed behind every section:
-looking up from the street through a fisheye lens at glass towers and palms,
-a slow drifting camera, a Tap Work card held out to the viewer. Each section
-has its own camera angle and spot for the card, the light runs from afternoon
-to sunset, and at the close the visitor taps the card to flip it to the
-WhatsApp number. The page shows no prices; quotes go through WhatsApp.
+One clip sits behind the whole site. The home page shows it full in the hero
+and pushes into its sky as the visitor scrolls; the asistencia page sits on
+that sky from the start. Sections are frosted-glass panels over it.
 
-The nine product reels (reels/, see reels/README.md) ride one 3D carousel with
-a tab per kind of business, so only one plays at a time and none are stacked.
+  index.html       hero, how it works, the nine product reels in a carousel
+                   with a tab per kind of business, a button to the asistencia
+                   page, and the real card at the close (tap it to turn it).
+  asistencia.html  the full attendance offer: the panel on desktop and phone,
+                   the promo, how it works, what it includes.
 
-    python3 buildsitio.py   # futuro/ + reels/v/ -> sitio/ (drag into Netlify Drop)
+The background clip is passed in (--fondo clip.mp4, with clip.jpg next to it
+as its poster); without one the background is a still. No prices anywhere:
+quotes go through WhatsApp.
 
-sitio/preview.html is the same page without the <html> shell, for the claude.ai
+    python3 buildsitio.py [--fondo clip.mp4] [--out carpeta]   # -> sitio/ (Netlify Drop)
+
+sitio/preview.html is the home page without the <html> shell, for the claude.ai
 preview, which supplies its own.
 """
 import io, os, shutil
@@ -50,6 +54,33 @@ LINE = {
     'acrilico': 'Le pegamos el chip al acrílico que ya tienes. No se bota nada.',
 }
 
+DESC = {
+    'index.html': 'Chips NFC para tu negocio en Machala: menú digital, reseñas de Google, Wi-Fi, pagos, '
+                  'asistencia y más. Mira cómo funciona cada uno.',
+    'asistencia.html': 'Control de asistencia con gafete NFC: tu equipo marca en el celular del local y tú ves '
+                       'el turno en un panel y exportas a Excel.',
+}
+
+# The asistencia page. Only what the system really does: it marks from the
+# venue's own phone (one or several), and it keeps the time and the badge,
+# no photo and no location.
+ASIS_HOW = [
+    ('Te entregamos los gafetes', 'Uno por persona, y dejamos el panel listo en el celular del local.'),
+    ('Tu equipo marca', 'Al llegar y al salir, cada uno acerca su gafete al celular del local.'),
+    ('Tú revisas el turno', 'Ves quién llegó, quién se atrasó y exportas el reporte a Excel.'),
+]
+ASIS_FEATS = [
+    ('Quién llegó y a qué hora', 'Cada marcación aparece en el panel en el momento.'),
+    ('Atrasos y ausencias', 'El resumen del turno te dice quién se atrasó y quién faltó.'),
+    ('Horas trabajadas', 'Suma las horas de cada persona y de todo el día.'),
+    ('Reporte a Excel', 'Exportas la lista completa en un clic.'),
+    ('Varios locales', 'Cada local marca en su propio celular, todo en una cuenta.'),
+    ('Sin app para tu equipo', 'Solo acercan el gafete. No instalan nada.'),
+    ('Solo en el local', 'Se marca únicamente en el celular del local.'),
+    ('Sin foto ni ubicación', 'Guarda la hora y el gafete, nada más.'),
+    ('Lo instalamos nosotros', 'Te lo dejamos funcionando en tu local.'),
+]
+
 HOW = [
     ('Acercas el celular', 'A dos centímetros basta. No hay que abrir la cámara ni enfocar un QR.'),
     ('Se abre solo', 'El chip guarda un enlace y el celular lo abre en el navegador.'),
@@ -69,13 +100,14 @@ LEFT = svg('M15 5l-7 7 7 7')
 RIGHT = svg('M9 5l7 7-7 7')
 PAUSE = svg('M8 5v14M16 5v14', 14)
 CHECK = svg('M5 12.5l4.5 4.5L19 7', 18)
+BADGE = svg('M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM10 3v3h4V3M9 17h6M12 9.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z', 26)
 
 
 def esc(s):
     return s.replace('&', '&amp;').replace('"', '&quot;').replace('<', '&lt;')
 
 
-def build():
+def build(out=OUT, fondo=None):
     byid = {p['id']: p for p in cat.products()}
     order = [(seg, pid) for seg in SEGMENTS for pid in seg[3]]
     assert sorted(pid for _, pid in order) == sorted(byid), 'un producto quedó sin segmento'
@@ -104,52 +136,75 @@ def build():
         '          <li class="step"><span class="step__n">0%d</span><h3>%s</h3><p>%s</p></li>' % (i + 1, t, d)
         for i, (t, d) in enumerate(HOW))
 
-    page = io.open(os.path.join(SRC, 'index.html'), encoding='utf-8').read()
-    for k, val in dict(
-            mark=cat.MARK, wa=cat.WA_ICON, phone=cat.PHONE, arrow=ARROW, left=LEFT, right=RIGHT, pause=PAUSE, check=CHECK,
-            walink=esc(cat.wa_link('Hola, quiero cotizar productos NFC de Tap Work')),
-            walink_asis=esc(cat.wa_link('Hola, quiero una demostración del control de asistencia de Tap Work')),
-            steps=steps, segs=segs, slides='\n'.join(slides), n=str(n)).items():
-        page = page.replace('{{%s}}' % k, val)
-    assert '{{' not in page, 'placeholder sin reemplazar'
+    asis_steps = '\n'.join(
+        '          <li class="step"><span class="step__n">0%d</span><h3>%s</h3><p>%s</p></li>' % (i + 1, t, d)
+        for i, (t, d) in enumerate(ASIS_HOW))
+    asis_feats = '\n'.join(
+        '        <li>%s<span><b>%s</b>%s</span></li>' % (CHECK, t, d) for t, d in ASIS_FEATS)
 
-    head, body = page.split('<!--/head-->')
-    doc = ('<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
-           '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-           '<meta name="description" content="Chips NFC para tu negocio en Machala: menú digital, reseñas de '
-           'Google, asistencia, Wi-Fi, pagos y más. Mira cómo funciona cada uno.">\n'
-           '<meta name="theme-color" content="#05060a">\n'
-           '<link rel="icon" href="data:image/svg+xml,%s">\n'
-           '<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>\n'
-           '%s</head>\n<body>\n%s</body>\n</html>\n' % (FAVICON, head, body))
+    # The background: a clip if one was given (its poster sits next to it as
+    # .jpg), otherwise a still of the 3D street.
+    if fondo:
+        media = ('<video autoplay muted loop playsinline preload="auto" poster="v/fondo.jpg">'
+                 '<source src="v/fondo.mp4" type="video/mp4"></video>')
+    else:
+        media = '<img src="v/hero-poster.jpg" alt="">'
+    bg = '<div class="bg" aria-hidden="true">%s</div>' % media
+    fill = dict(
+        mark=cat.MARK, wa=cat.WA_ICON, phone=cat.PHONE, arrow=ARROW, left=LEFT, right=RIGHT, pause=PAUSE,
+        leftsm=svg('M19 12H5M11 6l-6 6 6 6', 16), badge=BADGE,
+        walink=esc(cat.wa_link('Hola, quiero cotizar productos NFC de Tap Work')),
+        walink_asis=esc(cat.wa_link('Hola, quiero una demostración del control de asistencia de Tap Work')),
+        steps=steps, segs=segs, slides='\n'.join(slides), n=str(n), bg=bg,
+        bg_sky=bg.replace('class="bg"', 'class="bg bg--sky"'), asis_steps=asis_steps, asis_feats=asis_feats)
 
-    if os.path.isdir(OUT):
-        shutil.rmtree(OUT)
-    for d in ('v', 'js', 'fonts'):
-        os.makedirs(os.path.join(OUT, d))
-    io.open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(doc)
-    io.open(os.path.join(OUT, 'preview.html'), 'w', encoding='utf-8').write(page)
+    def render(name):
+        page = io.open(os.path.join(SRC, name), encoding='utf-8').read()
+        for k, val in fill.items():
+            page = page.replace('{{%s}}' % k, val)
+        assert '{{' not in page, 'placeholder sin reemplazar en ' + name
+        head, body = page.split('<!--/head-->')
+        doc = ('<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
+               '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+               '<meta name="description" content="%s">\n'
+               '<meta name="theme-color" content="#0e4fb8">\n'
+               '<link rel="icon" href="data:image/svg+xml,%s">\n'
+               '<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>\n'
+               '%s</head>\n<body>\n%s</body>\n</html>\n' % (DESC[name], FAVICON, head, body))
+        return page, doc
 
-    shutil.copy(os.path.join(SRC, 'app.js'), os.path.join(OUT, 'js', 'app.js'))
-    shutil.copy(os.path.join(SRC, 'scene.js'), os.path.join(OUT, 'js', 'scene.js'))
-    shutil.copy(os.path.join(SRC, 'three.min.js'), os.path.join(OUT, 'js', 'three.min.js'))
-    shutil.copy(os.path.join(REPO, 'assets', 'lenis.min.js'), os.path.join(OUT, 'js', 'lenis.min.js'))
-    for f in ('hero-poster.jpg', 'hero-poster-m.jpg', 'panel.jpg', 'card-front.jpg', 'card-back.jpg'):
-        shutil.copy(os.path.join(SRC, f), os.path.join(OUT, 'v', f))
+    if os.path.isdir(out):
+        shutil.rmtree(out)
+    for d in ('v', 'js', 'fonts', 'css'):
+        os.makedirs(os.path.join(out, d))
+    home, home_doc = render('index.html')
+    _, asis_doc = render('asistencia.html')
+    io.open(os.path.join(out, 'index.html'), 'w', encoding='utf-8').write(home_doc)
+    io.open(os.path.join(out, 'asistencia.html'), 'w', encoding='utf-8').write(asis_doc)
+    io.open(os.path.join(out, 'preview.html'), 'w', encoding='utf-8').write(home)
+
+    shutil.copy(os.path.join(SRC, 'site.css'), os.path.join(out, 'css', 'site.css'))
+    shutil.copy(os.path.join(SRC, 'app.js'), os.path.join(out, 'js', 'app.js'))
+    shutil.copy(os.path.join(REPO, 'assets', 'lenis.min.js'), os.path.join(out, 'js', 'lenis.min.js'))
+    for f in ('hero-poster.jpg', 'panel.jpg', 'panel-movil.jpg', 'card-front.jpg', 'card-back.jpg'):
+        shutil.copy(os.path.join(SRC, f), os.path.join(out, 'v', f))
+    if fondo:
+        base = os.path.splitext(fondo)[0]
+        shutil.copy(base + '.mp4', os.path.join(out, 'v', 'fondo.mp4'))
+        shutil.copy(base + '.jpg', os.path.join(out, 'v', 'fondo.jpg'))
     for f in os.listdir(FONTS):
-        shutil.copy(os.path.join(FONTS, f), os.path.join(OUT, 'fonts', f))
+        shutil.copy(os.path.join(FONTS, f), os.path.join(out, 'fonts', f))
     missing = []
-    for _, pid in order:
-        v = REEL.get(pid, byid[pid]['img'])
+    for v in sorted({REEL.get(pid, byid[pid]['img']) for _, pid in order} | {'asistencia'}):
         for ext in ('mp4', 'jpg'):
-            s = os.path.join(REELS, '%s.%s' % (v, ext))
-            if os.path.exists(s):
-                shutil.copy(s, os.path.join(OUT, 'v'))
+            src = os.path.join(REELS, '%s.%s' % (v, ext))
+            if os.path.exists(src):
+                shutil.copy(src, os.path.join(out, 'v'))
             else:
-                missing.append(os.path.basename(s))
-    total = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(OUT) for f in fs)
-    print('sitio/ %d KB · index.html %d KB · %d productos en %d segmentos'
-          % (total // 1024, len(doc) // 1024, n, len(SEGMENTS)))
+                missing.append(os.path.basename(src))
+    total = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(out) for f in fs)
+    print('%s/ %d KB · 2 páginas · %d productos en %d segmentos · fondo: %s'
+          % (os.path.basename(out), total // 1024, n, len(SEGMENTS), fondo or 'imagen fija'))
     if missing:
         print('FALTAN:', ', '.join(missing))
 
@@ -162,4 +217,9 @@ FAVICON = ('%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100
            '%3C/svg%3E')
 
 if __name__ == '__main__':
-    build()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--fondo', help='video de fondo (.mp4, con su póster .jpg al lado)')
+    ap.add_argument('--out', default=OUT)
+    a = ap.parse_args()
+    build(a.out, a.fondo)

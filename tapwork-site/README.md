@@ -77,19 +77,22 @@ archivos o las capturas salen de una copia vieja. El script hace justo eso:
 
 ## Sitio nuevo (`buildsitio.py`)
 
-    python3 buildsitio.py   # futuro/ + reels/v/ -> sitio/
+    python3 buildsitio.py [--fondo clip.mp4]   # futuro/ + reels/v/ -> sitio/
 
-- `futuro/scene.js`: el mundo en three.js, fijo detrás de toda la página. Calle
-  vista desde abajo en ojo de pez, torres de vidrio, palmeras, cámara que gira
-  lento y la tarjeta Tap Work real (el arte de `print/out`, en vertical). Cada sección tiene su ángulo de cámara y su
-  lugar para la tarjeta; la luz va de la tarde al atardecer. Al final la
-  tarjeta se toca y se voltea al reverso. Todo es procedural,
-  no descarga texturas.
-- `futuro/app.js`: la cámara que sigue a las secciones, el carrusel 3D de los
-  nueve reels con una pestaña por tipo de negocio, los títulos que entran
-  palabra por palabra y el toque final.
-- `futuro/hero-poster*.jpg`: un cuadro de la misma escena, que se ve mientras
-  carga three.js o si el navegador no tiene WebGL.
+Dos páginas sobre un mismo fondo:
+
+- `index.html`: hero, cómo funciona, el carrusel de los nueve reels con una
+  pestaña por tipo de negocio, un botón a asistencia y la tarjeta real al
+  final (se toca y se voltea, y aparece el WhatsApp).
+- `asistencia.html`: todo el control de asistencia aparte: el panel en
+  computadora y en celular, el video promo, cómo funciona y qué incluye.
+
+El fondo es un clip (`--fondo`, con su póster `.jpg` al lado). En el hero se ve
+completo y al bajar se acerca a su cielo, así que toda la página queda sobre el
+mismo cielo en movimiento. Sin `--fondo` queda una imagen fija. El clip no vive
+en el repo: tiene que ser una toma propia.
+
+- `futuro/site.css` y `futuro/app.js` los comparten las dos páginas.
 - La página no muestra precios: todo se cotiza por WhatsApp.
 
 `sitio/` es la carpeta que se arrastra a Netlify Drop; `sitio/preview.html` es

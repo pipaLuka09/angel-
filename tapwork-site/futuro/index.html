@@ -1,246 +1,20 @@
 <title>Tap Work</title>
-<style>
-  /* Layout: one fixed 3D street behind the whole page (sky, glass, palms, the
-     card); sections float over it as frosted-glass panels while the camera
-     turns from shot to shot, and the light goes from afternoon to sunset. */
-  @font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2");
-    font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
-  @font-face { font-family: "Source Serif 4"; src: url("fonts/serif-italic.woff2") format("woff2");
-    font-weight: 500; font-style: italic; font-display: swap; }
-  @font-face { font-family: "JetBrains Mono"; src: url("fonts/mono.woff2") format("woff2");
-    font-weight: 100 800; font-display: swap; }
-  :root {
-    color-scheme: dark;
-    --sky: #0e4fb8;
-    --deep: #06142e;
-    --glass: rgba(8, 22, 48, .46);
-    --glass-hi: rgba(255, 255, 255, .10);
-    --edge: rgba(255, 255, 255, .22);
-    --ink: #ffffff;
-    --soft: rgba(236, 244, 255, .82);
-    --dim: rgba(220, 232, 250, .62);
-    --cream: #fff0c9;
-    --red: #ec3013;
-    --red-hi: #ff4b2b;
-    --sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
-    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-    --gutter: clamp(16px, 4vw, 48px);
-    --max: 1240px;
-    --ease: cubic-bezier(.2, .8, .2, 1);
-  }
-  * { box-sizing: border-box; }
-  html { background: var(--deep); }
-  html.lenis, html.lenis body { height: auto; }
-  .lenis.lenis-smooth { scroll-behavior: auto !important; }
-  body { margin: 0; color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5;
-    -webkit-font-smoothing: antialiased; overflow-x: hidden; background: var(--sky); }
-  a { color: inherit; }
-  button { font: inherit; color: inherit; }
-  img { max-width: 100%; }
-  :focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; border-radius: 8px; }
-  .wrap { max-width: var(--max); margin: 0 auto; padding-inline: var(--gutter); }
-  .mono { font-family: var(--mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; }
-  .it { font-family: var(--serif); font-style: italic; font-weight: 500; font-stretch: 100%; letter-spacing: -.01em;
-    color: var(--cream); }
-
-  /* ------------------------------------------------------------- world */
-  .world { position: fixed; inset: 0; z-index: 0; background: #1b62c9 url("v/hero-poster.jpg") center / cover no-repeat; }
-  @media (max-aspect-ratio: 1/1) { .world { background-image: url("v/hero-poster-m.jpg"); } }
-  .world canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.2s ease; }
-  .gl-on .world canvas { opacity: 1; }
-  .world::after { content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(180deg, rgba(4, 18, 48, .45), transparent 26%, transparent 70%, rgba(4, 14, 36, .55)); }
-  main, footer, .bar { position: relative; z-index: 1; }
-  main { overflow-x: hidden; overflow-x: clip; }
-
-  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px;
-    font-size: 15px; font-weight: 700; text-decoration: none; border: 1px solid var(--edge);
-    background: rgba(255, 255, 255, .10); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    cursor: pointer; transition: background .25s, border-color .25s, transform .3s var(--ease); }
-  .btn:hover { background: rgba(255, 255, 255, .18); transform: translateY(-2px); }
-  .btn--red { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 14px 40px -12px rgba(236, 48, 19, .8); }
-  .btn--red:hover { background: var(--red-hi); border-color: var(--red-hi); }
-  .btn--sm { padding: 9px 15px; font-size: 13.5px; }
-
-  .glass { background: var(--glass); border: 1px solid var(--edge); border-radius: 30px;
-    backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%);
-    box-shadow: 0 40px 100px -40px rgba(2, 10, 30, .7), inset 0 1px 0 rgba(255, 255, 255, .18); }
-
-  /* --------------------------------------------------------------- bar */
-  .bar { position: fixed; z-index: 30; left: 0; right: 0; top: 0; padding-top: env(safe-area-inset-top, 0px); }
-  .bar__in { margin-top: 12px; border-radius: 20px; padding: 0 10px 0 16px; min-height: 56px; display: flex;
-    align-items: center; gap: 20px; }
-  .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 17px; letter-spacing: -.02em; text-decoration: none; }
-  .bar nav { display: flex; gap: 22px; margin-left: auto; font-size: 14px; font-weight: 600; }
-  .bar nav a { text-decoration: none; color: var(--soft); }
-  .bar nav a:hover { color: var(--ink); }
-  @media (max-width: 760px) { .bar nav { display: none; } .bar .btn { margin-left: auto; } }
-
-  /* -------------------------------------------------------------- hero */
-  .hero { min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto;
-    padding-block: calc(96px + env(safe-area-inset-top, 0px)) clamp(26px, 5vh, 56px); text-align: center; }
-  .hero__top { display: grid; justify-items: center; gap: 4px; }
-  .hero__small { margin: 0; font-size: clamp(22px, 2.6vw, 36px); font-weight: 500; letter-spacing: -.01em; color: var(--soft);
-    text-shadow: 0 2px 20px rgba(0, 20, 60, .4); }
-  .hero h1 { margin: 0; font-size: clamp(54px, 9.5vw, 150px); line-height: .95; font-weight: 500;
-    text-shadow: 0 6px 40px rgba(0, 20, 60, .45); }
-  .hero__bottom { position: relative; display: grid; justify-items: center; gap: 22px; }
-  /* A soft pool of shade under the copy, so it reads over the brightest sky. */
-  .hero__bottom::before { content: ""; position: absolute; z-index: -1; inset: -50px -12vw -40px; pointer-events: none;
-    background: radial-gradient(closest-side, rgba(4, 18, 48, .62), rgba(4, 18, 48, .25) 60%, transparent); }
-  .hero__lede { margin: 0; max-width: 52ch; font-size: clamp(15.5px, 1.4vw, 18px); line-height: 1.55; color: var(--soft);
-    text-shadow: 0 2px 16px rgba(0, 16, 50, .6); }
-  @media (max-width: 520px) { .hero__lede .long { display: none; } }
-  .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-  .hud { position: absolute; z-index: 2; color: var(--soft); display: flex; align-items: center; gap: 9px; top: 92px; }
-  .hud--l { left: var(--gutter); }
-  .hud--r { right: var(--gutter); }
-  .hud--l::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--red);
-    box-shadow: 0 0 0 4px rgba(236, 48, 19, .3); animation: blink 1.6s steps(2) infinite; }
-  @keyframes blink { 50% { opacity: .25; } }
-  @media (max-width: 760px) { .hud { display: none; } }
-  .hero__cue { margin-top: 6px; color: var(--dim); display: grid; justify-items: center; gap: 8px; }
-  .hero__cue i { width: 1px; height: 34px; background: linear-gradient(var(--cream), transparent); animation: drop 2s var(--ease) infinite; }
-  @keyframes drop { from { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; }
-    51% { transform-origin: bottom; } to { transform: scaleY(0); transform-origin: bottom; } }
-
-  /* ----------------------------------------------------------- sections */
-  .sec { padding-block: clamp(90px, 16vh, 180px); }
-  .tag { display: inline-flex; gap: 10px; margin: 0 0 18px; color: var(--soft); }
-  .tag b { color: var(--cream); font-weight: 500; }
-  .h2 { margin: 0; font-size: clamp(36px, 5.2vw, 76px); font-weight: 800; font-stretch: 118%; letter-spacing: -.045em;
-    line-height: .98; text-wrap: balance; }
-  .h2 .it { font-size: 1.08em; letter-spacing: -.02em; }
-  .intro { margin: 20px 0 0; max-width: 54ch; font-size: 17px; line-height: 1.6; color: var(--soft); }
-  .panel { padding: clamp(26px, 4vw, 52px); }
-  .side { display: grid; }
-  @media (min-width: 980px) { .side--r { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
-    .side--r > * { grid-column: 2; } .side--l { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); } }
-
-  .rv { transition: opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease); }
-  .rv-pre:not(.rv-in) { opacity: 0; transform: translateY(40px) scale(.98); filter: blur(10px); }
-
-  .specs { display: grid; gap: 12px; margin-top: 36px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-  .spec { padding: 20px 20px 22px; border-radius: 20px; background: var(--glass-hi); border: 1px solid rgba(255, 255, 255, .14); min-width: 0; }
-  .spec__v { font-size: clamp(38px, 3.4vw, 52px); white-space: nowrap; font-weight: 800; font-stretch: 112%; letter-spacing: -.05em; line-height: 1;
-    font-variant-numeric: tabular-nums; }
-  .spec__v small { font-size: .36em; letter-spacing: 0; font-weight: 600; color: var(--cream); margin-left: 5px; font-stretch: 100%; }
-  .spec p { margin: 10px 0 0; color: var(--soft); font-size: 14.5px; }
-  .steps { list-style: none; padding: 0; margin: 34px 0 0; display: grid; gap: 0; counter-reset: s; }
-  .step { display: grid; grid-template-columns: 44px 1fr; gap: 4px 16px; padding: 18px 0; border-top: 1px solid rgba(255, 255, 255, .16); }
-  .step__n { grid-row: span 2; font-family: var(--mono); font-size: 13px; color: var(--cream); padding-top: 4px; }
-  .step h3 { margin: 0; font-size: 21px; font-weight: 700; font-stretch: 108%; letter-spacing: -.02em; }
-  .step p { margin: 0; color: var(--soft); font-size: 15.5px; }
-
-  /* ----------------------------------------------------------- products */
-  .prod { overflow-x: hidden; overflow-x: clip; }
-  .deck { padding: clamp(24px, 4vw, 56px); background: rgba(6, 16, 36, .58); overflow: hidden; }
-  .deck__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px 40px; }
-  .segs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 34px; }
-  .segs button { border: 1px solid rgba(255, 255, 255, .18); background: rgba(255, 255, 255, .06); border-radius: 999px;
-    padding: 10px 16px; font-size: 14px; font-weight: 600; color: var(--soft); cursor: pointer; display: inline-flex; gap: 8px;
-    align-items: center; transition: color .2s, border-color .2s, background .2s; }
-  .segs button small { font-family: var(--mono); font-size: 11px; color: var(--dim); }
-  .segs button:hover { color: var(--ink); background: rgba(255, 255, 255, .12); }
-  .segs button.is-on { color: var(--deep); background: var(--cream); border-color: var(--cream); }
-  .segs button.is-on small { color: var(--red); }
-  .stage { display: grid; gap: 36px; margin-top: 40px; align-items: center; }
-  @media (min-width: 980px) { .stage { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 48px; } }
-  .car { --sw: clamp(190px, 56vw, 290px); position: relative; height: calc(var(--sw) * 16 / 9 + 20px); perspective: 1500px;
-    outline: none; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-  @media (min-width: 980px) { .car { --sw: clamp(220px, 21vw, 310px); } }
-  .slide { --o: 0; --a: 0; position: absolute; left: 50%; top: 0; width: var(--sw); max-width: 100%; aspect-ratio: 9 / 16;
-    margin-left: calc(var(--sw) / -2); border-radius: 26px; overflow: hidden; background: #0b0d12; cursor: pointer;
-    transform: translateX(calc(var(--o) * 64%)) translateZ(calc(var(--a) * -240px)) rotateY(calc(var(--o) * -26deg));
-    opacity: clamp(0, calc(1 - var(--a) * .36), 1); filter: brightness(calc(1 - var(--a) * .3));
-    transition: transform .85s var(--ease), opacity .6s ease, filter .6s ease, box-shadow .6s ease;
-    box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .9), inset 0 0 0 1px rgba(255, 255, 255, .1); }
-  .slide.is-on { box-shadow: 0 0 0 2px var(--cream), 0 40px 90px -30px rgba(0, 0, 0, .9); }
-  .slide video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-  .car-info { min-width: 0; }
-  .car-info.swap [data-anim] { animation: swapIn .6s var(--ease) both; }
-  .car-info.swap [data-anim="2"] { animation-delay: .05s; } .car-info.swap [data-anim="3"] { animation-delay: .1s; }
-  @keyframes swapIn { from { opacity: 0; transform: translateY(12px); filter: blur(6px); } }
-  .ci-top { display: flex; justify-content: space-between; gap: 12px; color: var(--dim); }
-  .ci-top [data-f="seg"] { color: var(--cream); }
-  .car-info h3 { margin: 18px 0 0; font-size: clamp(32px, 3.4vw, 48px); font-weight: 800; font-stretch: 115%; letter-spacing: -.04em; line-height: 1; }
-  .ci-kind { margin: 10px 0 0; color: var(--dim); font-size: 14px; }
-  .ci-line { margin: 16px 0 0; color: var(--soft); font-size: 17px; line-height: 1.55; max-width: 40ch; }
-  .car-info .btn { margin-top: 22px; }
-  .car-info__bar { margin-top: 26px; height: 2px; background: rgba(255, 255, 255, .16); border-radius: 2px; overflow: hidden; }
-  .car-info__bar i { display: block; height: 100%; background: var(--cream); transform: scaleX(0); transform-origin: left; }
-  .ctrls { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
-  .ctrls button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .22);
-    background: rgba(255, 255, 255, .06); display: grid; place-items: center; cursor: pointer; }
-  .ctrls button:hover { background: rgba(255, 255, 255, .14); }
-  .ctrls [data-car="toggle"] { width: auto; padding: 0 16px; border-radius: 999px; gap: 8px; display: inline-flex; font-size: 13px; font-weight: 600; }
-  .ctrls .mono { margin-left: auto; color: var(--dim); }
-
-  /* --------------------------------------------------------- asistencia */
-  .shot { margin: 30px 0 0; border-radius: 18px; padding: 8px; background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .16); }
-  .shot img { display: block; width: 100%; height: auto; border-radius: 12px; }
-  .shot figcaption { margin: 10px 4px 2px; color: var(--dim); }
-  .feats { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 10px; }
-  @media (min-width: 640px) { .feats { grid-template-columns: 1fr 1fr; } }
-  .feats li { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: var(--glass-hi);
-    border: 1px solid rgba(255, 255, 255, .12); font-size: 15px; color: var(--soft); }
-  .feats li b { display: block; color: var(--ink); font-size: 15.5px; }
-  .feats svg { flex: none; margin-top: 2px; color: var(--cream); }
-  .panel .btn { margin-top: 28px; }
-
-  /* -------------------------------------------------------- the close */
-  /* One screen: the line on top, the card in the middle (the scene draws it
-     there for this shot), the contact underneath once the card is tapped. */
-  .close { min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; justify-items: center;
-    text-align: center; padding-block: calc(84px + env(safe-area-inset-top, 0px)) clamp(24px, 5vh, 56px); }
-  .close__top { display: grid; justify-items: center; gap: 4px; }
-  .close__small { margin: 0; font-size: clamp(22px, 2.6vw, 36px); font-weight: 500; color: var(--soft); text-shadow: 0 2px 20px rgba(40, 10, 40, .4); }
-  .close h2 { margin: 0; font-size: clamp(56px, 9vw, 140px); line-height: .9; font-weight: 500; text-shadow: 0 6px 40px rgba(60, 10, 30, .4); }
-  /* The tap target sits where the scene draws the card in this shot. */
-  .tapzone { align-self: center; height: min(52vh, 460px); max-width: 80vw; aspect-ratio: .63; border: 0; background: transparent;
-    border-radius: 28px; cursor: pointer; display: grid; place-items: end center; padding: 0; }
-  .tapzone__hint { transform: translateY(70%); display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px;
-    border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid var(--edge); backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); font-size: 14px; font-weight: 700; color: var(--ink); }
-  .tapzone__hint i { width: 10px; height: 10px; border-radius: 50%; background: var(--cream); box-shadow: 0 0 0 0 rgba(255, 240, 201, .8);
-    animation: ping 1.6s ease-out infinite; }
-  @keyframes ping { to { box-shadow: 0 0 0 14px rgba(255, 240, 201, 0); } }
-  .tapped .tapzone__hint { opacity: 0; transition: opacity .4s; }
-  .reveal { display: grid; justify-items: center; gap: 16px; }
-  html.js .gl-ready .reveal { opacity: 0; transform: translateY(24px); filter: blur(8px); pointer-events: none;
-    transition: opacity .8s var(--ease) .35s, transform .8s var(--ease) .35s, filter .8s var(--ease) .35s; }
-  html.js .gl-ready.tapped .reveal { opacity: 1; transform: none; filter: none; pointer-events: auto; }
-  .reveal__line { margin: 0; color: var(--soft); font-size: 17px; }
-  .tel { display: block; font-size: min(11vw, 96px); white-space: nowrap; font-weight: 800; font-stretch: 112%; letter-spacing: -.05em;
-    line-height: 1; font-variant-numeric: tabular-nums; user-select: all; text-shadow: 0 6px 40px rgba(60, 10, 30, .35); }
-
-  footer { padding-block: 24px 34px; }
-  footer .wrap > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; padding: 16px 20px; color: var(--soft); }
-  .split .w { display: inline-block; }
-  .split.go .w { animation: wordIn 1.2s var(--ease) both; animation-delay: calc(var(--i) * .1s + .1s); }
-  @keyframes wordIn { from { opacity: 0; transform: translateY(45%) rotate(2deg); filter: blur(12px); } }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-  }
-</style>
+<link rel="stylesheet" href="css/site.css">
 <!--/head-->
-<div class="world" aria-hidden="true"><canvas></canvas></div>
+{{bg}}
 
 <header class="bar">
   <div class="wrap">
     <div class="bar__in glass">
       <a class="brand" href="#top">{{mark}} Tap Work</a>
-      <nav aria-label="Secciones"><a href="#como">Cómo funciona</a><a href="#productos">Productos</a><a href="#asistencia">Asistencia</a><a href="#tu-turno">Contacto</a></nav>
+      <nav aria-label="Secciones"><a href="#como">Cómo funciona</a><a href="#productos">Productos</a><a href="#tu-turno">Contacto</a><a class="pill" href="asistencia.html">Asistencia</a></nav>
       <a class="btn btn--red btn--sm" href="{{walink}}" target="_blank" rel="noopener">{{wa}} Cotizar</a>
     </div>
   </div>
 </header>
 
 <main id="top">
-  <section class="hero wrap" data-shot="0" aria-label="Tap Work">
+  <section class="hero wrap" aria-label="Tap Work">
     <p class="hud hud--l mono">Tap Work · NFC 13.56 MHz</p>
     <p class="hud hud--r mono">Machala · 3.26° S 79.96° O</p>
     <div class="hero__top">
@@ -259,8 +33,8 @@
     </div>
   </section>
 
-  <section class="sec" id="como" data-shot="1">
-    <div class="wrap side side--r">
+  <section class="sec" id="como">
+    <div class="wrap narrow">
       <div class="panel glass rv">
         <p class="tag mono"><b>01</b> Cómo funciona</p>
         <h2 class="h2" data-decode>Tres pasos. <span class="it">El primero es acercarlo.</span></h2>
@@ -279,7 +53,7 @@
     </div>
   </section>
 
-  <section class="sec prod" id="productos" data-shot="2">
+  <section class="sec prod" id="productos">
     <div class="wrap">
       <div class="deck glass rv">
         <div class="deck__head">
@@ -312,39 +86,26 @@
           </div>
         </div>
       </div>
+      <a class="door glass rv" href="asistencia.html">
+        <span class="door__ico">{{badge}}</span>
+        <span><b>Control de asistencia</b><span>Mira el panel completo: quién llegó, quién se atrasó y el reporte a Excel.</span></span>
+        <span class="door__go">Ver el panel {{arrow}}</span>
+      </a>
     </div>
   </section>
 
-  <section class="sec" id="asistencia" data-shot="3">
-    <div class="wrap side side--l">
-      <div class="panel glass rv">
-        <p class="tag mono"><b>03</b> Control de asistencia</p>
-        <h2 class="h2" data-decode>Todo el turno <span class="it">en un solo panel.</span></h2>
-        <p class="intro">Tu equipo marca entrada y salida acercando su gafete al celular del local. Tú ves quién llegó y quién
-          se atrasó, en el momento.</p>
-        <figure class="shot">
-          <img src="v/panel.jpg" width="1360" height="900" loading="lazy"
-            alt="Panel de asistencia de Tap Work con datos de ejemplo: 7 de 8 presentes, 2 atrasados, 1 ausente y la lista de marcaciones del turno">
-          <figcaption class="mono">Datos de ejemplo</figcaption>
-        </figure>
-        <ul class="feats">
-          <li>{{check}}<span><b>Sin app para tu equipo</b>Solo acercan el gafete.</span></li>
-          <li>{{check}}<span><b>Varios locales</b>Cada uno marca en su propio celular.</span></li>
-          <li>{{check}}<span><b>Lista a Excel</b>Exportas el reporte en un clic.</span></li>
-          <li>{{check}}<span><b>Lo instalamos nosotros</b>Queda funcionando en tu local.</span></li>
-        </ul>
-        <a class="btn btn--red" href="{{walink_asis}}" target="_blank" rel="noopener">{{wa}} Pedir una demostración</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="close wrap" id="tu-turno" data-shot="4">
+  <section class="close wrap" id="tu-turno">
     <div class="close__top">
       <p class="close__small">Ahora es tu turno.</p>
       <h2 class="it" data-split>Tócala.</h2>
     </div>
-    <button class="tapzone" type="button" aria-label="Tocar la tarjeta para ver el contacto">
-      <span class="tapzone__hint"><i></i> Toca la tarjeta</span>
+    <button class="tcard" type="button" aria-label="Tocar la tarjeta Tap Work para darle la vuelta y ver el contacto">
+      <span class="rings" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="tcard__float"><span class="tcard__in">
+        <img src="v/card-front.jpg" width="640" height="1015" alt="Tarjeta Tap Work: monograma TP, Tu negocio siempre conectado, NFC">
+        <img src="v/card-back.jpg" width="640" height="1015" alt="Reverso: Innovación que impulsa tu negocio">
+      </span></span>
+      <span class="tcard__hint"><i></i> Toca la tarjeta</span>
     </button>
     <div class="reveal" aria-live="polite">
       <p class="reveal__line">Así de fácil se siente un toque. Escríbenos y lo dejamos funcionando en tu local.</p>
@@ -356,6 +117,6 @@
   </section>
 </main>
 
-<footer><div class="wrap"><div class="glass mono"><span>Tap Work · Chips NFC para negocios</span><span>WhatsApp {{phone}}</span></div></div></footer>
+<footer><div class="wrap"><div class="glass mono"><span>Tap Work · Chips NFC para negocios</span><a href="asistencia.html">Control de asistencia</a><span>WhatsApp {{phone}}</span></div></div></footer>
 
 <script src="js/app.js"></script>
