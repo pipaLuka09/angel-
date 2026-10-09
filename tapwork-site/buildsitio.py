@@ -145,7 +145,10 @@ NOT_IN_SHOP = {'asistencia', 'gimnasios'}
 REAL = {
     'menu': {'img': 'menu.jpg', 'reel': 'menu.mp4'},          # the "Carta Digital" acrylic, tapped
     'tarjeta': {'img': 'tarjeta.jpg', 'reel': 'tarjeta.mp4'},  # Tania Sánchez's card, tapped
-    'resenas': {'img': 'resenas.jpg'},                         # the Google reviews acrylic
+    'resenas': {'img': 'resenas.jpg', 'reel': 'resenas.mp4'},  # the Google reviews acrylic
+    # No footage of these yet: studio shot of the 3D render, sales cut of the 3D tap and screens.
+    'pagos': {'img': 'pago.jpg', 'reel': 'pago.mp4'},
+    'wifi': {'img': 'wifi.jpg', 'reel': 'wifi.mp4'},
 }
 
 # Products with a page of their own.

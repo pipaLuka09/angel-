@@ -21,6 +21,7 @@ html,body{width:1080px;height:1350px;overflow:hidden;background:#0b0c0f}
 .lbl{position:absolute;left:64px;top:96px;padding:20px 28px 22px 34px;background:rgba(8,10,14,.72);border-radius:18px;
   font-size:58px;font-weight:800;line-height:1.08;letter-spacing:-.025em;backdrop-filter:blur(8px)}
 .lbl::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:8px;border-radius:4px;background:#ec3013}
+.lbl--b{top:auto;bottom:96px}
 .lbl small{display:block;font-size:34px;font-weight:600;color:rgba(255,255,255,.8);margin-top:8px;letter-spacing:-.01em}
 /* end */
 #end{background:#1f2229}
@@ -71,6 +72,36 @@ const P = {
     ],
     end: { img: 'tarjeta.jpg', name: 'Tarjeta de presentación NFC' },
   },
+  // No real footage yet for these three: the 3D tap and the phone screens
+  // (fr/<k>: clip 0-3.25 s, first screen 3.25-6.85 s, second 6.85-10.25 s).
+  resenas: {
+    frames: 246, hook: ['¿Todavía pides', 'reseñas', '<span class="x">de palabra?<i></i></span>'], hookAt: 1.6, pos: '50% 58%',
+    scenes: [
+      { len: 2.6, img: 'resenas.jpg', lbl: 'Ponlo en tu mostrador.', at: 'bottom' },
+      { len: 2.8, src: 0.2, speed: 1.0, lbl: 'Tu cliente acerca', sub: 'el celular.' },
+      { len: 3.0, src: 3.3, speed: 1.15, lbl: 'Se abre tu Google.', sub: 'Cinco estrellas, un toque.', at: 'bottom' },
+      { len: 2.8, src: 6.85, speed: 1.2, lbl: 'Reseña publicada', sub: 'en diez segundos.', at: 'bottom' },
+    ],
+    end: { img: 'resenas.jpg', name: 'Reseñas de Google NFC', drop: 40, scale: .84 },
+  },
+  pago: {
+    frames: 246, hook: ['¿Tu cliente todavía', '<span class="x">espera la cuenta?<i></i></span>'], hookAt: 1.6, pos: '50% 58%',
+    scenes: [
+      { len: 2.8, src: 0.2, speed: 1.0, lbl: 'Acerca el celular.' },
+      { len: 3.0, src: 4.0, speed: 0.95, lbl: 'Paga desde su celular.', at: 'bottom' },
+      { len: 2.8, src: 7.4, speed: 1.0, lbl: 'Y deja la propina.', sub: 'Sin llamar al mesero.', at: 'bottom' },
+    ],
+    end: { img: 'pago.jpg', name: 'Pagos y propinas NFC' },
+  },
+  wifi: {
+    frames: 246, hook: ['¿Todavía dictas', '<span class="x">la clave del Wi-Fi?<i></i></span>'], hookAt: 1.6, pos: '50% 58%',
+    scenes: [
+      { len: 2.8, src: 0.2, speed: 1.0, lbl: 'Acerca el celular.' },
+      { len: 3.0, src: 4.0, speed: 0.95, lbl: 'Se conecta solo.', at: 'bottom' },
+      { len: 2.8, src: 7.4, speed: 1.0, lbl: 'Nadie pide la clave.', sub: 'Ni al mesero.', at: 'bottom' },
+    ],
+    end: { img: 'wifi.jpg', name: 'Wi-Fi NFC' },
+  },
 };
 const KEY = new URLSearchParams(location.search).get('k') || 'menu';
 const C = P[KEY];
@@ -82,14 +113,18 @@ const ramp = (t, a, b) => Math.min(1, Math.max(0, (t - a) / (b - a)));
 const out3 = x => 1 - Math.pow(1 - x, 3);
 const back = x => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
 
-const imgs = [];
+const imgs = [], stills = {};
 function build() {
   $('#foot').style.objectPosition = C.pos;
   $('#hook').innerHTML = '<h1>' + C.hook.map((l, i) => '<span data-w="' + i + '">' + l + '</span>').join('<br>') +
     '</h1><p>Hay una forma más simple.</p>';
-  $('#labels').innerHTML = C.scenes.map((s, i) => '<div class="lbl" data-s="' + i + '">' + s.lbl +
+  $('#labels').innerHTML = C.scenes.map((s, i) => '<div class="lbl' + (s.at === 'bottom' ? ' lbl--b' : '') + '" data-s="' + i + '">' + s.lbl +
     (s.sub ? '<small>' + s.sub + '</small>' : '') + '</div>').join('');
   $('#end .ph').src = C.end.img; $('#end .name').textContent = C.end.name;
+  if (C.end.scale) {  // a smaller photo melts into a matching studio ground instead of showing its edge
+    $('#end').style.background = 'linear-gradient(#1f2229, #0b0c0f)';
+    $('#end .ph').style.webkitMaskImage = $('#end .ph').style.maskImage = 'radial-gradient(ellipse 52% 50% at 50% 52%, #000 70%, transparent 100%)';
+  }
   return fetch('mono.svg').then(r => r.text()).then(svg => { $('#mono').innerHTML = svg; });
 }
 function frameAt(src) { return Math.max(1, Math.min(C.frames, Math.round(src * 24) + 1)); }
@@ -101,10 +136,13 @@ window.renderAt = function (t) {
   if (t < HOOK) { blur = 16; dark = .55; scale = 1.08 + t * .01; }
   else if (t < ENDAT) {
     const s = C.scenes.find(s => t >= s.t0 && t < s.t0 + s.len) || C.scenes[C.scenes.length - 1];
-    const k = t - s.t0; src = s.src + k * s.speed; scale = 1.02 + .05 * (k / s.len);
+    const k = t - s.t0; scale = 1.02 + .05 * (k / s.len);
+    if (s.img) { stills[s.img] && ($('#foot').src = stills[s.img].src); $('#foot').style.objectPosition = '50% 50%'; }
+    else { src = s.src + k * s.speed; $('#foot').style.objectPosition = C.pos; }
     blur = 16 * (1 - out3(ramp(t, HOOK, HOOK + .45))); dark = .55 * (1 - ramp(t, HOOK, HOOK + .45));
   } else { const s = C.scenes[C.scenes.length - 1]; src = s.src + s.len * s.speed; }
-  setFrame(frameAt(src));
+  const sc = C.scenes.find(s => t >= s.t0 && t < s.t0 + s.len);
+  if (!(sc && sc.img && t >= HOOK && t < ENDAT)) { setFrame(frameAt(src)); $('#foot').style.objectPosition = C.pos; }
   $('#foot').style.transform = 'scale(' + scale.toFixed(4) + ')';
   $('#foot').style.filter = blur > .2 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
   $('#shade').style.background = 'rgba(5,8,14,' + dark.toFixed(3) + ')';
@@ -117,7 +155,8 @@ window.renderAt = function (t) {
     w.style.opacity = k; w.style.transform = 'translateY(' + (40 * (1 - k)).toFixed(1) + 'px)';
     w.style.filter = k < 1 ? 'blur(' + (10 * (1 - k)).toFixed(1) + 'px)' : 'none';
   });
-  const x = hk.querySelector('.x i'); if (x) x.style.transform = 'scaleX(' + out3(ramp(t, 1.25, 1.6)).toFixed(3) + ')';
+  const nl = C.hook.length - 1, x = hk.querySelector('.x i');
+  if (x) x.style.transform = 'scaleX(' + out3(ramp(t, .97 + nl * .28, 1.32 + nl * .28)).toFixed(3) + ')';
   hk.querySelector('p').style.opacity = ramp(t, 1.55, 1.95);
 
   // labels
@@ -132,7 +171,7 @@ window.renderAt = function (t) {
   // end card
   const e = $('#end'); const ek = ramp(t, ENDAT - XF, ENDAT + .2);
   e.style.opacity = ek;
-  e.querySelector('.ph').style.transform = 'translateY(' + (C.end.drop || 0) + 'px) scale(' + (1.08 - .08 * out3(ramp(t, ENDAT - XF, TOTAL))).toFixed(4) + ')';
+  e.querySelector('.ph').style.transform = 'translateY(' + (C.end.drop || 0) + 'px) scale(' + ((C.end.scale || 1) * (1.08 - .08 * out3(ramp(t, ENDAT - XF, TOTAL)))).toFixed(4) + ')';
   const lg = e.querySelector('.top'), lk = back(ramp(t, ENDAT + .1, ENDAT + .7));
   lg.style.opacity = ramp(t, ENDAT + .1, ENDAT + .45); lg.style.transform = 'translateY(' + (30 * (1 - lk)).toFixed(1) + 'px)';
   const ct = e.querySelector('.cta'), ck = back(ramp(t, ENDAT + .45, ENDAT + 1.05));
@@ -143,6 +182,8 @@ window.__total = TOTAL;
 window.__ready = build().then(() => Promise.all(Array.from({ length: C.frames }, (_, i) => {
   const im = new Image(); im.src = 'fr/' + KEY + '/f' + String(i + 1).padStart(4, '0') + '.jpg'; imgs[i + 1] = im;
   return im.decode().catch(() => {});
+}))).then(() => Promise.all(C.scenes.filter(s => s.img).map(s => {
+  const im = new Image(); im.src = s.img; stills[s.img] = im; return im.decode().catch(() => {});
 }))).then(() => Promise.all([$('#end .ph').decode().catch(() => {}), document.fonts.ready]));
 </script>
 </body></html>
