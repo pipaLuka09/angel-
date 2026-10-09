@@ -79,14 +79,18 @@ archivos o las capturas salen de una copia vieja. El script hace justo eso:
 
     python3 buildsitio.py   # futuro/ + reels/v/ -> sitio/
 
-- `futuro/scene.js`: el hero en three.js. Calle vista desde abajo con lente de
-  ojo de pez, torres de vidrio y la tarjeta Tap Work. El scroll acerca la
-  tarjeta, la voltea y pasa de la tarde a la noche. Todo es procedural, no
-  descarga texturas.
-- `futuro/app.js`: scroll del hero, títulos que se decodifican, carrusel 3D de
-  los nueve reels con una pestaña por tipo de negocio.
+- `futuro/scene.js`: el mundo en three.js, fijo detrás de toda la página. Calle
+  vista desde abajo en ojo de pez, torres de vidrio, palmeras, cámara que gira
+  lento y la tarjeta Tap Work. Cada sección tiene su ángulo de cámara y su
+  lugar para la tarjeta; la luz va de la tarde al atardecer. Al final la
+  tarjeta se toca y se voltea para mostrar el WhatsApp. Todo es procedural,
+  no descarga texturas.
+- `futuro/app.js`: la cámara que sigue a las secciones, el carrusel 3D de los
+  nueve reels con una pestaña por tipo de negocio, los títulos que entran
+  palabra por palabra y el toque final.
 - `futuro/hero-poster*.jpg`: un cuadro de la misma escena, que se ve mientras
   carga three.js o si el navegador no tiene WebGL.
+- La página no muestra precios: todo se cotiza por WhatsApp.
 
 `sitio/` es la carpeta que se arrastra a Netlify Drop; `sitio/preview.html` es
 la misma página sin el `<html>`, para la vista previa en claude.ai.

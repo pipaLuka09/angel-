@@ -1,9 +1,11 @@
-"""Build the Tap Work site: a 3D street-level hero, then the products in segments.
+"""Build the Tap Work site: one 3D street behind the whole page, sections over it.
 
-The hero is a three.js scene (futuro/scene.js): looking up from the street at
-glass towers through a fisheye lens, a Tap Work card held out to the camera.
-Scrolling brings the card closer, turns it to show its chip and turns the
-afternoon into night, which is where the rest of the page lives.
+The world is a three.js scene (futuro/scene.js), fixed behind every section:
+looking up from the street through a fisheye lens at glass towers and palms,
+a slow drifting camera, a Tap Work card held out to the viewer. Each section
+has its own camera angle and spot for the card, the light runs from afternoon
+to sunset, and at the close the visitor taps the card to flip it to the
+WhatsApp number. The page shows no prices; quotes go through WhatsApp.
 
 The nine product reels (reels/, see reels/README.md) ride one 3D carousel with
 a tab per kind of business, so only one plays at a time and none are stacked.
@@ -66,6 +68,7 @@ ARROW = svg('M5 12h14M13 6l6 6-6 6', 16)
 LEFT = svg('M15 5l-7 7 7 7')
 RIGHT = svg('M9 5l7 7-7 7')
 PAUSE = svg('M8 5v14M16 5v14', 14)
+CHECK = svg('M5 12.5l4.5 4.5L19 7', 18)
 
 
 def esc(s):
@@ -98,14 +101,14 @@ def build():
         '        <button type="button" role="tab" data-seg="%s" aria-selected="false">%s <small>%d</small></button>'
         % (sid, label, len(ids)) for sid, label, _, ids in SEGMENTS)
     steps = '\n'.join(
-        '        <li class="step rv"><span class="step__n">0%d</span><h3>%s</h3><p>%s</p></li>' % (i + 1, t, d)
+        '          <li class="step"><span class="step__n">0%d</span><h3>%s</h3><p>%s</p></li>' % (i + 1, t, d)
         for i, (t, d) in enumerate(HOW))
 
     page = io.open(os.path.join(SRC, 'index.html'), encoding='utf-8').read()
     for k, val in dict(
-            mark=cat.MARK, wa=cat.WA_ICON, phone=cat.PHONE, arrow=ARROW, left=LEFT, right=RIGHT, pause=PAUSE,
+            mark=cat.MARK, wa=cat.WA_ICON, phone=cat.PHONE, arrow=ARROW, left=LEFT, right=RIGHT, pause=PAUSE, check=CHECK,
             walink=esc(cat.wa_link('Hola, quiero cotizar productos NFC de Tap Work')),
-            walink_asis=esc(cat.wa_link('Hola, quiero control de asistencia con Tap Work')),
+            walink_asis=esc(cat.wa_link('Hola, quiero una demostración del control de asistencia de Tap Work')),
             steps=steps, segs=segs, slides='\n'.join(slides), n=str(n)).items():
         page = page.replace('{{%s}}' % k, val)
     assert '{{' not in page, 'placeholder sin reemplazar'

@@ -1,6 +1,6 @@
 /*
-  Page behaviour: the hero scroll, the product carousel, the decoding headings
-  and the section reveals. Runs as soon as it is parsed; the 3D scene and the
+  Page behaviour: the camera that follows the sections, the product carousel,
+  the decoding headings, the reveals and the tap at the close. Runs as soon as it is parsed; the 3D scene and the
   smooth scroll are fetched only after window.load so they never compete with
   the first paint.
 */
@@ -13,43 +13,53 @@
   function clamp(x, a, b) { return Math.min(Math.max(x, a), b); }
   function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
 
-  /* ------------------------------------------------------------------ hero */
-  var hero = document.querySelector('.hero');
-  var copyA = document.querySelector('.hero__copy');
-  var copyB = document.querySelector('.hero__copy2');
-  var meter = document.querySelector('.hero__meter i');
-  var scene = null, heroP = 0, ticking = false;
-
-  function heroProgress() {
-    var r = hero.getBoundingClientRect();
-    return clamp(-r.top / Math.max(1, r.height - innerHeight), 0, 1);
+  /* ------------------------------------------------------- world camera */
+  // Which section is on screen, as a float: 1.5 means halfway from the second
+  // section's centre to the third's. The scene turns its camera by it.
+  var shots = [].slice.call(document.querySelectorAll('[data-shot]'));
+  var scene = null, ticking = false;
+  function section() {
+    var mid = innerHeight / 2;
+    var cs = shots.map(function (el) { var r = el.getBoundingClientRect(); return r.top + r.height / 2; });
+    if (mid <= cs[0]) return 0;
+    for (var i = 0; i < cs.length - 1; i++) if (mid <= cs[i + 1]) return i + (mid - cs[i]) / (cs[i + 1] - cs[i]);
+    return cs.length - 1;
   }
-  function paintHero() {
-    ticking = false;
-    heroP = heroProgress();
-    if (!still) {
-      var a = ease(heroP / 0.3);
-      copyA.style.opacity = String(1 - a);
-      copyA.style.transform = 'translateY(' + (-40 * a).toFixed(1) + 'px)';
-      copyA.style.filter = a > 0.01 ? 'blur(' + (a * 8).toFixed(1) + 'px)' : '';
-      copyA.style.visibility = a > 0.99 ? 'hidden' : '';
-      var b = ease((heroP - 0.52) / 0.2) * (1 - ease((heroP - 0.92) / 0.08));
-      copyB.style.opacity = String(b);
-      copyB.style.transform = 'translateY(' + (30 * (1 - b)).toFixed(1) + 'px)';
-      if (scene) scene.setProgress(heroP);
-    }
-    if (meter) meter.style.transform = 'scaleX(' + heroP.toFixed(3) + ')';
-  }
-  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(paintHero); } }
+  function paint() { ticking = false; if (scene && !still) scene.setSection(section()); }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', onScroll);
-  paintHero();
 
   if (fine) {
     addEventListener('mousemove', function (e) {
       if (scene) scene.setPointer(e.clientX / innerWidth * 2 - 1, e.clientY / innerHeight * 2 - 1);
     }, { passive: true });
   }
+
+  /* ------------------------------------------------- word-by-word titles */
+  // The big italic lines rise word by word out of a blur. Words stay visible
+  // until the line is told to play, so nothing waits hidden for a script.
+  document.querySelectorAll('[data-split]').forEach(function (el) {
+    if (still) return;
+    var words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words.map(function (w, i) {
+      return '<span class="w" style="--i:' + i + '">' + w.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>';
+    }).join(' ');
+    el.classList.add('split');
+  });
+  var hero = document.querySelector('.hero [data-split]');
+  if (hero) hero.classList.add('go');
+
+  /* ------------------------------------------------------------ the tap */
+  var close = document.querySelector('.close');
+  var tapBtn = document.querySelector('.tapzone');
+  var tapped = false, autoTap = null;
+  function doTap() {
+    clearTimeout(autoTap);
+    if (scene) scene.tap();
+    if (!tapped) { tapped = true; close.classList.add('tapped'); }
+  }
+  if (tapBtn) tapBtn.addEventListener('click', doTap);
 
   /* -------------------------------------------------- decoding headings */
   var GLYPHS = '▮▯▪/\\<>_=+*#01';
@@ -227,25 +237,34 @@
   /* ------------------------------------------- deferred: 3D scene, Lenis */
   function load(src) {
     return new Promise(function (ok, no) {
-      var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no;
-      document.body.appendChild(s);
+      var el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = no;
+      document.body.appendChild(el);
     });
   }
   addEventListener('load', function () {
-    var canvas = document.querySelector('.hero__gl');
+    var canvas = document.querySelector('.world canvas');
     load('js/three.min.js').then(function () { return load('js/scene.js'); }).then(function () {
       if (!window.TWScene) return;
-      scene = window.TWScene.create(canvas, {});
+      scene = window.TWScene.create(canvas, { phone: (document.querySelector('.tel') || {}).textContent || '' });
       if (!scene) return;
-      scene.setProgress(still ? 0 : heroP);
+      scene.setSection(still ? 0 : section());
       scene.frame();
-      hero.classList.add('gl-on');
+      doc.classList.add('gl-on');
+      // The contact waits behind the card only once there is a card to tap.
+      close.classList.add('gl-ready');
+      if ('IntersectionObserver' in window) {
+        // Left alone on the close for a few seconds, the card taps itself.
+        new IntersectionObserver(function (es) {
+          clearTimeout(autoTap);
+          if (es[0].isIntersecting && !tapped) autoTap = setTimeout(doTap, 4500);
+          var h = close.querySelector('[data-split]');
+          if (es[0].isIntersecting && h) h.classList.add('go');
+        }, { threshold: 0.45 }).observe(close);
+      }
       if (still) return;
-      new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting && !document.hidden) scene.start(); else scene.stop();
-      }).observe(hero);
+      scene.start();
       document.addEventListener('visibilitychange', function () {
-        if (document.hidden) scene.stop(); else if (heroProgress() < 1) scene.start();
+        if (document.hidden) scene.stop(); else scene.start();
       });
     }).catch(function () {});
 
@@ -258,7 +277,7 @@
           a.addEventListener('click', function (e) {
             var id = a.getAttribute('href'), el = id.length > 1 && document.querySelector(id);
             if (!el) return;
-            e.preventDefault(); lenis.scrollTo(el, { offset: -64 });
+            e.preventDefault(); lenis.scrollTo(el, { offset: -70 });
           });
         });
       }).catch(function () {});
