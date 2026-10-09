@@ -11,7 +11,7 @@
   angle and a place for the card; between sections the scene eases from one to
   the next, and the afternoon turns to sunset toward the close.
 
-  window.TWScene.create(canvas) -> { setSection, setPointer, tap, start, stop, frame }
+  window.TWScene.create(canvas, { front, back }) -> { setSection, setPointer, tap, start, stop, frame }
 */
 (function () {
   if (!window.THREE) return;
@@ -20,11 +20,11 @@
   // Per-section shot. cx/cy place the card in camera space (right/up), with a
   // separate pair for portrait screens, where text owns the top and bottom.
   var SHOTS = [
-    { yaw: 0.00, pitch: 70, dist: 5.6, cx: -2.75, cy: 0.20, pcx: 0.0, pcy: 1.05, rx: 0.16, ry: -0.42, rz: 0.16, dusk: 0.00 },
-    { yaw: 0.95, pitch: 64, dist: 6.4, cx: -2.70, cy: 0.10, pcx: 0.0, pcy: 2.6, rx: 0.10, ry: 0.50, rz: -0.12, dusk: 0.08 },
-    { yaw: 1.85, pitch: 80, dist: 9.5, cx: 0.00, cy: 3.40, pcx: 0.0, pcy: 4.2, rx: 0.40, ry: 0.25, rz: 0.00, dusk: 0.18 },
-    { yaw: 2.70, pitch: 68, dist: 7.0, cx: 2.80, cy: 0.70, pcx: 0.0, pcy: 3.0, rx: 0.10, ry: -0.55, rz: 0.10, dusk: 0.42 },
-    { yaw: 3.50, pitch: 60, dist: 4.4, cx: 0.00, cy: 0.05, pcx: 0.0, pcy: 0.05, rx: 0.00, ry: 0.00, rz: 0.00, dusk: 0.92 }
+    { yaw: 0.00, pitch: 70, dist: 6.2, cx: -3.10, cy: -0.30, pcx: 0.0, pcy: 0.95, pdist: 7.6, rx: 0.16, ry: -0.42, rz: 0.16, dusk: 0.00 },
+    { yaw: 0.95, pitch: 64, dist: 6.4, cx: -2.70, cy: 0.10, pcx: 0.0, pcy: 2.6, pdist: 6.4, rx: 0.10, ry: 0.50, rz: -0.12, dusk: 0.08 },
+    { yaw: 1.85, pitch: 80, dist: 9.5, cx: 0.00, cy: 3.40, pcx: 0.0, pcy: 4.2, pdist: 9.5, rx: 0.40, ry: 0.25, rz: 0.00, dusk: 0.18 },
+    { yaw: 2.70, pitch: 68, dist: 7.0, cx: 2.80, cy: 0.70, pcx: 0.0, pcy: 3.0, pdist: 7.0, rx: 0.10, ry: -0.55, rz: 0.10, dusk: 0.42 },
+    { yaw: 3.50, pitch: 60, dist: 4.9, cx: 0.00, cy: -0.30, pcx: 0.0, pcy: -0.05, pdist: 4.9, rx: 0.00, ry: 0.00, rz: 0.00, dusk: 0.92 }
   ];
 
   var COMMON = [
@@ -139,56 +139,21 @@
     ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   }
-  // The Tap Work mark, same geometry as brand/tapwork-mark-dark.svg (100 units).
-  function drawMark(ctx, x, y, s, ink) {
-    var u = s / 100;
-    ctx.save(); ctx.translate(x, y); ctx.scale(u, u);
-    ctx.fillStyle = ink;
-    ctx.fillRect(15, 26, 48, 13.5); ctx.fillRect(32.2, 26, 13.6, 45);
-    ctx.strokeStyle = ink; ctx.lineWidth = 7.5; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.arc(52.5, 48.75, 16.5, -0.73, 0.73); ctx.stroke();
-    ctx.beginPath(); ctx.arc(51.5, 48.5, 30, -0.67, 0.67); ctx.stroke();
-    ctx.fillStyle = '#ec3013'; roundRect(ctx, 15, 79, 70, 7.5, 3.75); ctx.fill();
-    ctx.restore();
-  }
-
-  function cardCanvas(back, phone) {
-    var W = 1024, H = 646, c = document.createElement('canvas');
-    c.width = W; c.height = H;
-    var g = c.getContext('2d');
-    roundRect(g, 0, 0, W, H, 46); g.save(); g.clip();
-    var bg = g.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#1c1e23'); bg.addColorStop(0.55, '#0c0d10'); bg.addColorStop(1, '#16171b');
-    g.fillStyle = bg; g.fillRect(0, 0, W, H);
-    g.globalAlpha = 0.05; g.strokeStyle = '#fff';
-    for (var i = 0; i < H; i += 3) { g.lineWidth = Math.random() * 0.8; g.beginPath(); g.moveTo(0, i); g.lineTo(W, i + 8); g.stroke(); }
-    g.globalAlpha = 1;
-    g.strokeStyle = '#f2f3f4'; g.lineCap = 'round';
-    if (!back) {
-      drawMark(g, 64, 52, 150, '#f2f3f4');
-      g.fillStyle = '#f2f3f4'; g.font = '800 92px Archivo, sans-serif';
-      g.fillText('Tap Work', 70, 330);
-      g.fillStyle = '#9aa0a8'; g.font = '500 30px "JetBrains Mono", monospace';
-      g.fillText('ACERCA TU CELULAR', 74, 384);
-      g.lineWidth = 9;
-      for (var k = 0; k < 3; k++) { g.beginPath(); g.arc(870, 110, 22 + k * 22, -0.75, 0.75); g.stroke(); }
-      g.fillStyle = '#ec3013'; g.fillRect(74, 548, 210, 12);
-      g.fillStyle = '#7c828b'; g.font = '500 26px "JetBrains Mono", monospace';
-      g.fillText('NFC · 13.56 MHz', 690, 562);
-    } else {
-      drawMark(g, 64, 52, 120, '#f2f3f4');
-      g.fillStyle = '#9aa0a8'; g.font = '600 34px Archivo, sans-serif';
-      g.fillText('Escr\u00edbenos por WhatsApp', 74, 300);
-      g.fillStyle = '#f2f3f4'; g.font = '800 104px Archivo, sans-serif';
-      g.fillText(phone, 70, 420);
-      g.fillStyle = '#ec3013'; g.fillRect(74, 548, 210, 12);
-      g.lineWidth = 9;
-      for (var j = 0; j < 3; j++) { g.beginPath(); g.arc(870, 110, 22 + j * 22, -0.75, 0.75); g.stroke(); }
-    }
-    g.restore();
-    var tex = new T.CanvasTexture(c);
-    tex.anisotropy = 4;
-    return tex;
+  // The real card: the print artwork from print/out, cropped to the trim and
+  // given the card's rounded corners (3.18 mm on a 54 mm edge).
+  function cardTexture(src, done) {
+    var img = new Image();
+    img.onload = function () {
+      var W = img.naturalWidth, H = img.naturalHeight, c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      var g = c.getContext('2d');
+      roundRect(g, 0, 0, W, H, W * 3.18 / 54); g.clip();
+      g.drawImage(img, 0, 0, W, H);
+      var tex = new T.CanvasTexture(c);
+      tex.anisotropy = 4;
+      done(tex);
+    };
+    img.src = src;
   }
 
   // A palm, drawn once: curved trunk, a crown of fronds with leaflets.
@@ -293,7 +258,8 @@
     scene.add(motes);
 
     // ---- the card ----
-    var CW = 3.37, CH = 2.125;
+    // ID-1, stood on end like the printed design: 54 x 85.6 mm.
+    var CW = 2.125, CH = 3.37;
     var holder = new T.Group(); scene.add(holder);
     var card = new T.Group(); holder.add(card);
     var shape = new T.Shape(), r = 0.14, hw = CW / 2, hh = CH / 2;
@@ -330,13 +296,9 @@
       ring.position.z = 0.06; card.add(ring); rings.push(ring);
     }
 
-    function paintCard() {
-      front.material.uniforms.map.value = cardCanvas(false);
-      backFace.material.uniforms.map.value = cardCanvas(true, opts.phone || '');
-    }
-    if (document.fonts && document.fonts.load) {
-      Promise.all([document.fonts.load('800 92px Archivo'), document.fonts.load('500 26px "JetBrains Mono"')]).then(paintCard, paintCard);
-    } else paintCard();
+    front.visible = backFace.visible = false;
+    cardTexture(opts.front || 'v/card-front.jpg', function (t) { front.material.uniforms.map.value = t; front.visible = true; });
+    cardTexture(opts.back || 'v/card-back.jpg', function (t) { backFace.material.uniforms.map.value = t; backFace.visible = true; });
 
     // ---- post ----
     var rt = new T.WebGLRenderTarget(4, 4, { minFilter: T.LinearFilter, magFilter: T.LinearFilter });
@@ -391,13 +353,13 @@
       camRight.setFromMatrixColumn(camera.matrixWorld, 0);
       camUp.setFromMatrixColumn(camera.matrixWorld, 1);
 
-      var dist = S.dist * (portrait ? 0.78 : 1);
+      var dist = portrait ? (S.pdist || S.dist) * 0.78 : S.dist;
       holder.position.copy(fwd).multiplyScalar(dist);
       holder.position.addScaledVector(camRight, portrait ? S.pcx : S.cx);
       holder.position.addScaledVector(camUp, (portrait ? S.pcy : S.cy) + Math.sin(t * 1.1) * 0.07);
       holder.quaternion.copy(camera.quaternion);
 
-      // Tap: the card flips to its back (the phone number) and the rings burst.
+      // Tap: the card jumps toward the viewer, flips to its back and the rings burst.
       state.flip += ((state.flipped ? Math.PI : 0) - state.flip) * 0.08;
       var since = t - state.tapAt;
       var jolt = since < 0.6 ? Math.sin(since / 0.6 * Math.PI) * 0.35 : 0;
@@ -415,7 +377,7 @@
       for (var i = 0; i < rings.length; i++) {
         var k = ((t * (0.5 + burst * 1.5)) + i / rings.length) % 1;
         var s = 1.0 + k * (2.0 + burst * 2.5);
-        rings[i].scale.set(s * 1.25, s, 1);
+        rings[i].scale.set(s * 1.1, s * 1.7, 1);
         rings[i].material.opacity = (1 - k) * facing * (0.28 + burst * 0.7 + S.dusk * 0.25);
       }
 

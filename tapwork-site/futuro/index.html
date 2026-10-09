@@ -52,6 +52,7 @@
   .world::after { content: ""; position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(180deg, rgba(4, 18, 48, .45), transparent 26%, transparent 70%, rgba(4, 14, 36, .55)); }
   main, footer, .bar { position: relative; z-index: 1; }
+  main { overflow-x: hidden; overflow-x: clip; }
 
   .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px;
     font-size: 15px; font-weight: 700; text-decoration: none; border: 1px solid var(--edge);
@@ -134,7 +135,7 @@
 
   /* ----------------------------------------------------------- products */
   .prod { overflow-x: hidden; overflow-x: clip; }
-  .deck { padding: clamp(24px, 4vw, 56px); background: rgba(6, 16, 36, .58); }
+  .deck { padding: clamp(24px, 4vw, 56px); background: rgba(6, 16, 36, .58); overflow: hidden; }
   .deck__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px 40px; }
   .segs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 34px; }
   .segs button { border: 1px solid rgba(255, 255, 255, .18); background: rgba(255, 255, 255, .06); border-radius: 999px;
@@ -197,7 +198,7 @@
   .close__small { margin: 0; font-size: clamp(22px, 2.6vw, 36px); font-weight: 500; color: var(--soft); text-shadow: 0 2px 20px rgba(40, 10, 40, .4); }
   .close h2 { margin: 0; font-size: clamp(56px, 9vw, 140px); line-height: .9; font-weight: 500; text-shadow: 0 6px 40px rgba(60, 10, 30, .4); }
   /* The tap target sits where the scene draws the card in this shot. */
-  .tapzone { align-self: center; width: min(80vw, 520px); max-height: 100%; aspect-ratio: 1.6; border: 0; background: transparent;
+  .tapzone { align-self: center; height: min(52vh, 460px); max-width: 80vw; aspect-ratio: .63; border: 0; background: transparent;
     border-radius: 28px; cursor: pointer; display: grid; place-items: end center; padding: 0; }
   .tapzone__hint { transform: translateY(70%); display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px;
     border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid var(--edge); backdrop-filter: blur(12px);

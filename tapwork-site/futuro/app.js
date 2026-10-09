@@ -245,7 +245,7 @@
     var canvas = document.querySelector('.world canvas');
     load('js/three.min.js').then(function () { return load('js/scene.js'); }).then(function () {
       if (!window.TWScene) return;
-      scene = window.TWScene.create(canvas, { phone: (document.querySelector('.tel') || {}).textContent || '' });
+      scene = window.TWScene.create(canvas, {});
       if (!scene) return;
       scene.setSection(still ? 0 : section());
       scene.frame();

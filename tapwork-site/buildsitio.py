@@ -134,7 +134,7 @@ def build():
     shutil.copy(os.path.join(SRC, 'scene.js'), os.path.join(OUT, 'js', 'scene.js'))
     shutil.copy(os.path.join(SRC, 'three.min.js'), os.path.join(OUT, 'js', 'three.min.js'))
     shutil.copy(os.path.join(REPO, 'assets', 'lenis.min.js'), os.path.join(OUT, 'js', 'lenis.min.js'))
-    for f in ('hero-poster.jpg', 'hero-poster-m.jpg', 'panel.jpg'):
+    for f in ('hero-poster.jpg', 'hero-poster-m.jpg', 'panel.jpg', 'card-front.jpg', 'card-back.jpg'):
         shutil.copy(os.path.join(SRC, f), os.path.join(OUT, 'v', f))
     for f in os.listdir(FONTS):
         shutil.copy(os.path.join(FONTS, f), os.path.join(OUT, 'fonts', f))

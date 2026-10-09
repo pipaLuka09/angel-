@@ -81,9 +81,9 @@ archivos o las capturas salen de una copia vieja. El script hace justo eso:
 
 - `futuro/scene.js`: el mundo en three.js, fijo detrás de toda la página. Calle
   vista desde abajo en ojo de pez, torres de vidrio, palmeras, cámara que gira
-  lento y la tarjeta Tap Work. Cada sección tiene su ángulo de cámara y su
+  lento y la tarjeta Tap Work real (el arte de `print/out`, en vertical). Cada sección tiene su ángulo de cámara y su
   lugar para la tarjeta; la luz va de la tarde al atardecer. Al final la
-  tarjeta se toca y se voltea para mostrar el WhatsApp. Todo es procedural,
+  tarjeta se toca y se voltea al reverso. Todo es procedural,
   no descarga texturas.
 - `futuro/app.js`: la cámara que sigue a las secciones, el carrusel 3D de los
   nueve reels con una pestaña por tipo de negocio, los títulos que entran
