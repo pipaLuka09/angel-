@@ -75,12 +75,18 @@ archivos o las capturas salen de una copia vieja. El script hace justo eso:
 
 - Faltan los enlaces de Instagram / TikTok / Facebook (hoy dicen "pendiente").
 
-## Página de reels (`buildreels.py`)
+## Sitio nuevo (`buildsitio.py`)
 
-    python3 buildreels.py   # reels/v/ + assets/*.min.js -> sitio/
+    python3 buildsitio.py   # futuro/ + reels/v/ -> sitio/
 
-Un video vertical por producto (ver `reels/README.md`), en una pared de tres
-columnas, con la capa de movimiento del tema ShopNow (`reels/motion.js`, mismos
-tiempos que `assets/motion.js`). `sitio/` es la carpeta que se arrastra a
-Netlify Drop; `sitio/preview.html` es la misma página sin el `<html>`, para la
-vista previa en claude.ai.
+- `futuro/scene.js`: el hero en three.js. Calle vista desde abajo con lente de
+  ojo de pez, torres de vidrio y la tarjeta Tap Work. El scroll acerca la
+  tarjeta, la voltea y pasa de la tarde a la noche. Todo es procedural, no
+  descarga texturas.
+- `futuro/app.js`: scroll del hero, títulos que se decodifican, carrusel 3D de
+  los nueve reels con una pestaña por tipo de negocio.
+- `futuro/hero-poster*.jpg`: un cuadro de la misma escena, que se ve mientras
+  carga three.js o si el navegador no tiene WebGL.
+
+`sitio/` es la carpeta que se arrastra a Netlify Drop; `sitio/preview.html` es
+la misma página sin el `<html>`, para la vista previa en claude.ai.

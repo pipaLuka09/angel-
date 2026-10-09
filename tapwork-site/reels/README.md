@@ -24,4 +24,4 @@ Los nombres que salen en pantalla (Tania Sánchez, Milo, Prensa de pierna) son
 los mismos demos que ya usan los clips y el sitio. No hay precios ni datos de
 clientes reales.
 
-La página que usa estos videos la arma `../buildreels.py`.
+La página que usa estos videos la arma `../buildsitio.py`.

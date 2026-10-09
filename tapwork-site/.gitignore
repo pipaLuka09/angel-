@@ -21,8 +21,8 @@ print/out/*.html
 # Symlink a la instalación global de Node que usa print/render.mjs.
 print/node_modules
 
-# Página armada por buildreels.py: se regenera con `python3 buildreels.py`
-# a partir de reels/v/ y de los vendor de assets/.
+# Página armada por buildsitio.py: se regenera con `python3 buildsitio.py`
+# a partir de futuro/, reels/v/ y assets/lenis.min.js.
 sitio/
 
 # Intermedios de reels/render.js.
