@@ -36,6 +36,8 @@ PHOTOS = os.path.join(ROOT, 'fotos')
 FONTS = os.path.join(ROOT, 'reels', 'fonts')
 
 REEL = {'pagos': 'pago', 'gimnasios': 'gym'}
+# Products that carry their own brand name.
+NAME = {'gimnasios': 'FORJA para gimnasios'}
 
 # Kinds of business, in the order the tabs read. Each product sits in the one
 # its catalogue client line names.
@@ -54,7 +56,7 @@ LINE = {
     'asistencia': 'Tu equipo marca con su gafete y tú exportas la lista a Excel en un clic.',
     'wifi': 'Se conecta solo. Nadie le pide la clave al mesero.',
     'pagos': 'Paga y deja la propina desde su celular, sin esperar la cuenta.',
-    'gimnasios': 'Cada serie queda registrada en la máquina, sin papel ni app.',
+    'gimnasios': 'Con FORJA, cada serie queda registrada en la máquina, sin papel ni app.',
     'mascotas': 'Quien la encuentre ve sus vacunas, sus alergias y cómo avisarte.',
     'acrilico': 'Le pegamos el chip al acrílico que ya tienes. No se bota nada.',
 }
@@ -62,8 +64,8 @@ LINE = {
 PAGES = ['index.html', 'asistencia.html', 'gimnasio.html', 'productos.html']
 
 DESC = {
-    'gimnasio.html': 'Sistema NFC para gimnasios: un lector en cada máquina; tu socio acerca el celular, ve el '
-                     'ejercicio y registra su serie al instante, sin app ni papel.',
+    'gimnasio.html': 'FORJA, el sistema NFC para gimnasios de Tap Work: un sticker en cada máquina; tu socio '
+                     'acerca el celular, registra su serie y ve su progreso, sin app ni papel.',
     'productos.html': 'Todos los productos NFC de Tap Work con sus especificaciones: menú digital, reseñas de '
                       'Google, tarjeta de presentación, Wi-Fi, pagos, gafetes, gimnasios y más.',
     'index.html': 'Chips NFC para tu negocio en Machala: menú digital, reseñas de Google, Wi-Fi, pagos, '
@@ -196,7 +198,7 @@ def build(out=OUT, fondo=None):
     for i, ((sid, _, sname, _), pid) in enumerate(order):
         p = byid[pid]
         v = REEL.get(pid, p['img'])
-        name = cat.sentence(p['label'])
+        name = NAME.get(pid) or cat.sentence(p['label'])
         client = p['client'][0].upper() + p['client'][1:]
         slides.append(
             '          <div class="slide" data-seg="{sid}" data-seg-name="{sname}" data-code="{code}" data-name="{name}"\n'
@@ -235,7 +237,7 @@ def build(out=OUT, fondo=None):
     for (sid, label, sname, _), pid in shop_order:
         p = byid[pid]
         v = REEL.get(pid, p['img'])
-        name = cat.sentence(p['label'])
+        name = NAME.get(pid) or cat.sentence(p['label'])
         soon = pid in SOON
         real = REAL.get(pid, {})
         photo = 'v/real-' + real['img'] if 'img' in real else 'v/p-%s.webp' % p['img']
@@ -281,7 +283,7 @@ def build(out=OUT, fondo=None):
         logo=logo, dumbbell=DUMBBELL, paw=PAW, bag=BAG, playsm=PLAY,
         gym_steps=gym_steps, gym_feats=gym_feats, shop='\n'.join(shop), shop_segs=shop_segs,
         shop_json=json.dumps(sheet, ensure_ascii=False).replace('</', '<\\/'),
-        walink_gym=esc(cat.wa_link('Hola, quiero lectores NFC para mi gimnasio')),
+        walink_gym=esc(cat.wa_link('Hola, quiero FORJA para mi gimnasio')),
         walink_pet=esc(cat.wa_link('Hola, me interesa el collar NFC para mascotas, avísenme cuando esté listo')),
         mark=cat.MARK, wa=cat.WA_ICON, phone=cat.PHONE, arrow=ARROW, left=LEFT, right=RIGHT, pause=PAUSE,
         leftsm=svg('M19 12H5M11 6l-6 6 6 6', 16), badge=BADGE,
