@@ -39,6 +39,8 @@ html,body{width:1080px;height:1350px;overflow:hidden;background:#0b0c0f}
 .logo .w{font-family:'Montserrat',sans-serif;font-weight:800;font-size:46px;letter-spacing:.2em;color:#EDF0F2}
 .logo .w b{color:#ff3a2a}
 #end .name{font-size:62px;font-weight:800;letter-spacing:-.03em}
+#end .name{text-align:center}
+#end .name small{display:block;font-size:34px;font-weight:600;letter-spacing:-.01em;opacity:.8;margin-top:4px}
 #end .cta{position:absolute;left:50%;bottom:110px;transform:translateX(-50%);background:#fff;color:#0b0c0f;border-radius:999px;
   padding:26px 54px;text-align:center;white-space:nowrap}
 #end .cta small{display:block;font-family:'JetBrains Mono',monospace;font-size:22px;letter-spacing:.16em;color:#555}
@@ -115,14 +117,14 @@ const P = {
     frames: 2329, device: true, hook: ['¿Tus socios todavía', '<span class="x">anotan en papel?<i></i></span>'], hookAt: 16,
     scenes: [
       { len: 2.2, src: 9.6, speed: 1.0, lbl: 'Acerca el celular', sub: 'al sticker de la máquina.' },
-        { len: 1.8, src: 15.1, speed: 1.0, lbl: 'Se abre su máquina.', sub: 'Sin descargar ninguna app.' },
+        { len: 1.8, src: 15.1, speed: 1.0, lbl: 'Se abre FORJA.', sub: 'Sin descargar ninguna app.' },
       { len: 3.4, src: 20.0, speed: 3.2, lbl: 'Registra su serie:', sub: 'peso, repeticiones y cómo se sintió.' },
       { len: 2.0, src: 32.0, speed: 1.0, lbl: 'La próxima vez,', sub: 'lo está esperando.' },
       { len: 2.0, src: 35.5, speed: 0.8, lbl: 'Ve cómo se hace.', sub: 'Las claves y los errores comunes.' },
       { len: 2.6, src: 67.5, speed: 1.5, lbl: 'Su progreso y su meta.', sub: 'Récord, sesiones y kilos que faltan.' },
       { len: 3.0, src: 78.0, speed: 3.0, lbl: 'Todo el gimnasio,', sub: 'máquina por máquina.' },
     ],
-    end: { img: 'gym.jpg', name: 'Sistema para gimnasios' },
+    end: { img: 'gym.jpg', name: 'FORJA<small>Sistema para gimnasios</small>' },
   },
 };
 const KEY = new URLSearchParams(location.search).get('k') || 'menu';
@@ -147,7 +149,7 @@ function build() {
     '</h1><p>Hay una forma más simple.</p>';
   $('#labels').innerHTML = C.scenes.map((s, i) => '<div class="lbl' + (s.at === 'bottom' ? ' lbl--b' : '') + '" data-s="' + i + '">' + s.lbl +
     (s.sub ? '<small>' + s.sub + '</small>' : '') + '</div>').join('');
-  $('#end .ph').src = C.end.img; $('#end .name').textContent = C.end.name;
+  $('#end .ph').src = C.end.img; $('#end .name').innerHTML = C.end.name;
   if (C.end.scale) {  // a smaller photo melts into a matching studio ground instead of showing its edge
     $('#end').style.background = 'linear-gradient(#1f2229, #0b0c0f)';
     $('#end .ph').style.webkitMaskImage = $('#end .ph').style.maskImage = 'radial-gradient(ellipse 52% 50% at 50% 52%, #000 70%, transparent 100%)';
