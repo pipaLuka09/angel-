@@ -1,7 +1,7 @@
 /*
-  Page behaviour, shared by the home page and the asistencia page: the
-  background that pushes into the sky, the product carousel, the decoding
-  headings, the reveals and the card at the close. Each part checks that its
+  Page behaviour, shared by every page: the background that pushes into the
+  sky, the product carousel, the decoding headings, the reveals, the card at
+  the close and the shop with its product sheet. Each part checks that its
   elements exist, so either page can load the same file. Runs as soon as it is
   parsed; only the smooth scroll waits for window.load.
 */
@@ -249,6 +249,73 @@
       }, { threshold: 0.4 }).observe(car);
     }
     layout(); fill(); syncToggle();
+  })();
+
+  /* ------------------------------------------------- not-yet-built door */
+  document.querySelectorAll('.door--soon .door__go').forEach(function (btn) {
+    var note = document.getElementById(btn.getAttribute('aria-controls'));
+    btn.addEventListener('click', function () {
+      var open = btn.getAttribute('aria-expanded') !== 'true';
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      note.hidden = !open;
+    });
+  });
+
+  /* ---------------------------------------------------------------- shop */
+  var shop = document.querySelector('.shop');
+  if (shop) (function () {
+    var data = JSON.parse(document.getElementById('shop-data').textContent);
+    var items = [].slice.call(shop.querySelectorAll('.item'));
+    var chips = [].slice.call(document.querySelectorAll('.shopbar [data-seg]'));
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        chips.forEach(function (x) { x.classList.toggle('is-on', x === c); });
+        items.forEach(function (it) { it.hidden = c.dataset.seg !== '*' && it.dataset.seg !== c.dataset.seg; });
+      });
+    });
+    // Hover shows the product's reel in place of the photo, like a second shot.
+    if (fine && !still) items.forEach(function (it) {
+      var v = it.querySelector('video');
+      it.querySelector('.item__media').addEventListener('mouseenter', function () {
+        v.preload = 'auto'; var p = v.play(); if (p && p.catch) p.catch(function () {});
+        it.classList.add('is-live');
+      });
+      it.querySelector('.item__media').addEventListener('mouseleave', function () { v.pause(); it.classList.remove('is-live'); });
+    });
+
+    var dlg = document.getElementById('sheet');
+    function f(k) { return dlg.querySelector('[data-s="' + k + '"]'); }
+    var reel = f('reel'), img = f('img');
+    function view(which) {
+      var vid = which === 'reel';
+      img.hidden = vid; reel.hidden = !vid;
+      dlg.querySelectorAll('[data-view]').forEach(function (b) { b.classList.toggle('is-on', b.dataset.view === which); });
+      if (vid) { var p = reel.play(); if (p && p.catch) p.catch(function () {}); } else reel.pause();
+    }
+    dlg.querySelectorAll('[data-view]').forEach(function (b) { b.addEventListener('click', function () { view(b.dataset.view); }); });
+    function open(id) {
+      var d = data[id];
+      f('seg').textContent = d.seg; f('code').textContent = d.code; f('name').textContent = d.name;
+      f('kind').textContent = d.kind + ' · ' + d.client; f('text').textContent = d.text; f('cta').textContent = d.cta;
+      f('wa').href = d.wa; f('soon').hidden = !d.soon;
+      var pg = f('page'); pg.hidden = !d.page; if (d.page) pg.href = d.page;
+      img.src = d.img; img.alt = d.name; f('thumb').src = d.img; f('poster').src = d.poster;
+      reel.poster = d.poster; reel.src = d.reel;
+      var dl = f('specs'); dl.textContent = '';
+      d.specs.forEach(function (row) {
+        var dt = document.createElement('dt'), dd = document.createElement('dd');
+        dt.textContent = row[0]; dd.textContent = row[1]; dl.appendChild(dt); dl.appendChild(dd);
+      });
+      view('img');
+      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+    }
+    items.forEach(function (it) {
+      it.querySelector('.item__media').addEventListener('click', function () { open(it.dataset.id); });
+      it.querySelector('.item__more').addEventListener('click', function () { open(it.dataset.id); });
+    });
+    dlg.querySelector('.sheet__x').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('close', function () { reel.pause(); });
   })();
 
   /* ------------------------------------------------------------ back link */

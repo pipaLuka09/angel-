@@ -6,8 +6,8 @@
 <header class="bar">
   <div class="wrap">
     <div class="bar__in glass">
-      <a class="brand" href="#top">{{mark}} Tap Work</a>
-      <nav aria-label="Secciones"><a href="#como">Cómo funciona</a><a href="#productos">Productos</a><a href="#tu-turno">Contacto</a><a class="pill" href="asistencia.html">Asistencia</a></nav>
+      <a class="brand" aria-label="Tap Work, inicio" href="#top">{{logo}}</a>
+      <nav aria-label="Secciones"><a href="index.html#como">Cómo funciona</a><a href="productos.html">Productos NFC</a><a href="gimnasio.html">Gimnasios</a><a class="pill" href="asistencia.html">Asistencia</a></nav>
       <a class="btn btn--red btn--sm" href="{{walink}}" target="_blank" rel="noopener">{{wa}} Cotizar</a>
     </div>
   </div>
@@ -86,11 +86,30 @@
           </div>
         </div>
       </div>
-      <a class="door glass rv" href="asistencia.html">
-        <span class="door__ico">{{badge}}</span>
-        <span><b>Control de asistencia</b><span>Mira el panel completo: quién llegó, quién se atrasó y el reporte a Excel.</span></span>
-        <span class="door__go">Ver el panel {{arrow}}</span>
-      </a>
+      <div class="doors">
+        <a class="door glass rv" href="asistencia.html">
+          <span class="door__ico">{{badge}}</span>
+          <span><b>Control de asistencia</b><span>Mira el panel completo: quién llegó, quién se atrasó y el reporte a Excel.</span></span>
+          <span class="door__go">Ver el panel {{arrow}}</span>
+        </a>
+        <a class="door glass rv" href="gimnasio.html">
+          <span class="door__ico">{{dumbbell}}</span>
+          <span><b>Sistema para gimnasios</b><span>Un lector en cada máquina: el socio ve su ejercicio y registra cada serie.</span></span>
+          <span class="door__go">Ver el sistema {{arrow}}</span>
+        </a>
+        <div class="door door--soon glass rv">
+          <span class="door__ico">{{paw}}</span>
+          <span><b>Collares para mascotas</b><span>La ficha de tu mascota en un dije NFC.</span></span>
+          <button class="door__go" type="button" aria-expanded="false" aria-controls="soon-pet">Ver más {{arrow}}</button>
+          <p class="door__note" id="soon-pet" hidden><b>Aún estamos trabajando en ello.</b> Todavía no está a la venta.
+            Si te interesa, <a href="{{walink_pet}}" target="_blank" rel="noopener">escríbenos y te avisamos cuando esté listo</a>.</p>
+        </div>
+        <a class="door glass rv" href="productos.html">
+          <span class="door__ico">{{bag}}</span>
+          <span><b>Productos NFC</b><span>Todos los productos con sus especificaciones y detalles.</span></span>
+          <span class="door__go">Ver productos {{arrow}}</span>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -117,6 +136,6 @@
   </section>
 </main>
 
-<footer><div class="wrap"><div class="glass mono"><span>Tap Work · Chips NFC para negocios</span><a href="asistencia.html">Control de asistencia</a><span>WhatsApp {{phone}}</span></div></div></footer>
+<footer><div class="wrap"><div class="glass mono"><span>Tap Work · Chips NFC para negocios</span><a href="productos.html">Productos NFC</a><span>WhatsApp {{phone}}</span></div></div></footer>
 
 <script src="js/app.js"></script>

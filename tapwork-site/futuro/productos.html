@@ -1,0 +1,67 @@
+<title>Productos NFC · Tap Work</title>
+<link rel="stylesheet" href="css/site.css">
+<!--/head-->
+{{bg_sky}}
+
+<header class="bar">
+  <div class="wrap">
+    <div class="bar__in glass">
+      <a class="brand" aria-label="Tap Work, inicio" href="index.html">{{logo}}</a>
+      <nav aria-label="Secciones"><a href="index.html#como">Cómo funciona</a><a class="pill" href="productos.html">Productos NFC</a><a href="gimnasio.html">Gimnasios</a><a href="asistencia.html">Asistencia</a></nav>
+      <a class="btn btn--red btn--sm" href="{{walink}}" target="_blank" rel="noopener">{{wa}} Cotizar</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="ahero wrap" style="padding-bottom:24px">
+    <a class="back" href="index.html">{{leftsm}} Volver al inicio</a>
+    <p class="tag mono" style="margin-top:28px"><b>{{n}}</b> Productos NFC</p>
+    <h1 data-decode>La colección <span class="it">Tap Work.</span></h1>
+    <p class="intro">Cada producto lleva un chip NFC. Elige uno para ver qué abre, para qué negocio es y sus
+      especificaciones. Te cotizamos por WhatsApp según cuántos necesites.</p>
+  </section>
+
+  <section class="wrap" style="padding-bottom:60px">
+    <div class="shopbar">
+      <div class="segs" role="toolbar" aria-label="Filtrar por tipo de negocio">
+        <button type="button" data-seg="*" class="is-on">Todos <small>{{n}}</small></button>
+{{shop_segs}}
+      </div>
+    </div>
+    <div class="shop">
+{{shop}}
+    </div>
+  </section>
+</main>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheet-name">
+  <div class="sheet__in">
+    <div class="sheet__media">
+      <div class="sheet__view"><img data-s="img" alt=""><video data-s="reel" controls muted playsinline preload="none" hidden></video></div>
+      <div class="sheet__thumbs" role="group" aria-label="Fotos y video">
+        <button type="button" class="is-on" data-view="img" aria-label="Foto del producto"><img data-s="thumb" alt=""></button>
+        <button type="button" data-view="reel" aria-label="Video del producto"><img data-s="poster" alt="">{{playsm}}</button>
+      </div>
+    </div>
+    <div class="sheet__info">
+      <p class="ci-top mono"><span data-s="seg"></span><span data-s="code"></span></p>
+      <h2 id="sheet-name" data-s="name"></h2>
+      <p class="ci-kind" data-s="kind"></p>
+      <p class="sheet__soon" data-s="soon" hidden><b>Aún estamos trabajando en ello.</b> Este producto todavía no está a la venta.</p>
+      <p class="sheet__text" data-s="text"></p>
+      <h3 class="mono sheet__h">Especificaciones</h3>
+      <dl class="specs-t" data-s="specs"></dl>
+      <div class="actions" style="justify-content:flex-start;margin-top:24px">
+        <a class="btn btn--red" data-s="wa" href="#" target="_blank" rel="noopener">{{wa}} <span data-s="cta"></span></a>
+        <a class="btn" data-s="page" href="#" hidden>Ver el sistema completo {{arrow}}</a>
+      </div>
+    </div>
+  </div>
+  <button class="sheet__x" type="button" aria-label="Cerrar">×</button>
+</dialog>
+<script type="application/json" id="shop-data">{{shop_json}}</script>
+
+<footer><div class="wrap"><div class="glass mono"><span>Tap Work · Chips NFC para negocios</span><a href="index.html">Inicio</a><span>WhatsApp {{phone}}</span></div></div></footer>
+
+<script src="js/app.js"></script>

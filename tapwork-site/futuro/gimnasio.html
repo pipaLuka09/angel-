@@ -1,0 +1,58 @@
+<title>Sistema para gimnasios · Tap Work</title>
+<link rel="stylesheet" href="css/site.css">
+<!--/head-->
+{{bg_sky}}
+
+<header class="bar">
+  <div class="wrap">
+    <div class="bar__in glass">
+      <a class="brand" aria-label="Tap Work, inicio" href="index.html">{{logo}}</a>
+      <nav aria-label="Secciones"><a href="index.html#como">Cómo funciona</a><a href="productos.html">Productos NFC</a><a class="pill" href="gimnasio.html">Gimnasios</a><a href="asistencia.html">Asistencia</a></nav>
+      <a class="btn btn--red btn--sm" href="{{walink_gym}}" target="_blank" rel="noopener">{{wa}} Cotizar</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="ahero wrap">
+    <a class="back" href="index.html">{{leftsm}} Volver al inicio</a>
+    <p class="tag mono" style="margin-top:28px"><b>TW-09</b> Lector NFC para máquinas</p>
+    <h1 data-decode>Sistema para gimnasios <span class="it">cada máquina, registrada con un toque.</span></h1>
+    <p class="intro">Ponemos un lector NFC en cada máquina. Tu socio acerca el celular, ve el ejercicio de esa máquina y
+      registra su serie al instante, sin descargar ninguna app y sin papel.</p>
+  </section>
+
+  <section class="wrap" style="padding-bottom:40px">
+    <div class="acols">
+      <figure class="promo glass rv">
+        <video controls muted playsinline preload="metadata" poster="v/gym.jpg" width="720" height="1280"
+          aria-label="Video: un socio acerca el celular al lector de la máquina, ve su rutina de prensa de pierna y registra la serie">
+          <source src="v/gym.mp4" type="video/mp4"></video>
+        <figcaption class="cap mono">Así lo usa tu socio · 18 s</figcaption>
+      </figure>
+      <div class="panel glass rv">
+        <p class="tag mono"><b>01</b> Cómo funciona</p>
+        <h2 class="h2" data-decode>Tres pasos <span class="it">en cada máquina.</span></h2>
+        <ol class="steps">
+{{gym_steps}}
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel glass rv" style="margin-top:22px">
+      <p class="tag mono"><b>02</b> Qué ve tu socio</p>
+      <h2 class="h2" data-decode>Su rutina, <span class="it">en la misma máquina.</span></h2>
+      <ul class="feats feats--3" style="margin-top:28px">
+{{gym_feats}}
+      </ul>
+      <div class="actions" style="justify-content:flex-start;margin-top:30px">
+        <a class="btn btn--red" href="{{walink_gym}}" target="_blank" rel="noopener">{{wa}} Quiero lectores para mi gimnasio</a>
+        <a class="btn" href="productos.html">Ver los otros productos {{arrow}}</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><div class="glass mono"><span>Tap Work · Chips NFC para negocios</span><a href="index.html">Inicio</a><span>WhatsApp {{phone}}</span></div></div></footer>
+
+<script src="js/app.js"></script>

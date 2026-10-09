@@ -79,13 +79,21 @@ archivos o las capturas salen de una copia vieja. El script hace justo eso:
 
     python3 buildsitio.py [--fondo clip.mp4]   # futuro/ + reels/v/ -> sitio/
 
-Dos páginas sobre un mismo fondo:
+Cuatro páginas sobre un mismo fondo:
 
 - `index.html`: hero, cómo funciona, el carrusel de los nueve reels con una
   pestaña por tipo de negocio, un botón a asistencia y la tarjeta real al
   final (se toca y se voltea, y aparece el WhatsApp).
 - `asistencia.html`: todo el control de asistencia aparte: el panel en
   computadora y en celular, el video promo, cómo funciona y qué incluye.
+- `gimnasio.html`: el sistema para gimnasios (lector NFC por máquina).
+- `productos.html`: la tienda de productos NFC, con filtros por tipo de negocio
+  y una ficha por producto con fotos, video y especificaciones. Las
+  especificaciones están en `SPECS` de `buildsitio.py`: solo datos ciertos
+  (formato, qué abre, NFC); medidas, materiales y demás se agregan ahí.
+- El collar para mascotas sale como "Aún estamos trabajando en ello" (`SOON`).
+- Arriba a la izquierda va el logo real: el monograma TP de `print/monograma.py`
+  con el wordmark en Montserrat, como en la tarjeta.
 
 El fondo es un clip (`--fondo`, con su póster `.jpg` al lado). En el hero se ve
 completo y al bajar se acerca a su cielo, así que toda la página queda sobre el

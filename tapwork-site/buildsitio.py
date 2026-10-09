@@ -19,15 +19,19 @@ quotes go through WhatsApp.
 sitio/preview.html is the home page without the <html> shell, for the claude.ai
 preview, which supplies its own.
 """
-import io, os, shutil
+import io, json, os, shutil, sys
 
 import buildsimple as cat
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'print'))
+import monograma  # noqa: E402  the TP monogram, rebuilt as vector from the real card
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
 SRC = os.path.join(ROOT, 'futuro')
 OUT = os.path.join(ROOT, 'sitio')
 REELS = os.path.join(ROOT, 'reels', 'v')
+STILLS = os.path.join(ROOT, 'img1080')
 FONTS = os.path.join(ROOT, 'reels', 'fonts')
 
 REEL = {'pagos': 'pago', 'gimnasios': 'gym'}
@@ -54,7 +58,13 @@ LINE = {
     'acrilico': 'Le pegamos el chip al acrílico que ya tienes. No se bota nada.',
 }
 
+PAGES = ['index.html', 'asistencia.html', 'gimnasio.html', 'productos.html']
+
 DESC = {
+    'gimnasio.html': 'Sistema NFC para gimnasios: un lector en cada máquina; tu socio acerca el celular, ve el '
+                     'ejercicio y registra su serie al instante, sin app ni papel.',
+    'productos.html': 'Todos los productos NFC de Tap Work con sus especificaciones: menú digital, reseñas de '
+                      'Google, tarjeta de presentación, Wi-Fi, pagos, gafetes, gimnasios y más.',
     'index.html': 'Chips NFC para tu negocio en Machala: menú digital, reseñas de Google, Wi-Fi, pagos, '
                   'asistencia y más. Mira cómo funciona cada uno.',
     'asistencia.html': 'Control de asistencia con gafete NFC: tu equipo marca en el celular del local y tú ves '
@@ -81,6 +91,54 @@ ASIS_FEATS = [
     ('Lo instalamos nosotros', 'Te lo dejamos funcionando en tu local.'),
 ]
 
+# The gym page: only what the reel shows the system doing.
+GYM_HOW = [
+    ('Un lector en cada máquina', 'Ponemos el lector NFC en la máquina, con el ejercicio que le corresponde.'),
+    ('Tu socio acerca el celular', 'Se abre el ejercicio de esa máquina: sus series, el peso y cómo se hace.'),
+    ('Registra su serie', 'Con un toque la serie queda registrada, al instante y sin papel.'),
+]
+GYM_FEATS = [
+    ('El ejercicio de la máquina', 'Nombre, grupo muscular y número de la estación.'),
+    ('Series y peso', 'Cada serie con sus repeticiones y los kilos.'),
+    ('Cómo se hace', 'El socio ve la técnica antes de empezar.'),
+    ('Serie registrada', 'Queda guardada en el momento en que la marca.'),
+    ('Sin app ni papel', 'Se abre en el navegador del celular del socio.'),
+    ('Lo cambias cuando quieras', 'El lector se queda igual; la rutina la actualizas tú.'),
+]
+
+# Products still being built: they show, but say so instead of taking orders.
+SOON = {'mascotas'}
+
+# The shop's spec sheet. Only facts we can stand behind: the format of each
+# piece, what it opens, and what NFC itself guarantees. Sizes are given only
+# where the format fixes them (an ID-1 card is 85.6 x 54 mm by definition).
+COMMON_SPECS = [
+    ('Tecnología', 'NFC, 13.56 MHz'),
+    ('Cómo se usa', 'Se acerca el celular, a unos 2 cm'),
+    ('Compatible con', 'Celulares con NFC: la mayoría de Android y iPhone XS o posterior'),
+    ('App', 'No hace falta: se abre en el navegador'),
+    ('Contenido', 'Lo cambias cuando quieras, sin reimprimir'),
+]
+SPECS = {
+    'menu': [('Formato', 'Hablador NFC para mesa'), ('Abre', 'Tu menú digital, con platos y precios')],
+    'resenas': [('Formato', 'Tarjeta NFC de reseñas'), ('Abre', 'La página para dejar una reseña de tu negocio en Google')],
+    'tarjeta': [('Formato', 'Tarjeta NFC, tamaño tarjeta de crédito (85,6 × 54 mm)'),
+                ('Abre', 'Tu contacto, que se guarda con un toque, y tu WhatsApp')],
+    'asistencia': [('Formato', 'Gafete NFC, uno por persona'),
+                   ('Abre', 'La marcación de entrada y salida en el celular del local'),
+                   ('Incluye', 'Panel de asistencia con reporte a Excel')],
+    'wifi': [('Formato', 'Disco NFC de Wi-Fi'), ('Abre', 'La conexión a tu red de invitados')],
+    'pagos': [('Formato', 'Acrílico NFC de pago'), ('Abre', 'Tu enlace de pago y la propina')],
+    'gimnasios': [('Formato', 'Lector NFC para cada máquina'),
+                  ('Abre', 'El ejercicio de la máquina, sus series y cómo se hace')],
+    'mascotas': [('Formato', 'Dije NFC para el collar'),
+                 ('Abre', 'La ficha de tu mascota: vacunas, alergias y cómo avisarte')],
+    'acrilico': [('Formato', 'Chip NFC que va detrás de tu acrílico actual'),
+                 ('Abre', 'Tu menú, tu pago o tu reseña, lo que tú decidas')],
+}
+# Products with a page of their own.
+PAGE_OF = {'asistencia': 'asistencia.html', 'gimnasios': 'gimnasio.html'}
+
 HOW = [
     ('Acercas el celular', 'A dos centímetros basta. No hay que abrir la cámara ni enfocar un QR.'),
     ('Se abre solo', 'El chip guarda un enlace y el celular lo abre en el navegador.'),
@@ -99,7 +157,13 @@ ARROW = svg('M5 12h14M13 6l6 6-6 6', 16)
 LEFT = svg('M15 5l-7 7 7 7')
 RIGHT = svg('M9 5l7 7-7 7')
 PAUSE = svg('M8 5v14M16 5v14', 14)
+PLAY = svg('M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z', 22, fill=True)
 CHECK = svg('M5 12.5l4.5 4.5L19 7', 18)
+DUMBBELL = svg('M6 7v10M18 7v10M3 9.5v5M21 9.5v5M6 12h12', 26)
+PAW = svg('M12 13.5c-2.8 0-4.8 2.6-4.8 4.4 0 1.5 1.4 2 2.6 1.6.9-.3 1.5-.5 2.2-.5s1.3.2 2.2.5c1.2.4 2.6-.1 2.6-1.6 0-1.8-2-4.4-4.8-4.4z'
+          'M5 10.5a1.6 2 0 1 0 3.2 0 1.6 2 0 1 0-3.2 0M15.8 10.5a1.6 2 0 1 0 3.2 0 1.6 2 0 1 0-3.2 0'
+          'M8.3 6.5a1.6 2 0 1 0 3.2 0 1.6 2 0 1 0-3.2 0M12.5 6.5a1.6 2 0 1 0 3.2 0 1.6 2 0 1 0-3.2 0', 26)
+BAG = svg('M5.5 8h13l-1 12.5h-11L5.5 8zM9 8V6.5a3 3 0 0 1 6 0V8', 26)
 BADGE = svg('M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM10 3v3h4V3M9 17h6M12 9.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z', 26)
 
 
@@ -127,7 +191,9 @@ def build(out=OUT, fondo=None):
             '          </div>'.format(
                 sid=sid, sname=esc(sname), code=esc(p['code'].upper()), name=esc(name),
                 kind=esc('%s · %s' % (cat.sentence(p['kind']), client)), line=esc(LINE[pid]),
-                cta=esc(cat.sentence(p['cta'])), wa=esc(cat.wa_link('Hola, ' + p['cta'])),
+                cta=esc('Avísame cuando esté listo' if pid in SOON else cat.sentence(p['cta'])),
+                wa=esc(cat.wa_link('Hola, me interesa el collar NFC para mascotas, avísenme cuando esté listo'
+                                   if pid in SOON else 'Hola, ' + p['cta'])),
                 i=i + 1, n=n, pre='metadata' if i == 0 else 'none', v=v))
     segs = '\n'.join(
         '        <button type="button" role="tab" data-seg="%s" aria-selected="false">%s <small>%d</small></button>'
@@ -142,6 +208,47 @@ def build(out=OUT, fondo=None):
     asis_feats = '\n'.join(
         '        <li>%s<span><b>%s</b>%s</span></li>' % (CHECK, t, d) for t, d in ASIS_FEATS)
 
+    gym_steps = '\n'.join(
+        '          <li class="step"><span class="step__n">0%d</span><h3>%s</h3><p>%s</p></li>' % (i + 1, t, d)
+        for i, (t, d) in enumerate(GYM_HOW))
+    gym_feats = '\n'.join(
+        '        <li>%s<span><b>%s</b>%s</span></li>' % (CHECK, t, d) for t, d in GYM_FEATS)
+
+    # The shop: one card per product, and the full sheet as JSON for the drawer.
+    shop, sheet = [], {}
+    for (sid, label, sname, _), pid in order:
+        p = byid[pid]
+        v = REEL.get(pid, p['img'])
+        name = cat.sentence(p['label'])
+        soon = pid in SOON
+        sheet[pid] = dict(
+            name=name, code=p['code'].upper(), kind=cat.sentence(p['kind']), seg=sname,
+            client=p['client'][0].upper() + p['client'][1:], text=cat.sentence(p['benefit']),
+            specs=SPECS[pid] + COMMON_SPECS, img='v/p-%s.webp' % p['img'], reel='v/%s.mp4' % v,
+            poster='v/%s.jpg' % v, soon=soon, page=PAGE_OF.get(pid, ''),
+            cta='Avísame cuando esté listo' if soon else cat.sentence(p['cta']),
+            wa=cat.wa_link('Hola, me interesa el collar NFC para mascotas, avísenme cuando esté listo' if soon
+                           else 'Hola, ' + p['cta']))
+        shop.append(
+            '        <article class="item%s" data-seg="%s" data-id="%s">\n'
+            '          <button class="item__media" type="button" aria-label="Ver detalles de %s">\n'
+            '            <img src="v/p-%s.webp" width="1080" height="1080" loading="lazy" alt="%s: %s">\n'
+            '            <video muted loop playsinline preload="none" aria-hidden="true"><source src="v/%s.mp4" type="video/mp4"></video>\n'
+            '            <span class="item__tag mono">%s</span>%s\n'
+            '          </button>\n'
+            '          <div class="item__body"><h3>%s</h3><p>%s</p>\n'
+            '            <button class="item__more" type="button">Ver detalles %s</button></div>\n'
+            '        </article>' % (
+                ' is-soon' if soon else '', sid, pid, esc(name), p['img'], esc(name), esc(cat.sentence(p['kind'])),
+                v, esc(p['code'].upper()), ' <span class="item__soon mono">Próximamente</span>' if soon else '',
+                esc(name), esc(cat.sentence(p['kind'])), ARROW))
+    shop_segs = '\n'.join(
+        '        <button type="button" data-seg="%s">%s <small>%d</small></button>' % (sid, label, len(ids))
+        for sid, label, _, ids in SEGMENTS)
+
+    logo = ('<span class="logo"><span class="logo__mark">%s</span><span class="logo__word">TAP <b>WORK</b></span></span>'
+            % monograma.svg('#E30613', 'plata-logo', [('0%', '#F4F6F8'), ('46%', '#C3CAD1'), ('100%', '#E6EAED')]))
+
     # The background: a clip if one was given (its poster sits next to it as
     # .jpg), otherwise a still of the 3D street.
     if fondo:
@@ -151,6 +258,11 @@ def build(out=OUT, fondo=None):
         media = '<img src="v/hero-poster.jpg" alt="">'
     bg = '<div class="bg" aria-hidden="true">%s</div>' % media
     fill = dict(
+        logo=logo, dumbbell=DUMBBELL, paw=PAW, bag=BAG, playsm=PLAY,
+        gym_steps=gym_steps, gym_feats=gym_feats, shop='\n'.join(shop), shop_segs=shop_segs,
+        shop_json=json.dumps(sheet, ensure_ascii=False).replace('</', '<\\/'),
+        walink_gym=esc(cat.wa_link('Hola, quiero lectores NFC para mi gimnasio')),
+        walink_pet=esc(cat.wa_link('Hola, me interesa el collar NFC para mascotas, avísenme cuando esté listo')),
         mark=cat.MARK, wa=cat.WA_ICON, phone=cat.PHONE, arrow=ARROW, left=LEFT, right=RIGHT, pause=PAUSE,
         leftsm=svg('M19 12H5M11 6l-6 6 6 6', 16), badge=BADGE,
         walink=esc(cat.wa_link('Hola, quiero cotizar productos NFC de Tap Work')),
@@ -177,11 +289,11 @@ def build(out=OUT, fondo=None):
         shutil.rmtree(out)
     for d in ('v', 'js', 'fonts', 'css'):
         os.makedirs(os.path.join(out, d))
-    home, home_doc = render('index.html')
-    _, asis_doc = render('asistencia.html')
-    io.open(os.path.join(out, 'index.html'), 'w', encoding='utf-8').write(home_doc)
-    io.open(os.path.join(out, 'asistencia.html'), 'w', encoding='utf-8').write(asis_doc)
-    io.open(os.path.join(out, 'preview.html'), 'w', encoding='utf-8').write(home)
+    for name in PAGES:
+        page, doc = render(name)
+        io.open(os.path.join(out, name), 'w', encoding='utf-8').write(doc)
+        if name == 'index.html':
+            io.open(os.path.join(out, 'preview.html'), 'w', encoding='utf-8').write(page)
 
     shutil.copy(os.path.join(SRC, 'site.css'), os.path.join(out, 'css', 'site.css'))
     shutil.copy(os.path.join(SRC, 'app.js'), os.path.join(out, 'js', 'app.js'))
@@ -192,6 +304,9 @@ def build(out=OUT, fondo=None):
         base = os.path.splitext(fondo)[0]
         shutil.copy(base + '.mp4', os.path.join(out, 'v', 'fondo.mp4'))
         shutil.copy(base + '.jpg', os.path.join(out, 'v', 'fondo.jpg'))
+    for _, pid in order:
+        img = byid[pid]['img']
+        shutil.copy(os.path.join(STILLS, img + '.webp'), os.path.join(out, 'v', 'p-%s.webp' % img))
     for f in os.listdir(FONTS):
         shutil.copy(os.path.join(FONTS, f), os.path.join(out, 'fonts', f))
     missing = []
@@ -203,8 +318,8 @@ def build(out=OUT, fondo=None):
             else:
                 missing.append(os.path.basename(src))
     total = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(out) for f in fs)
-    print('%s/ %d KB · 2 páginas · %d productos en %d segmentos · fondo: %s'
-          % (os.path.basename(out), total // 1024, n, len(SEGMENTS), fondo or 'imagen fija'))
+    print('%s/ %d KB · %d páginas · %d productos en %d segmentos · fondo: %s'
+          % (os.path.basename(out), total // 1024, len(PAGES), n, len(SEGMENTS), fondo or 'imagen fija'))
     if missing:
         print('FALTAN:', ', '.join(missing))
 
