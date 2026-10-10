@@ -56,6 +56,11 @@ img { max-width: 100%; }
   background: linear-gradient(180deg, rgba(4, 18, 48, .40), transparent 28%, transparent 64%, rgba(4, 14, 36, .50)),
     rgba(6, 22, 56, calc(var(--z) * .30)); }
 .bg--sky { --z: 1; }
+/* The live sky (cielo.js): until the GPU draws it, and wherever it can't,
+   this gradient is the sky. The birds and planes fly on the canvas above. */
+.bg--live { background: linear-gradient(180deg, #0d4cb4 0%, #2f74d0 45%, #7db2ea 100%); }
+.bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.bg--live::after { background: linear-gradient(180deg, rgba(4, 18, 48, .28), transparent 30%, transparent 70%, rgba(4, 14, 36, .34)); }
 main, footer, .bar { position: relative; z-index: 1; }
 main { overflow-x: hidden; overflow-x: clip; }
 
@@ -100,7 +105,7 @@ main { overflow-x: hidden; overflow-x: clip; }
 .hero__bottom { position: relative; display: grid; justify-items: center; gap: 22px; }
 /* A soft pool of shade under the copy, so it reads over the brightest sky. */
 .hero__bottom::before { content: ""; position: absolute; z-index: -1; inset: -50px -12vw -40px; pointer-events: none;
-  background: radial-gradient(closest-side, rgba(4, 18, 48, .62), rgba(4, 18, 48, .25) 60%, transparent); }
+  background: radial-gradient(closest-side, rgba(4, 18, 48, .72), rgba(4, 18, 48, .32) 60%, transparent); }
 .hero__lede { margin: 0; max-width: 52ch; font-size: clamp(15.5px, 1.4vw, 18px); line-height: 1.55; color: var(--soft);
   text-shadow: 0 2px 16px rgba(0, 16, 50, .6); }
 @media (max-width: 520px) { .hero__lede .long { display: none; } }

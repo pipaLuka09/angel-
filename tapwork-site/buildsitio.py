@@ -272,13 +272,15 @@ def build(out=OUT, fondo=None):
             % monograma.svg('#E30613', 'plata-logo', [('0%', '#F4F6F8'), ('46%', '#C3CAD1'), ('100%', '#E6EAED')]))
 
     # The background: a clip if one was given (its poster sits next to it as
-    # .jpg), otherwise a still of the 3D street.
+    # .jpg), with the birds and planes of cielo.js flying over it; otherwise
+    # the live sky of cielo.js, drawn on the GPU behind them.
     if fondo:
         media = ('<video autoplay muted loop playsinline preload="auto" poster="v/fondo.jpg">'
                  '<source src="v/fondo.mp4" type="video/mp4"></video>')
     else:
-        media = '<img src="v/hero-poster.jpg" alt="">'
-    bg = '<div class="bg" aria-hidden="true">%s</div>' % media
+        media = '<canvas class="sky-gl"></canvas>'
+    bg = '<div class="bg%s" aria-hidden="true">%s<canvas class="sky-fx"></canvas></div>' % (
+        '' if fondo else ' bg--live', media)
     fill = dict(
         logo=logo, dumbbell=DUMBBELL, paw=PAW, bag=BAG, playsm=PLAY,
         gym_steps=gym_steps, gym_feats=gym_feats, shop='\n'.join(shop), shop_segs=shop_segs,
@@ -290,7 +292,7 @@ def build(out=OUT, fondo=None):
         walink=esc(cat.wa_link('Hola, quiero cotizar productos NFC de Tap Work')),
         walink_asis=esc(cat.wa_link('Hola, quiero una demostración del control de asistencia de Tap Work')),
         steps=steps, segs=segs, slides='\n'.join(slides), n=str(n), shop_n=str(len(shop_order)), bg=bg,
-        bg_sky=bg.replace('class="bg"', 'class="bg bg--sky"'), asis_steps=asis_steps, asis_feats=asis_feats)
+        bg_sky=bg.replace('class="bg', 'class="bg bg--sky', 1), asis_steps=asis_steps, asis_feats=asis_feats)
 
     def render(name):
         page = io.open(os.path.join(SRC, name), encoding='utf-8').read()
@@ -319,8 +321,9 @@ def build(out=OUT, fondo=None):
 
     shutil.copy(os.path.join(SRC, 'site.css'), os.path.join(out, 'css', 'site.css'))
     shutil.copy(os.path.join(SRC, 'app.js'), os.path.join(out, 'js', 'app.js'))
+    shutil.copy(os.path.join(SRC, 'cielo.js'), os.path.join(out, 'js', 'cielo.js'))
     shutil.copy(os.path.join(REPO, 'assets', 'lenis.min.js'), os.path.join(out, 'js', 'lenis.min.js'))
-    for f in ('hero-poster.jpg', 'panel.jpg', 'panel-movil.jpg', 'card-front.jpg', 'card-back.jpg'):
+    for f in ('panel.jpg', 'panel-movil.jpg', 'card-front.jpg', 'card-back.jpg'):
         shutil.copy(os.path.join(SRC, f), os.path.join(out, 'v', f))
     if fondo:
         base = os.path.splitext(fondo)[0]
@@ -345,7 +348,7 @@ def build(out=OUT, fondo=None):
                 missing.append(os.path.basename(src))
     total = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(out) for f in fs)
     print('%s/ %d KB · %d páginas · %d productos en %d segmentos · fondo: %s'
-          % (os.path.basename(out), total // 1024, len(PAGES), n, len(SEGMENTS), fondo or 'imagen fija'))
+          % (os.path.basename(out), total // 1024, len(PAGES), n, len(SEGMENTS), fondo or 'cielo en vivo'))
     if missing:
         print('FALTAN:', ', '.join(missing))
 
