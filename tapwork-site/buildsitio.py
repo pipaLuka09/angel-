@@ -322,6 +322,10 @@ def build(out=OUT, fondo=None):
     shutil.copy(os.path.join(SRC, 'site.css'), os.path.join(out, 'css', 'site.css'))
     shutil.copy(os.path.join(SRC, 'app.js'), os.path.join(out, 'js', 'app.js'))
     shutil.copy(os.path.join(SRC, 'cielo.js'), os.path.join(out, 'js', 'cielo.js'))
+    os.makedirs(os.path.join(out, 'v', 'cielo'), exist_ok=True)
+    for f in os.listdir(os.path.join(SRC, 'cielo')):
+        if f.endswith('.webp'):
+            shutil.copy(os.path.join(SRC, 'cielo', f), os.path.join(out, 'v', 'cielo', f))
     shutil.copy(os.path.join(REPO, 'assets', 'lenis.min.js'), os.path.join(out, 'js', 'lenis.min.js'))
     for f in ('panel.jpg', 'panel-movil.jpg', 'card-front.jpg', 'card-back.jpg'):
         shutil.copy(os.path.join(SRC, f), os.path.join(out, 'v', f))

@@ -4,7 +4,7 @@
   contrails and a hot-air balloon through it. Scrolling climbs through that
   sky: the clouds and everything in them slide past at their own depth, and
   near the bottom of the page the afternoon turns to evening, with the first
-  stars. Behind a video background (the --fondo build) only the birds and
+  stars. The nearest gulls and the airliners are real photos. Behind a video background (the --fondo build) only the birds and
   planes are drawn, over the clip, once the reader has scrolled past it.
   Nothing moves with prefers-reduced-motion: the sky is drawn still.
 */
@@ -98,6 +98,17 @@
   // Everything that flies has a depth d (1 = near, slides with the page; small
   // = far, barely moves) and an anchor a: the scroll position, in screens, at
   // which it sits at height yf of the screen.
+  // Real photos (Unsplash licence, free for commercial use): gliding gulls and
+  // airliners seen from below, cut out of their sky. face is the way the
+  // gull's head points (1 = right). Until a photo has loaded nothing is drawn
+  // for it (the planes fall back to a drawn silhouette).
+  var GULLS = [['gaviota-1', 1], ['gaviota-2', 1], ['gaviota-3', 1], ['gaviotas-par', -1],
+               ['gaviota-cerca', -1], ['gaviota-4', -1], ['gaviota-lejos', 1]];
+  function photo(name) { var im = new Image(); im.decoding = 'async'; im.src = 'v/cielo/' + name + '.webp'; return im; }
+  var gulls = GULLS.map(function (g) { return { im: photo(g[0]), face: g[1], far: g[0] === 'gaviota-lejos' }; });
+  var jets = [photo('avion-1'), photo('avion-2')];
+  function ready(im) { return im.complete && im.naturalWidth > 0; }
+
   function screenY(o, S) { return H * (o.yf + (o.a - S) * o.d); }
   function hazy(d, dusk) {  // far things fade into the sky
     var f = 1 - d, r = 18 + 120 * f, g = 26 + 140 * f, b = 38 + 170 * f;
@@ -105,7 +116,7 @@
   }
 
   function newFlock(S, from) {
-    var d = rnd(.22, 1), dir = Math.random() < .5 ? 1 : -1;
+    var d = rnd(.15, .55), dir = Math.random() < .5 ? 1 : -1;
     var n = Math.max(2, Math.round(rnd(3, 12) * (1.15 - d * .45)));
     var vee = n > 4 && Math.random() < .4;
     var size = (small ? .7 : 1) * (12 + 46 * d * d);
@@ -156,11 +167,36 @@
     return !(o.dir > 0 ? o.x - span > W : o.x + span < 0) && y0 > -H * .4 && y0 < H * 1.4;
   }
 
+  function newGull(S, from) {
+    var g = gulls[Math.random() * gulls.length | 0], d = g.far ? rnd(.4, .6) : rnd(.55, 1), dir = Math.random() < .5 ? 1 : -1;
+    var o = { kind: 'gull', g: g, d: d, dir: dir, w: (small ? .62 : 1) * (80 + 160 * d * d), yf: rnd(.15, .75),
+      v: dir * W * rnd(.05, .085) * (.55 + d * .5), ph: rnd(0, 6.3) };
+    if (from === 'side') { o.a = S + rnd(-.25, .25); o.x = dir > 0 ? -o.w : W + o.w; }
+    else { o.a = S + (from === 'above' ? -rnd(.4, .9) : rnd(.6, 1.4)) / d; o.x = rnd(.1, .9) * W; }
+    if (overVideo) o.a = Math.max(o.a, 1.1);
+    return o;
+  }
+  function stepGull(o, dt, dS, S, dusk) {
+    o.x += o.v * dt + o.dir * dS * H * .25 * o.d;
+    var y = screenY(o, S) + Math.sin(T * .7 + o.ph) * o.w * .06, im = o.g.im;
+    if (ready(im)) {
+      var h = o.w * im.naturalHeight / im.naturalWidth;
+      ctx.save(); ctx.translate(o.x, y);
+      ctx.rotate(Math.sin(T * .45 + o.ph) * .08 + o.dir * .03);  // banks a little as it glides
+      ctx.scale(o.dir === o.g.face ? 1 : -1, 1 + .03 * Math.sin(T * 1.7 + o.ph));  // and the wings flex
+      if (dusk > .02) ctx.filter = 'brightness(' + (1 - .55 * dusk).toFixed(2) + ') saturate(' + (1 - .3 * dusk).toFixed(2) + ')';
+      ctx.globalAlpha = .8 + .2 * o.d;
+      ctx.drawImage(im, -o.w / 2, -h / 2, o.w, h);
+      ctx.restore();
+    }
+    return !(o.dir > 0 ? o.x - o.w > W : o.x + o.w < 0) && y > -H * .5 && y < H * 1.5;
+  }
+
   function newPlane(S, far) {
     var dir = Math.random() < .5 ? 1 : -1;
     var p = {
       kind: 'plane', far: far, dir: dir, d: far ? .14 : rnd(.45, .6),
-      L: far ? rnd(16, 22) : (small ? 70 : 110) * rnd(.85, 1.15),
+      L: far ? rnd(22, 30) : (small ? 62 : 90) * rnd(.9, 1.1), jet: jets[Math.random() * jets.length | 0],
       yf: far ? rnd(.12, .3) : rnd(.18, .5), trail: [[], []], acc: 0
     };
     p.ang = (dir > 0 ? 0 : Math.PI) - dir * rnd(.03, .09);
@@ -173,7 +209,16 @@
   }
   function drawPlane(p, lights) {
     var c = Math.cos(p.ang), s = Math.sin(p.ang);
-    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang); ctx.scale(p.L, p.L);
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang);
+    if (ready(p.jet)) {  // the photo points its nose up: a quarter turn points it along the heading
+      var jh = p.L * p.jet.naturalHeight / p.jet.naturalWidth;
+      ctx.save(); ctx.rotate(Math.PI / 2);
+      if (lights > .02) ctx.filter = 'brightness(' + (1 - .5 * lights).toFixed(2) + ')';
+      ctx.drawImage(p.jet, -p.L / 2, -jh / 2, p.L, jh);
+      ctx.restore();
+    }
+    ctx.scale(p.L, p.L);
+    if (!ready(p.jet)) {
     ctx.fillStyle = p.far ? 'rgba(232,238,246,.9)' : '#c9d3df';
     ctx.beginPath();  // wings and tailplane
     [1, -1].forEach(function (k) {
@@ -190,11 +235,12 @@
       ctx.fillStyle = '#aeb9c6';
       ctx.beginPath(); ctx.ellipse(.05, .17, .065, .024, 0, 0, 6.2832); ctx.ellipse(.05, -.17, .065, .024, 0, 0, 6.2832); ctx.fill();
     }
+    }
     if (lights > .05) {  // navigation lights in the evening: red left, green right, white strobe
       var on = (T % 1.2) < .08;
       ctx.globalAlpha = lights;
       [['#ff3b30', -.48], ['#34c759', .48]].forEach(function (l) {
-        ctx.fillStyle = l[0]; ctx.beginPath(); ctx.arc(-.2, l[1], .018 + (p.far ? .05 : 0), 0, 6.2832); ctx.fill();
+        ctx.fillStyle = l[0]; ctx.beginPath(); ctx.arc(-.08, l[1], .02 + (p.far ? .05 : 0), 0, 6.2832); ctx.fill();
       });
       if (on) { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-.52, 0, p.far ? .09 : .03, 0, 6.2832); ctx.fill(); }
       ctx.globalAlpha = 1;
@@ -220,7 +266,7 @@
         var a = (p.far ? .5 : .6) * smooth(age / .5) * (1 - age / life);
         if (a <= .01) continue;
         ctx.strokeStyle = tint + a.toFixed(3) + ')';
-        ctx.lineWidth = p.L * (p.far ? .12 : .03) + age * p.L * (p.far ? .05 : .016);
+        ctx.lineWidth = p.L * (p.far ? .1 : .035) + age * p.L * (p.far ? .04 : .018);
         ctx.beginPath(); ctx.moveTo(tr[i - 1][0], tr[i - 1][1] - shift); ctx.lineTo(tr[i][0], tr[i][1] - shift); ctx.stroke();
       }
     }
@@ -268,7 +314,7 @@
 
   /* -------------------------------------------------------------- frame */
   var things = [], T = 0, last = 0, lastS = null, running = false, flip = false;
-  var nFlocks = fine ? 4 : 3;
+  var nFlocks = fine ? 3 : 2, nGulls = fine ? 2 : 1;
 
   function size() {
     var w = innerWidth, h = document.documentElement.clientHeight;
@@ -292,6 +338,9 @@
     things = [];
     for (var i = 0; i < nFlocks; i++) things.push(newFlock(S, i === 0 ? 'side' : 'below'));
     things[0].x = W * rnd(.15, .4); things[0].a = S + (overVideo ? 1.2 : .05);
+    for (i = 0; i < nGulls; i++) things.push(newGull(S, i === 0 ? 'side' : 'below'));
+    var g0 = things[nFlocks];  // one gull already gliding across the first screen
+    g0.x = W * (g0.dir > 0 ? rnd(.1, .3) : rnd(.7, .9)); g0.a = S + (overVideo ? 1.2 : 0); g0.yf = rnd(.22, .4);
     things.push(newPlane(S, false), newPlane(S, true), newBalloon(S));
   }
 
@@ -308,10 +357,12 @@
     for (var i = 0; i < things.length; i++) {
       var o = things[i], alive;
       if (o.kind === 'birds') alive = stepFlock(o, dt, dS, S, dusk);
+      else if (o.kind === 'gull') alive = stepGull(o, dt, dS, S, dusk);
       else if (o.kind === 'plane') alive = stepPlane(o, dt, dS, S, dusk);
       else alive = stepBalloon(o, dt, dS, S, dusk);
       if (!alive) {
         if (o.kind === 'birds') things[i] = newFlock(S, screenY(o, S) > H ? 'above' : Math.random() < .5 ? 'side' : 'below');
+        else if (o.kind === 'gull') things[i] = newGull(S, screenY(o, S) > H ? 'above' : Math.random() < .5 ? 'side' : 'below');
         else if (o.kind === 'plane') things[i] = newPlane(S, o.far);
         else things[i] = newBalloon(S);
       }
