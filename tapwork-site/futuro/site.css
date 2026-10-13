@@ -59,6 +59,54 @@ img { max-width: 100%; }
 /* The live sky (cielo.js): until the GPU draws it, and wherever it can't,
    this gradient is the sky. The birds and planes fly on the canvas above. */
 .bg--live { background: linear-gradient(180deg, #0d4cb4 0%, #2f74d0 45%, #7db2ea 100%); }
+
+/* The shot of the grandmother (bg--photo), in two layers so it moves like a
+   clip: the street and sky slowly turn as if the camera breathes, she leans
+   in, a light runs over the card and the sun flares. Scrolling pushes the
+   whole shot in (--z); cielo.js flies the gulls and planes between the two
+   layers and sets --dusk near the bottom of the page. */
+.bg--photo { background: #0b1a33; }
+/* Text sits over her once the page scrolls (and on the inner pages): a deeper tint keeps it readable. */
+.bg--photo::after { z-index: 1; background: linear-gradient(180deg, rgba(4, 18, 48, .40), transparent 28%, transparent 64%, rgba(4, 14, 36, .50)),
+    rgba(6, 22, 56, calc(var(--z) * .5)); }
+.bg--photo .scene { position: absolute; inset: 0; transform-origin: 52% 42%;
+  transform: scale(calc(1.06 + var(--z) * .32)); will-change: transform; }
+.frame { position: absolute; left: 50%; top: 50%; width: max(100vw, 179.2vh); height: max(100vh, 55.8vw);
+  transform: translate(-50%, -50%); }
+.frame img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transform: none; }
+.frame.cam { animation: cam 16s ease-in-out infinite; }
+.frame.lean { animation: lean 7s ease-in-out infinite; transform-origin: 52% 100%; }
+@keyframes cam { 0%, 100% { transform: translate(-50%, -50%) rotate(-1.1deg) scale(1.01); }
+  50% { transform: translate(-50%, -50%) rotate(1.1deg) scale(1.045); } }
+@keyframes lean { 0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, -51%) rotate(-.9deg) scale(1.03); } }
+.sun { position: absolute; left: 61.7%; top: 54.6%; width: 24%; aspect-ratio: 1; border-radius: 50%; translate: -50% -50%;
+  background: radial-gradient(circle, rgba(255, 252, 235, .8), rgba(255, 240, 200, .28) 20%, transparent 62%);
+  mix-blend-mode: screen; animation: flare 5s ease-in-out infinite; }
+@keyframes flare { 50% { opacity: .55; transform: scale(.82); } }
+.shine { position: absolute; inset: 0; clip-path: polygon(43% 62.8%, 59.8% 57.3%, 61.6% 79.2%, 44% 87.7%);
+  background: linear-gradient(100deg, transparent 44%, rgba(255, 255, 255, .34) 50%, rgba(255, 255, 255, .06) 55%, transparent 60%)
+    no-repeat 140% 0 / 300% 100%;
+  mix-blend-mode: screen; animation: shine 6s ease-in-out infinite; }
+@keyframes shine { 0%, 50% { background-position: 140% 0; } 80%, 100% { background-position: -40% 0; } }
+.dusk { position: absolute; inset: 0; opacity: var(--dusk, 0); pointer-events: none;
+  background: linear-gradient(180deg, rgba(20, 10, 56, .82), rgba(80, 26, 66, .6) 55%, rgba(230, 100, 40, .5)); }
+@media (prefers-reduced-motion: reduce) { .frame.cam, .frame.lean, .sun, .shine { animation: none; } }
+
+/* Over her shot the hero copy steps aside, so the card in her hand stays clear. */
+@media (min-width: 900px) {
+  .hero--photo { justify-items: start; text-align: left; }
+  .hero--photo .hero__top { justify-items: start; }
+  .hero--photo h1 { font-size: clamp(60px, 7vw, 112px); max-width: 5.5ch; }
+  .hero--photo .hero__bottom { justify-items: start; max-width: 430px; }
+  .hero--photo .hero__bottom::before { inset: -60px -40px -40px -12vw; }
+  .hero--photo .actions { justify-content: flex-start; }
+  .hero--photo .hud--l { display: none; }
+}
+@media (max-width: 899px) {
+  .hero--photo h1 { font-size: clamp(46px, 13vw, 76px); }
+  .hero--photo > div[aria-hidden] { min-height: 58svh; }
+}
 .bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .bg--live::after { background: linear-gradient(180deg, rgba(4, 18, 48, .28), transparent 30%, transparent 70%, rgba(4, 14, 36, .34)); }
 main, footer, .bar { position: relative; z-index: 1; }

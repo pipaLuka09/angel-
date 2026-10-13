@@ -16,6 +16,7 @@
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   var overVideo = !!bg.querySelector('video');
+  var onPhoto = bg.classList.contains('bg--photo');  // her shot: the flyers pass between its two layers
   var lift = bg.classList.contains('bg--sky') ? 1.4 : 0;  // the inner pages start higher up
   var ctx = fxc.getContext('2d');
   var W = 0, H = 0, DPR = 1, small = false;
@@ -313,7 +314,7 @@
   }
 
   /* -------------------------------------------------------------- frame */
-  var things = [], T = 0, last = 0, lastS = null, running = false, flip = false;
+  var things = [], T = 0, last = 0, lastS = null, running = false, flip = false, lastDusk = -1;
   var nFlocks = fine ? 3 : 2, nGulls = fine ? 2 : 1;
 
   function size() {
@@ -350,6 +351,7 @@
     var S = scrollS(), dS = lastS === null ? 0 : S - lastS; lastS = S;
     var dusk = duskAt(S);
     if (overVideo) fxc.style.opacity = smooth((S - .45) / .5).toFixed(3);  // only once the clip is all sky
+    if (onPhoto && Math.abs(dusk - lastDusk) > .004) { bg.style.setProperty('--dusk', dusk.toFixed(3)); lastDusk = dusk; }
     flip = !flip;
     if (gl && (fine || flip)) drawSky(T, S, dusk);
     ctx.clearRect(0, 0, W, H);

@@ -272,16 +272,23 @@ def build(out=OUT, fondo=None):
             % monograma.svg('#E30613', 'plata-logo', [('0%', '#F4F6F8'), ('46%', '#C3CAD1'), ('100%', '#E6EAED')]))
 
     # The background: a clip if one was given (its poster sits next to it as
-    # .jpg), with the birds and planes of cielo.js flying over it; otherwise
-    # the live sky of cielo.js, drawn on the GPU behind them.
+    # .jpg), with the birds and planes of cielo.js flying over it. Otherwise
+    # the shot of the grandmother holding the card (futuro/abuela/), in two
+    # layers that move like a clip: the street and sky behind, the gulls and
+    # planes of cielo.js, and her in front.
     if fondo:
-        media = ('<video autoplay muted loop playsinline preload="auto" poster="v/fondo.jpg">'
-                 '<source src="v/fondo.mp4" type="video/mp4"></video>')
+        bg = ('<div class="bg" aria-hidden="true"><video autoplay muted loop playsinline preload="auto" '
+              'poster="v/fondo.jpg"><source src="v/fondo.mp4" type="video/mp4"></video>'
+              '<canvas class="sky-fx"></canvas></div>')
     else:
-        media = '<canvas class="sky-gl"></canvas>'
-    bg = '<div class="bg%s" aria-hidden="true">%s<canvas class="sky-fx"></canvas></div>' % (
-        '' if fondo else ' bg--live', media)
+        bg = ('<div class="bg bg--photo" aria-hidden="true">'
+              '<div class="scene"><div class="frame cam"><img src="v/abuela/fondo.jpg" alt="" fetchpriority="high">'
+              '<i class="sun"></i></div></div>'
+              '<canvas class="sky-fx"></canvas>'
+              '<div class="scene"><div class="frame lean"><img src="v/abuela/frente.webp" alt=""><i class="shine"></i></div></div>'
+              '<i class="dusk"></i></div>')
     fill = dict(
+        hero_cls='' if fondo else ' hero--photo',
         logo=logo, dumbbell=DUMBBELL, paw=PAW, bag=BAG, playsm=PLAY,
         gym_steps=gym_steps, gym_feats=gym_feats, shop='\n'.join(shop), shop_segs=shop_segs,
         shop_json=json.dumps(sheet, ensure_ascii=False).replace('</', '<\\/'),
@@ -322,6 +329,9 @@ def build(out=OUT, fondo=None):
     shutil.copy(os.path.join(SRC, 'site.css'), os.path.join(out, 'css', 'site.css'))
     shutil.copy(os.path.join(SRC, 'app.js'), os.path.join(out, 'js', 'app.js'))
     shutil.copy(os.path.join(SRC, 'cielo.js'), os.path.join(out, 'js', 'cielo.js'))
+    os.makedirs(os.path.join(out, 'v', 'abuela'), exist_ok=True)
+    for f in ('fondo.jpg', 'frente.webp'):
+        shutil.copy(os.path.join(SRC, 'abuela', f), os.path.join(out, 'v', 'abuela', f))
     os.makedirs(os.path.join(out, 'v', 'cielo'), exist_ok=True)
     for f in os.listdir(os.path.join(SRC, 'cielo')):
         if f.endswith('.webp'):
@@ -352,7 +362,7 @@ def build(out=OUT, fondo=None):
                 missing.append(os.path.basename(src))
     total = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(out) for f in fs)
     print('%s/ %d KB · %d páginas · %d productos en %d segmentos · fondo: %s'
-          % (os.path.basename(out), total // 1024, len(PAGES), n, len(SEGMENTS), fondo or 'cielo en vivo'))
+          % (os.path.basename(out), total // 1024, len(PAGES), n, len(SEGMENTS), fondo or 'foto de la abuelita en vivo'))
     if missing:
         print('FALTAN:', ', '.join(missing))
 
