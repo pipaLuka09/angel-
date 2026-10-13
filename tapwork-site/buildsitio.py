@@ -273,19 +273,21 @@ def build(out=OUT, fondo=None):
 
     # The background: a clip if one was given (its poster sits next to it as
     # .jpg), with the birds and planes of cielo.js flying over it. Otherwise
-    # the shot of the grandmother holding the card (futuro/abuela/), in two
-    # layers that move like a clip: the street and sky behind, the gulls and
-    # planes of cielo.js, and her in front.
+    # the shot of the grandmother holding the card (futuro/abuela/) as a
+    # fixed-camera time-lapse: cielo.js redraws the street on the GPU with
+    # moving clouds and palms in the wind, flies gulls and planes over it, and
+    # she stands in front. The still <img> is the fallback without WebGL.
     if fondo:
         bg = ('<div class="bg" aria-hidden="true"><video autoplay muted loop playsinline preload="auto" '
               'poster="v/fondo.jpg"><source src="v/fondo.mp4" type="video/mp4"></video>'
               '<canvas class="sky-fx"></canvas></div>')
     else:
         bg = ('<div class="bg bg--photo" aria-hidden="true">'
-              '<div class="scene"><div class="frame cam"><img src="v/abuela/fondo.jpg" alt="" fetchpriority="high">'
-              '<i class="sun"></i></div></div>'
+              '<div class="frame still"><img src="v/abuela/fondo.jpg" alt="" fetchpriority="high"></div>'
+              '<canvas class="sky-gl"></canvas>'
+              '<div class="frame"><i class="sun"></i></div>'
               '<canvas class="sky-fx"></canvas>'
-              '<div class="scene"><div class="frame lean"><img src="v/abuela/frente.webp" alt=""><i class="shine"></i></div></div>'
+              '<div class="frame lean"><img src="v/abuela/frente.webp" alt=""><i class="shine"></i></div>'
               '<i class="dusk"></i></div>')
     fill = dict(
         hero_cls='' if fondo else ' hero--photo',
@@ -330,7 +332,7 @@ def build(out=OUT, fondo=None):
     shutil.copy(os.path.join(SRC, 'app.js'), os.path.join(out, 'js', 'app.js'))
     shutil.copy(os.path.join(SRC, 'cielo.js'), os.path.join(out, 'js', 'cielo.js'))
     os.makedirs(os.path.join(out, 'v', 'abuela'), exist_ok=True)
-    for f in ('fondo.jpg', 'frente.webp'):
+    for f in ('fondo.jpg', 'frente.webp', 'plate.jpg', 'masks.png', 'cielo.png'):
         shutil.copy(os.path.join(SRC, 'abuela', f), os.path.join(out, 'v', 'abuela', f))
     os.makedirs(os.path.join(out, 'v', 'cielo'), exist_ok=True)
     for f in os.listdir(os.path.join(SRC, 'cielo')):
