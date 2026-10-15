@@ -105,6 +105,9 @@ if __name__ == '__main__':
                             sticker=dict(src='pieza-sticker.png', d=sd / 100 * iw))
     # el menú: la foto real del acrílico "Carta Digital"; el ícono NFC está bajo el QR
     info['menu'] = dict(photo='../menu.jpg', ring='255,255,255', tap=[530, 825, 46])
+    # tarjeta: la foto real de la tarjeta; se toca el ícono NFC de la esquina. La tarjeta es
+    # ancha, así que en el cuadro vertical va a lo ancho (fit) en vez de a lo alto.
+    info['tarjeta'] = dict(photo='../tarjeta.jpg', ring='214,178,110', tap=[167, 572, 40], fit='width')
     # reseñas: la foto real del acrílico de Google; se toca el óvalo con el ícono NFC
     info['resenas'] = dict(photo='../resenas.jpg', ring='255,209,0', tap=[530, 673, 110])
     info['gym'] = dict(photo='gym-fondo.jpg', ring='236,48,19', phone=.62, tap=gym())

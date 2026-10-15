@@ -1,8 +1,9 @@
 // Renderiza toque.html cuadro por cuadro (24 fps) y arma los videos con ffmpeg.
-//   node render-toque.js pago wifi resenas acrilico menu gym
+//   node render-toque.js pago wifi resenas acrilico menu tarjeta gym
 // Salen: ../<k>.mp4 (1080x1350, tienda), ../../reels/v/<k>.mp4 (720x1280,
 // carrusel del inicio) con su póster .jpg (el cuadro con la pantalla abierta).
-// El menú y FORJA solo van en el carrusel: la tienda tiene el video real del menú y
+// El menú, la tarjeta y FORJA solo van en el carrusel: la tienda tiene los videos reales
+// del menú y de la tarjeta, y
 // FORJA tiene su propia página. Antes hay que correr acrilicos.py (arma las fotos de fondo).
 const {chromium} = require('playwright');
 const path = require('path'), fs = require('fs'), {execFileSync} = require('child_process');
@@ -13,7 +14,7 @@ const SIZES = [
   {w: 720, h: 1280, out: k => path.join(__dirname, '..', '..', 'reels', 'v', k), crf: 24, poster: true},
 ];
 const POSTER = 5.2;
-const SOLO_CARRUSEL = new Set(['menu', 'gym']);
+const SOLO_CARRUSEL = new Set(['menu', 'tarjeta', 'gym']);
 (async () => {
   const b = await chromium.launch();
   for (const k of process.argv.slice(2)) for (const S of SIZES) {

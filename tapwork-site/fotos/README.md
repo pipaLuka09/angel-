@@ -31,7 +31,8 @@ generado. Formato 4:5.
   `herramientas/toque.html` dibuja cada cuadro y `herramientas/render-toque.js`
   saca este video y el de 720 × 1280 del carrusel (`../reels/v/`).
 - El mismo toque hace los videos del carrusel del menú (sobre `menu.jpg`, abre
-  una carta sin precios) y de FORJA (`../reels/v/gym.mp4`): el sticker de la
+  una carta sin precios), de la tarjeta (sobre `tarjeta.jpg`, abre el contacto
+  de Tania Sánchez y lo guarda) y de FORJA (`../reels/v/gym.mp4`): el sticker de la
   estación (`piezas.html?p=forja`) pegado en el poste de una máquina real, en
   una foto de Unsplash de Ambitious Studio* | Rick Barrett
   (unsplash.com/photos/h9t94gzm6q8, licencia de Unsplash), y la pantalla de

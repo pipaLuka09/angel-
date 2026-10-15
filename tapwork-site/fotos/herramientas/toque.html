@@ -4,7 +4,7 @@
   El toque: un celular se acerca al círculo del acrílico, salen las ondas NFC y
   se abre la pantalla (el pago, el Wi-Fi, la carta, la reseña o la máquina de
   FORJA). renderAt(t) dibuja el cuadro exacto del segundo t;
-  ?k=pago|wifi|menu|resenas|acrilico|gym elige la escena y ?w=&h= el tamaño del cuadro
+  ?k=pago|wifi|menu|resenas|tarjeta|acrilico|gym elige la escena y ?w=&h= el tamaño del cuadro
   (1080x1350 tienda, 720x1280 carrusel del inicio). La foto de fondo, dónde
   tocar, el color de las ondas, el tamaño del celular y el sticker que se pega
   (acrílico reutilizado) salen de acrilicos.json, que arma acrilicos.py.
@@ -17,7 +17,7 @@ html,body{background:#000;overflow:hidden}
 #view{position:relative;overflow:hidden}
 #stage{position:absolute;left:0;top:0;width:1080px;height:1350px;transform-origin:0 0}
 #photo{position:absolute;inset:0;width:1080px;height:1350px}
-#dim{position:absolute;inset:0;background:#05070c;opacity:0}
+#dim{position:absolute;inset:-1500px;background:#05070c;opacity:0}
 .ring{position:absolute;border-radius:50%;border:7px solid;opacity:0;pointer-events:none}
 
 /* el celular */
@@ -87,8 +87,16 @@ window.__total = 7.5 + D;
 // el cuadro: la foto 1080x1350 a lo alto del cuadro, centrada
 const view = document.getElementById('view'), stage = document.getElementById('stage');
 view.style.width = VW + 'px'; view.style.height = VH + 'px';
-const SC = VH / 1350, OX = (VW - 1080 * SC) / 2;
-stage.style.transform = `translate(${OX}px,0) scale(${SC})`;
+// (o a lo ancho, con los bordes de arriba y abajo fundidos con el fondo del estudio)
+const FIT_W = INFO[K].fit === 'width' && VW / VH < 1080 / 1350;
+const SC = FIT_W ? VW / 1080 : VH / 1350, OX = (VW - 1080 * SC) / 2, OY = FIT_W ? (VH - 1350 * SC) / 2 : 0;
+stage.style.transform = `translate(${OX}px,${OY}px) scale(${SC})`;
+if (FIT_W) {
+  view.style.background = 'linear-gradient(#1d2026, #15171c 45%, #0b0c0f)';
+  const fade = 'linear-gradient(transparent, #000 9%, #000 91%, transparent)';
+  document.getElementById('photo').style.webkitMaskImage = fade;
+  document.getElementById('photo').style.maskImage = fade;
+}
 document.getElementById('photo').src = INFO[K].photo;
 if (INFO[K].sticker) document.getElementById('stk').src = INFO[K].sticker.src;
 
@@ -178,6 +186,25 @@ const SCREENS = {
     button: [0.5, 0.925],
     bar: ['#1d1d1f', '#1d1d1f'],
   },
+  tarjeta: {
+    bg: '#121110',
+    ask: `<div class="layer" id="s1" style="background:linear-gradient(#1b1915,#0d0c0b);color:#F2EEE6;padding:70px 22px 0">
+        <div style="font-family:S;font-style:italic;font-size:46px;line-height:1;color:#D6B26E">TS</div>
+        <div style="font-family:S;font-style:italic;font-size:30px;margin-top:10px">Tania Sánchez</div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:2px;opacity:.6;margin-top:4px">ASESORA DE SEGUROS</div>
+        ${[['Seguro de vida', 'FAMILIAR'], ['Salud y medicina', 'INDIVIDUAL'], ['Vehículos', 'TODO RIESGO']].map(([a, b]) =>
+          `<div style="display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-top:1px solid rgba(242,238,230,.12);font-size:16px;font-weight:700"><span>${a}</span><span style="font-size:11px;letter-spacing:1.5px;opacity:.55">${b}</span></div>`).join('')}
+        <span class="cta" style="position:absolute;left:18px;right:18px;bottom:96px;width:auto;background:#EC3013;color:#fff">Escribir por WhatsApp</span>
+        <span class="cta" id="go" style="position:absolute;left:18px;right:18px;bottom:30px;width:auto;background:#F2EEE6;color:#121110">Guardar contacto</span></div>`,
+    done: `<div class="layer" id="s2" style="background:linear-gradient(#1b1915,#0d0c0b);color:#F2EEE6;text-align:center;padding-top:170px">
+        <div class="check" style="background:#2BB58A">${CHECK('#fff')}</div>
+        <div style="font-weight:900;font-stretch:85%;font-size:30px;margin-top:20px">Contacto guardado</div>
+        <div style="font-family:S;font-style:italic;font-size:21px;margin-top:6px">Tania Sánchez</div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:2px;opacity:.6;margin-top:4px">ASESORA DE SEGUROS</div>
+        <div style="display:inline-block;margin-top:22px;padding:8px 14px;border-radius:20px;background:rgba(43,181,138,.15);color:#2BB58A;font-size:13px;font-weight:700">● Ya está en tus contactos</div></div>`,
+    button: [0.5, 0.925],
+    bar: ['#fff', '#fff'],
+  },
   gym: {
     bg: '#0E0F12',
     ask: `<div class="layer" id="s1" style="background:#0E0F12;color:#fff;padding:64px 20px 0">
@@ -234,10 +261,10 @@ const mix = (A, B, x) => A.map((v, i) => lerp(v, B[i], x));
 const PW = 330, PH = 680, AX = .5, AY = .3;       // el punto del celular que toca: arriba al centro (la antena)
 // poses: [x, y, rotación, escala] del punto de anclaje en la foto
 const PS = INFO[K].phone || 1;                      // el celular a la escala de la escena (lejos en el gimnasio)
-const P_OUT = [TAP[0] + 560, TAP[1] + 1250, -26, 1.12 * PS];
+const P_OUT = [TAP[0] + 560, TAP[1] + (FIT_W ? 1750 : 1250), -26, 1.12 * PS];
 const P_NEAR = [TAP[0] + 40 * PS, TAP[1] + 70 * PS, -12, 1.06 * PS];
 const P_TAP = [TAP[0] + 8 * PS, TAP[1] + 16 * PS, -9, PS];
-const P_SHOW = [540, 470, 0, 1.24];
+const P_SHOW = [540, 470, 0, 1.24 * (FIT_W ? (VH / 1350) / SC : 1)];  // del mismo tamaño en pantalla aunque la foto vaya a lo ancho
 
 function pose(t) {
   if (t < .5) return P_OUT;

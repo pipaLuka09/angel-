@@ -12,7 +12,8 @@ las dos pantallas que se abren y el cierre con el WhatsApp.
   (720p y póster, lo que usa la página).
 - `v/asistencia.mp4` es el promo original de asistencia recodificado a 720p, no
   sale de aquí.
-- `v/pago.mp4`, `v/wifi.mp4`, `v/resenas.mp4`, `v/acrilico.mp4`, `v/menu.mp4` y `v/gym.mp4` (y
+- `v/pago.mp4`, `v/wifi.mp4`, `v/resenas.mp4`, `v/acrilico.mp4`, `v/menu.mp4`,
+  `v/tarjeta.mp4` y `v/gym.mp4` (y
   sus pósters) tampoco: son el toque del celular sobre fotos reales, de
   `../fotos/herramientas/render-toque.js`.
 
