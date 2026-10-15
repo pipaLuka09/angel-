@@ -54,7 +54,7 @@ LINE = {
     'resenas': 'Tu cliente deja la reseña en Google en diez segundos, cuando la experiencia fue buena.',
     'tarjeta': 'Tu contacto se guarda con un toque. Sin dictar tu número ni imprimir tarjetas.',
     'asistencia': 'Tu equipo marca con su gafete y tú exportas la lista a Excel en un clic.',
-    'wifi': 'Se conecta solo. Nadie le pide la clave al mesero.',
+    'wifi': 'Android se conecta con un toque y iPhone con el QR del mismo acrílico. Nadie pide la clave.',
     'pagos': 'Paga y deja la propina desde su celular, sin esperar la cuenta.',
     'gimnasios': 'Con FORJA, cada serie queda registrada en la máquina, sin papel ni app.',
     'mascotas': 'Quien la encuentre ve sus vacunas, sus alergias y cómo avisarte.',
@@ -130,7 +130,7 @@ SPECS = {
     'asistencia': [('Formato', 'Gafete NFC, uno por persona'),
                    ('Abre', 'La marcación de entrada y salida en el celular del local'),
                    ('Incluye', 'Panel de asistencia con reporte a Excel')],
-    'wifi': [('Formato', 'Disco NFC de Wi-Fi'), ('Abre', 'La conexión a tu red de invitados')],
+    'wifi': [('Formato', 'Acrílico NFC de Wi-Fi, con QR para iPhone'), ('Abre', 'La conexión a tu red de invitados (en iPhone, con el QR)')],
     'pagos': [('Formato', 'Acrílico NFC de pago'), ('Abre', 'Tu enlace de pago y la propina')],
     'gimnasios': [('Formato', 'Lector NFC para cada máquina'),
                   ('Abre', 'El ejercicio de la máquina, sus series y cómo se hace')],
@@ -148,7 +148,8 @@ REAL = {
     'menu': {'img': 'menu.jpg', 'reel': 'menu.mp4'},          # the "Carta Digital" acrylic, tapped
     'tarjeta': {'img': 'tarjeta.jpg', 'reel': 'tarjeta.mp4'},  # Tania Sánchez's card, tapped
     'resenas': {'img': 'resenas.jpg', 'reel': 'resenas.mp4'},  # the Google reviews acrylic
-    # No footage of these yet: studio shot of the 3D render, sales cut of the 3D tap and screens.
+    # The real acrylics (a dental office's Deuna and Wi-Fi pieces) in the studio, and a phone
+    # tapping them: fotos/herramientas/acrilicos.py and toque.html.
     'pagos': {'img': 'pago.jpg', 'reel': 'pago.mp4'},
     'wifi': {'img': 'wifi.jpg', 'reel': 'wifi.mp4'},
 }

@@ -77,49 +77,50 @@ def finish(bg, name):
     a += np.random.default_rng(1).normal(0, 2.0, a.shape)  # fine grain so gradients don't band
     Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(name, quality=88, optimize=True, progressive=True)
 
-# --- Reseñas: the acrylic plate, flattened, standing, turned a little ---
-plate = flatten('resenas-src.png', [[244, 460], [645, 435], [667, 1052], [267, 1063]], 800, 1200, 1.025)
-plate = levels(plate, 1, 99.2, 250)
-plate = rounded(plate, 36).resize((600, 900), Image.LANCZOS)
-plate = tilt(plate, .045)
-finish(place(studio(), plate, W / 2 + 10, edge=(70, 26)), 'resenas.jpg')
+if __name__ == '__main__':
+    # --- Reseñas: the acrylic plate, flattened, standing, turned a little ---
+    plate = flatten('resenas-src.png', [[244, 460], [645, 435], [667, 1052], [267, 1063]], 800, 1200, 1.025)
+    plate = levels(plate, 1, 99.2, 250)
+    plate = rounded(plate, 36).resize((600, 900), Image.LANCZOS)
+    plate = tilt(plate, .045)
+    finish(place(studio(), plate, W / 2 + 10, edge=(70, 26)), 'resenas.jpg')
 
-# --- Tarjeta: the card, flattened, the thumb and its glare painted out ---
-card = flatten('tarjeta-src.png', [[42, 395], [513, 394], [508, 693], [46, 670]], 856, 540, 1.03)
-cv = np.asarray(card).copy()
-# the thumb and its glare sit along the top-left edge: repaint that strip with
-# the card's own matte black, nothing else on the card is touched
-hsv = cv2.cvtColor(cv, cv2.COLOR_RGB2HSV)
-mask = np.zeros(cv.shape[:2], np.uint8)
-strip = hsv[:42, :240, 2] > 62
-mask[:42, :240][strip] = 255
-mask = cv2.dilate(mask, np.ones((7, 7), np.uint8))
-cv = cv2.inpaint(cv, mask, 7, cv2.INPAINT_TELEA)
-card = Image.fromarray(cv)
-card = ImageEnhance.Contrast(card).enhance(1.06)
-card = rounded(card, int(540 * 3.18 / 54)).resize((930, 586), Image.LANCZOS)
-card = tilt(card, .05)
-finish(place(studio(), card, W / 2), 'tarjeta.jpg')
+    # --- Tarjeta: the card, flattened, the thumb and its glare painted out ---
+    card = flatten('tarjeta-src.png', [[42, 395], [513, 394], [508, 693], [46, 670]], 856, 540, 1.03)
+    cv = np.asarray(card).copy()
+    # the thumb and its glare sit along the top-left edge: repaint that strip with
+    # the card's own matte black, nothing else on the card is touched
+    hsv = cv2.cvtColor(cv, cv2.COLOR_RGB2HSV)
+    mask = np.zeros(cv.shape[:2], np.uint8)
+    strip = hsv[:42, :240, 2] > 62
+    mask[:42, :240][strip] = 255
+    mask = cv2.dilate(mask, np.ones((7, 7), np.uint8))
+    cv = cv2.inpaint(cv, mask, 7, cv2.INPAINT_TELEA)
+    card = Image.fromarray(cv)
+    card = ImageEnhance.Contrast(card).enhance(1.06)
+    card = rounded(card, int(540 * 3.18 / 54)).resize((930, 586), Image.LANCZOS)
+    card = tilt(card, .05)
+    finish(place(studio(), card, W / 2), 'tarjeta.jpg')
 
-# --- Menú: the "Carta Digital" insert, flattened, back in a clean acrylic stand ---
-ins = flatten('menu-src.png', [[130, 245], [367, 256], [333, 529], [135, 528]], 560, 700, 1.0)
-ins = levels(ins, 1, 99.6, 236).resize((600, 750), Image.LANCZOS).filter(ImageFilter.UnsharpMask(2.2, 110, 2))
-pw, ph = ins.size; m = 18; foot = 70
-stand = Image.new('RGBA', (pw + 2 * m, ph + m + foot), (0, 0, 0, 0))
-d = ImageDraw.Draw(stand)
-# the acrylic sheet: barely there, a lit rim and a sheen across it
-d.rounded_rectangle([0, 0, pw + 2 * m - 1, ph + m], 10, fill=(255, 255, 255, 18), outline=(255, 255, 255, 120), width=2)
-stand.alpha_composite(ins.convert('RGBA'), (m, m))
-sheen = Image.new('L', stand.size, 0)
-ImageDraw.Draw(sheen).polygon([(0, 0), (pw * .55, 0), (pw * .15, ph + m), (0, ph + m)], fill=26)
-stand.alpha_composite(Image.merge('RGBA', [Image.new('L', stand.size, 255)] * 3 + [sheen.filter(ImageFilter.GaussianBlur(30))]))
-d = ImageDraw.Draw(stand)
-d.line([(6, 2), (pw + 2 * m - 6, 2)], fill=(255, 255, 255, 210), width=3)
-# the L foot, seen from just above
-d.polygon([(0, ph + m), (pw + 2 * m, ph + m), (pw + 2 * m - 26, ph + m + foot), (26, ph + m + foot)], fill=(255, 255, 255, 22))
-d.line([(26, ph + m + foot - 1), (pw + 2 * m - 26, ph + m + foot - 1)], fill=(255, 255, 255, 170), width=3)
-d.line([(0, ph + m), (26, ph + m + foot)], fill=(255, 255, 255, 90), width=2)
-d.line([(pw + 2 * m, ph + m), (pw + 2 * m - 26, ph + m + foot)], fill=(255, 255, 255, 90), width=2)
-stand = stand.resize((int(stand.width * 1.08), int(stand.height * 1.08)), Image.LANCZOS)
-finish(place(studio(), stand, W / 2), 'menu.jpg')
-print('ok')
+    # --- Menú: the "Carta Digital" insert, flattened, back in a clean acrylic stand ---
+    ins = flatten('menu-src.png', [[130, 245], [367, 256], [333, 529], [135, 528]], 560, 700, 1.0)
+    ins = levels(ins, 1, 99.6, 236).resize((600, 750), Image.LANCZOS).filter(ImageFilter.UnsharpMask(2.2, 110, 2))
+    pw, ph = ins.size; m = 18; foot = 70
+    stand = Image.new('RGBA', (pw + 2 * m, ph + m + foot), (0, 0, 0, 0))
+    d = ImageDraw.Draw(stand)
+    # the acrylic sheet: barely there, a lit rim and a sheen across it
+    d.rounded_rectangle([0, 0, pw + 2 * m - 1, ph + m], 10, fill=(255, 255, 255, 18), outline=(255, 255, 255, 120), width=2)
+    stand.alpha_composite(ins.convert('RGBA'), (m, m))
+    sheen = Image.new('L', stand.size, 0)
+    ImageDraw.Draw(sheen).polygon([(0, 0), (pw * .55, 0), (pw * .15, ph + m), (0, ph + m)], fill=26)
+    stand.alpha_composite(Image.merge('RGBA', [Image.new('L', stand.size, 255)] * 3 + [sheen.filter(ImageFilter.GaussianBlur(30))]))
+    d = ImageDraw.Draw(stand)
+    d.line([(6, 2), (pw + 2 * m - 6, 2)], fill=(255, 255, 255, 210), width=3)
+    # the L foot, seen from just above
+    d.polygon([(0, ph + m), (pw + 2 * m, ph + m), (pw + 2 * m - 26, ph + m + foot), (26, ph + m + foot)], fill=(255, 255, 255, 22))
+    d.line([(26, ph + m + foot - 1), (pw + 2 * m - 26, ph + m + foot - 1)], fill=(255, 255, 255, 170), width=3)
+    d.line([(0, ph + m), (26, ph + m + foot)], fill=(255, 255, 255, 90), width=2)
+    d.line([(pw + 2 * m, ph + m), (pw + 2 * m - 26, ph + m + foot)], fill=(255, 255, 255, 90), width=2)
+    stand = stand.resize((int(stand.width * 1.08), int(stand.height * 1.08)), Image.LANCZOS)
+    finish(place(studio(), stand, W / 2), 'menu.jpg')
+    print('ok')

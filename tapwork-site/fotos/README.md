@@ -8,17 +8,24 @@ generado. Formato 4:5.
   (dedos, reflejos) y se pone de pie sobre un fondo de estudio oscuro con
   sombra y reflejo. `herramientas/estudio.py` las arma (pide las fotos fuente y
   sus recortes sin fondo, hechos con rembg / isnet-general-use).
-- `pago.jpg`, `wifi.jpg`: todavía no hay foto real; son el render 3D sobre el
-  mismo fondo de estudio, para que la tienda se vea pareja.
+- `pago.jpg`, `wifi.jpg`: los acrílicos reales que diseñamos para un consultorio
+  dental (pago con Deuna y Wi-Fi), metidos en el mismo soporte en L del menú y
+  sobre el mismo fondo de estudio. `herramientas/acrilicos.py` los arma con el
+  arte final (`herramientas/pago-diseno.png`, `wifi-diseno.png`; el QR del
+  Wi-Fi es de una red de muestra) y guarda en `acrilicos.json` dónde quedó el
+  círculo "toca aquí".
 - `menu.mp4`, `tarjeta.mp4`: videos de venta de 14,8 s hechos con el video real
   del cliente: gancho, tres escenas con texto y cierre con la foto de estudio,
   el logo y el WhatsApp. `herramientas/video-venta.html` dibuja cada cuadro y
   `herramientas/render-venta.js` lo renderiza.
-- `resenas.mp4`, `pago.mp4`, `wifi.mp4`: el mismo formato de venta, pero sin
-  toma real todavía: la foto del acrílico (reseñas), la animación 3D del toque
-  y las pantallas del celular sin textos (`herramientas/pantallas.js` las saca
-  de `../reels/composer.html`). Cuando haya video real, se rehacen como los del
-  menú y la tarjeta.
+- `resenas.mp4`: el mismo formato de venta, pero sin toma real todavía: la
+  foto del acrílico y las pantallas del celular sin textos
+  (`herramientas/pantallas.js` las saca de `../reels/composer.html`).
+- `pago.mp4`, `wifi.mp4`: el toque, 7,5 s en bucle: un celular se acerca al
+  círculo de la foto de estudio, salen las ondas NFC y se abre la pantalla (el
+  pago con monto de muestra o la conexión a la red "Invitados").
+  `herramientas/toque.html` dibuja cada cuadro y `herramientas/render-toque.js`
+  saca este video y el de 720 × 1280 del carrusel (`../reels/v/`).
 - `gym-venta.mp4` (y su póster `gym-venta.jpg`): el video de la página del
   sistema para gimnasios, hecho con la grabación de pantalla real del sistema
   dentro de un celular (la grabación es de baja resolución). Se saltó el tramo
