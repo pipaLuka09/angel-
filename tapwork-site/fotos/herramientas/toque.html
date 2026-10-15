@@ -2,10 +2,12 @@
 <html lang="es"><head><meta charset="utf-8">
 <!--
   El toque: un celular se acerca al círculo del acrílico, salen las ondas NFC y
-  se abre la pantalla (la conexión al Wi-Fi o el pago). renderAt(t) dibuja el
-  cuadro exacto del segundo t; ?k=pago|wifi elige el acrílico y ?w=&h= el
-  tamaño del cuadro (1080x1350 tienda, 720x1280 carrusel del inicio).
-  La foto de fondo y la posición del círculo salen de acrilicos.py.
+  se abre la pantalla (el pago, el Wi-Fi, la carta, la reseña o la máquina de
+  FORJA). renderAt(t) dibuja el cuadro exacto del segundo t;
+  ?k=pago|wifi|menu|acrilico|gym elige la escena y ?w=&h= el tamaño del cuadro
+  (1080x1350 tienda, 720x1280 carrusel del inicio). La foto de fondo, dónde
+  tocar, el color de las ondas, el tamaño del celular y el sticker que se pega
+  (acrílico reutilizado) salen de acrilicos.json, que arma acrilicos.py.
 -->
 <style>
 @font-face{font-family:A;src:url(../../sitio/fonts/archivo.woff2) format('woff2');font-weight:100 900;font-stretch:62% 125%}
@@ -52,6 +54,7 @@ html,body{background:#000;overflow:hidden}
 <body>
 <div id="view"><div id="stage">
   <img id="photo" alt="">
+  <img id="stk" alt="" style="position:absolute;left:0;top:0;opacity:0">
   <div id="rings"></div>
   <div id="dim"></div>
   <div id="shadow"></div>
@@ -78,14 +81,16 @@ const Q = new URLSearchParams(location.search);
 const K = Q.get('k') || 'pago', VW = +(Q.get('w') || 1080), VH = +(Q.get('h') || 1350);
 const INFO = window.__INFO;
 const TAP = INFO[K].tap;               // x, y, radio del círculo en la foto (1080x1350)
-window.__total = 7.5;
+const D = INFO[K].delay || 0;          // segundos antes de que entre el celular
+window.__total = 7.5 + D;
 
 // el cuadro: la foto 1080x1350 a lo alto del cuadro, centrada
 const view = document.getElementById('view'), stage = document.getElementById('stage');
 view.style.width = VW + 'px'; view.style.height = VH + 'px';
 const SC = VH / 1350, OX = (VW - 1080 * SC) / 2;
 stage.style.transform = `translate(${OX}px,0) scale(${SC})`;
-document.getElementById('photo').src = '../' + K + '.jpg';
+document.getElementById('photo').src = INFO[K].photo;
+if (INFO[K].sticker) document.getElementById('stk').src = INFO[K].sticker.src;
 
 const NAVY = '#0A2463', YEL = '#FFD100', MINT = '#2BB58A';
 const wifiIc = (c, full) => `<svg width="18" height="14" viewBox="0 0 18 14"><path d="M9 13.2 1 4.6a11.6 11.6 0 0 1 16 0z" fill="${c}" opacity="${full ? 1 : .35}"/></svg>`;
@@ -94,6 +99,7 @@ const bat = c => `<svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y
 const CHECK = c => `<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 
 // --- las pantallas de cada acrílico --------------------------------------
+const dishes = L => L.map(([a, b]) => `<div style="padding:15px 0;border-top:1px solid rgba(243,234,223,.12)"><div style="font-weight:800;font-size:17px">${a}</div><div style="font-family:S;font-style:italic;font-size:15px;opacity:.7;margin-top:2px">${b}</div></div>`).join('');
 const APP = {
   wifi: {
     bg: 'radial-gradient(120% 80% at 30% 20%,#2f4a8a 0%,#101a35 55%,#070b16 100%)',
@@ -110,6 +116,7 @@ const APP = {
         <div style="margin:18px 0 4px;padding:13px 14px;border-radius:16px;background:#F3F6FA;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700">
           <span style="display:flex;gap:8px;align-items:center">${wifiIc(NAVY, true)} Invitados</span><span style="color:${MINT};font-size:12px;letter-spacing:.5px">EXCELENTE</span></div></div>`,
     button: [0.68, 0.905],      // dónde cae el dedo, en fracción de la pantalla
+    bar: ['#fff', '#fff'],      // color de la barra de estado antes y después
   },
   pago: {
     bg: '#F4F5F9',
@@ -134,16 +141,79 @@ const APP = {
           <div style="display:flex;justify-content:space-between;margin-top:10px"><span style="opacity:.7">Para</span><span>Consultorio dental</span></div>
           <div style="display:flex;justify-content:space-between;margin-top:10px"><span style="opacity:.7">Hora</span><span>10:24</span></div></div></div>`,
     button: [0.5, 0.925],
+    bar: [NAVY, '#fff'],
+  },
+  menu: {
+    bg: '#14110F',
+    // el encabezado y las pestañas quedan quietos; solo cambia la lista
+    ask: `<div class="layer" style="background:#14110F;color:#F3EADF;padding:66px 22px 0">
+        <div style="font-family:S;font-style:italic;font-size:40px;line-height:1">Carta</div>
+        <div style="font-size:13px;font-weight:600;opacity:.6;margin-top:4px">Leída con NFC · actualizada hoy</div>
+        <div id="tabs" style="position:relative;display:flex;gap:6px;margin:20px 0 0;font-size:13px;font-weight:700;white-space:nowrap">
+          <i id="pill" style="position:absolute;top:0;height:100%;border-radius:20px;background:#F3EADF"></i>
+          <span class="tb" style="position:relative;padding:9px 12px;border-radius:20px;border:1px solid rgba(243,234,223,.3)">Entradas</span>
+          <span class="tb" id="go" style="position:relative;padding:9px 12px;border-radius:20px;border:1px solid rgba(243,234,223,.3)">Platos fuertes</span>
+          <span class="tb" style="position:relative;padding:9px 12px;border-radius:20px;border:1px solid rgba(243,234,223,.3)">Bebidas</span></div></div>
+      <div class="layer" id="s1" style="top:200px;color:#F3EADF;padding:0 22px">${dishes([['Bolón de verde', 'Con queso o chicharrón, y huevo frito'], ['Ceviche de camarón', 'Con chifles, canguil y limón'], ['Empanadas de viento', 'Tres, con azúcar por encima'], ['Patacones con queso', 'Verde crocante y queso fresco']])}</div>`,
+    done: `<div class="layer" id="s2" style="top:200px;color:#F3EADF;padding:0 22px">${dishes([['Encebollado', 'Albacora, yuca y cebolla curtida'], ['Seco de pollo', 'Con arroz amarillo y maduro'], ['Arroz con menestra', 'Carne asada y patacones'], ['Guatita', 'Con arroz, aguacate y maduro']])}</div>`,
+    button: [0.47, 0.235],
+    bar: ['#fff', '#fff'],
+    slide: true,
+  },
+  acrilico: {
+    bg: '#fff',
+    ask: `<div class="layer" id="s1" style="background:#fff;color:#1d1d1f;text-align:center;padding-top:120px">
+        <div style="font-family:S;font-style:italic;font-size:30px;line-height:1.1">¿Cómo te<br>atendimos hoy?</div>
+        <div class="muted" style="font-size:14px;font-weight:600;margin-top:10px">Toca las estrellas</div>
+        <div id="stars" style="display:flex;justify-content:center;gap:8px;margin-top:34px"></div>
+        <div style="margin:36px 22px 0;padding:16px;border-radius:16px;background:#F4F4F6;text-align:left;font-size:14px;color:#8a8a93">Cuéntanos algo (opcional)</div>
+        <span class="cta" id="go" style="position:absolute;left:18px;right:18px;bottom:30px;width:auto;background:#1d1d1f;color:#fff">Enviar</span></div>`,
+    done: `<div class="layer" id="s2" style="background:#fff;color:#1d1d1f;text-align:center;padding-top:170px">
+        <div class="check" style="background:#EC3013">${CHECK('#fff')}</div>
+        <div style="font-weight:900;font-stretch:85%;font-size:30px;margin-top:20px">¡Gracias!</div>
+        <div style="font-family:S;font-style:italic;font-size:20px;margin-top:4px">tu opinión ya llegó</div>
+        <div style="margin-top:22px;font-size:26px;letter-spacing:6px;color:#F2A900">★★★★★</div></div>`,
+    button: [0.5, 0.925],
+    bar: ['#1d1d1f', '#1d1d1f'],
+  },
+  gym: {
+    bg: '#0E0F12',
+    ask: `<div class="layer" id="s1" style="background:#0E0F12;color:#fff;padding:64px 20px 0">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;letter-spacing:1.5px"><span style="color:#EC3013">FORJA</span><span style="opacity:.55">ESTACIÓN 07</span></div>
+        <div style="font-family:S;font-style:italic;font-size:34px;line-height:1.05;margin-top:12px">Press de banca</div>
+        <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:#1A1C21;font-size:13px;font-weight:600"><span style="opacity:.55">Tu última vez · hace 3 días</span><br><b style="font-size:16px">60 kg × 10 repeticiones</b></div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:1px;opacity:.55;margin-top:22px">PESO</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+          <span style="width:52px;height:52px;border-radius:16px;background:#1A1C21;display:grid;place-items:center;font-size:28px;font-weight:700">−</span>
+          <span style="font-weight:900;font-stretch:85%;font-size:44px">62,5 <small style="font-size:18px;opacity:.6">kg</small></span>
+          <span style="width:52px;height:52px;border-radius:16px;background:#EC3013;display:grid;place-items:center;font-size:28px;font-weight:700">+</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;font-size:15px;font-weight:700"><span style="opacity:.55">Repeticiones</span><span style="font-size:22px">10</span></div>
+        <div style="display:flex;gap:8px;margin-top:18px;font-size:13px;font-weight:700">
+          <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#1A1C21">Fácil</span>
+          <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#fff;color:#0E0F12">Bien</span>
+          <span style="flex:1;text-align:center;padding:10px 0;border-radius:12px;background:#1A1C21">Duro</span></div>
+        <span class="cta" id="go" style="position:absolute;left:18px;right:18px;bottom:30px;width:auto;background:#EC3013;color:#fff">Guardar serie</span></div>`,
+    done: `<div class="layer" id="s2" style="background:#0E0F12;color:#fff;text-align:center;padding-top:150px">
+        <div class="check" style="background:#EC3013">${CHECK('#fff')}</div>
+        <div style="font-weight:900;font-stretch:85%;font-size:30px;margin-top:20px">¡Serie guardada!</div>
+        <div style="font-family:S;font-style:italic;font-size:20px;margin-top:4px;opacity:.85">62,5 kg × 10, en la estación 07</div>
+        <div style="margin:28px 20px 0;padding:16px;border-radius:18px;background:#1A1C21;text-align:left;font-size:14px;font-weight:600">
+          <div style="display:flex;justify-content:space-between"><span style="opacity:.6">Nuevo récord</span><span style="color:#EC3013;font-weight:800">+2,5 kg</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px"><span style="opacity:.6">Sesiones en esta máquina</span><span>14</span></div></div></div>`,
+    button: [0.5, 0.925],
+    bar: ['#fff', '#fff'],
   },
 }[K];
 const app = document.getElementById('app');
 app.style.background = APP.bg;
 app.innerHTML = APP.ask + APP.done;
 const s1 = document.getElementById('s1'), s2 = document.getElementById('s2'), go = document.getElementById('go');
+const STARS = document.getElementById('stars');
+const star = on => `<svg width="44" height="44" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4L2.8 9.5l6.4-.8z" fill="${on ? '#F2A900' : 'none'}" stroke="${on ? '#F2A900' : '#c9c9cf'}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 
 // anillos NFC alrededor del círculo
 const rings = document.getElementById('rings');
-const RING_COL = K === 'pago' ? '255,209,0' : '255,106,85';
+const RING_COL = INFO[K].ring || (K === 'pago' ? '255,209,0' : '255,106,85');
 const R = [];
 for (let i = 0; i < 3; i++) { const d = document.createElement('div'); d.className = 'ring'; rings.appendChild(d); R.push(d); }
 
@@ -158,9 +228,10 @@ const mix = (A, B, x) => A.map((v, i) => lerp(v, B[i], x));
 
 const PW = 330, PH = 680, AX = .5, AY = .3;       // el punto del celular que toca: arriba al centro (la antena)
 // poses: [x, y, rotación, escala] del punto de anclaje en la foto
-const P_OUT = [TAP[0] + 560, TAP[1] + 1250, -26, 1.12];
-const P_NEAR = [TAP[0] + 40, TAP[1] + 70, -12, 1.06];
-const P_TAP = [TAP[0] + 8, TAP[1] + 16, -9, 1.0];
+const PS = INFO[K].phone || 1;                      // el celular a la escala de la escena (lejos en el gimnasio)
+const P_OUT = [TAP[0] + 560, TAP[1] + 1250, -26, 1.12 * PS];
+const P_NEAR = [TAP[0] + 40 * PS, TAP[1] + 70 * PS, -12, 1.06 * PS];
+const P_TAP = [TAP[0] + 8 * PS, TAP[1] + 16 * PS, -9, PS];
 const P_SHOW = [540, 470, 0, 1.24];
 
 function pose(t) {
@@ -173,7 +244,19 @@ function pose(t) {
   return mix(P_SHOW, [P_SHOW[0] + 40, P_SHOW[1] + 1150, 8, 1.2], eio(seg(t, 6.55, 7.35)));
 }
 
-window.renderAt = function (t) {
+window.renderAt = function (T) {
+  // acrílico reutilizado: primero se pega el sticker en el acrílico de siempre
+  const S = INFO[K].sticker;
+  if (S) {
+    const stk = document.getElementById('stk'), k = seg(T, .3, .95), land = eout(k);
+    const sc = lerp(1.7, 1, land) * (1 - .06 * Math.sin(Math.PI * seg(T, .95, 1.2)));
+    const d = S.d * sc;
+    stk.style.width = stk.style.height = d + 'px';
+    stk.style.transform = `translate(${TAP[0] - d / 2 + (1 - land) * 160}px,${TAP[1] - d / 2 - (1 - land) * 220}px) rotate(${(1 - land) * -40}deg)`;
+    stk.style.opacity = clamp(k * 3);
+    stk.style.filter = `drop-shadow(${3 + (1 - land) * 30}px ${4 + (1 - land) * 40}px ${4 + (1 - land) * 18}px rgba(0,0,0,${.45 - (1 - land) * .2}))`;
+  }
+  const t = T - D;
   // celular
   let [x, y, r, s] = pose(t);
   // vibra un poco al leer el chip
@@ -207,8 +290,7 @@ window.renderAt = function (t) {
   app.style.opacity = open;
   app.style.transform = `scale(${lerp(.92, 1, open)})`;
   const sb = document.getElementById('sb');
-  const dark = K === 'pago' ? (t < 4.35) : true;  // la barra de estado sobre fondo claro u oscuro
-  const sbc = (K === 'pago' && open > .5 && dark) ? '#0A2463' : '#fff';
+  const sbc = open > .5 ? APP.bar[t < 4.35 ? 0 : 1] : '#fff';  // la barra de estado sobre fondo claro u oscuro
   sb.style.color = sbc;
   const wifiOn = K === 'wifi' ? t > 4.35 : true;
   document.getElementById('sbic').innerHTML = sig(sbc) + wifiIc(sbc, wifiOn) + bat(sbc);
@@ -219,15 +301,24 @@ window.renderAt = function (t) {
   dot.style.left = `calc(${APP.button[0] * 100}% - 28px)`; dot.style.top = `calc(${APP.button[1] * 100}% - 28px)`;
   dot.style.opacity = t > 3.75 && t < 4.35 ? Math.sin(Math.PI * seg(t, 3.75, 4.35)) * .9 : 0;
   dot.style.transform = `scale(${lerp(.6, 1.15, seg(t, 3.75, 4.35))})`;
-  s1.style.opacity = 1 - done;
-  s2.style.opacity = done;
-  s2.style.transform = `translateY(${(1 - done) * 40}px)`;
+  if (APP.slide) {  // la carta: la lista se desliza como al cambiar de pestaña
+    s1.style.transform = `translateX(${-done * 110}%)`; s2.style.transform = `translateX(${(1 - done) * 110}%)`;
+    const tb = [...document.querySelectorAll('.tb')], pill = document.getElementById('pill');
+    const a = tb[0], b = tb[1];
+    pill.style.left = lerp(a.offsetLeft, b.offsetLeft, done) + 'px';
+    pill.style.width = lerp(a.offsetWidth, b.offsetWidth, done) + 'px';
+    a.style.color = done < .5 ? '#14110F' : '#F3EADF'; b.style.color = done < .5 ? '#F3EADF' : '#14110F';
+  } else {
+    s1.style.opacity = 1 - done;
+    s2.style.opacity = done;
+    s2.style.transform = `translateY(${(1 - done) * 40}px)`;
+  }
   const chk = s2.querySelector('.check');
-  chk.style.transform = `scale(${t < 4.3 ? 0 : back(seg(t, 4.35, 4.85))})`;
+  if (chk) chk.style.transform = `scale(${t < 4.3 ? 0 : back(seg(t, 4.35, 4.85))})`;
+  // reseña: las estrellas se encienden una por una antes de enviar
+  if (STARS) STARS.innerHTML = [0, 1, 2, 3, 4].map(i => star(t > 3.0 + i * .12)).join('');
 };
-window.__ready = document.fonts.ready.then(() => new Promise(r => {
-  const im = document.getElementById('photo'); if (im.complete) r(); else im.onload = r;
-}));
+window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].filter(i => i.getAttribute('src')).map(i => i.decode().catch(() => {}))));
 renderAt(0);
 </script>
 </body></html>

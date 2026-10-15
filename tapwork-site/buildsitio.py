@@ -152,6 +152,8 @@ REAL = {
     # tapping them: fotos/herramientas/acrilicos.py and toque.html.
     'pagos': {'img': 'pago.jpg', 'reel': 'pago.mp4'},
     'wifi': {'img': 'wifi.jpg', 'reel': 'wifi.mp4'},
+    # An ordinary QR-only acrylic, the Tap Work sticker landing on it and the tap.
+    'acrilico': {'img': 'acrilico.jpg', 'reel': 'acrilico.mp4'},
 }
 
 # Products with a page of their own.

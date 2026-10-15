@@ -1,8 +1,9 @@
 // Renderiza toque.html cuadro por cuadro (24 fps) y arma los videos con ffmpeg.
-//   node render-toque.js pago wifi
+//   node render-toque.js pago wifi acrilico menu gym
 // Salen: ../<k>.mp4 (1080x1350, tienda), ../../reels/v/<k>.mp4 (720x1280,
 // carrusel del inicio) con su póster .jpg (el cuadro con la pantalla abierta).
-// Antes hay que correr acrilicos.py: la foto ../<k>.jpg es el fondo.
+// El menú y FORJA solo van en el carrusel: la tienda tiene el video real del menú y
+// FORJA tiene su propia página. Antes hay que correr acrilicos.py (arma las fotos de fondo).
 const {chromium} = require('playwright');
 const path = require('path'), fs = require('fs'), {execFileSync} = require('child_process');
 const FF = process.env.FFMPEG || 'ffmpeg';
@@ -12,9 +13,11 @@ const SIZES = [
   {w: 720, h: 1280, out: k => path.join(__dirname, '..', '..', 'reels', 'v', k), crf: 24, poster: true},
 ];
 const POSTER = 5.2;
+const SOLO_CARRUSEL = new Set(['menu', 'gym']);
 (async () => {
   const b = await chromium.launch();
   for (const k of process.argv.slice(2)) for (const S of SIZES) {
+    if (SOLO_CARRUSEL.has(k) && S.w === 1080) continue;
     const dir = path.join(__dirname, 'rf', `${k}-${S.w}`);
     fs.rmSync(dir, {recursive: true, force: true}); fs.mkdirSync(dir, {recursive: true});
     const p = await b.newPage({viewport: {width: S.w, height: S.h}});
@@ -27,7 +30,7 @@ const POSTER = 5.2;
       await p.screenshot({path: path.join(dir, `f${String(i + 1).padStart(4, '0')}.jpg`), type: 'jpeg', quality: 92});
     }
     if (S.poster) {
-      await p.evaluate(t => renderAt(t), POSTER);
+      await p.evaluate(t => renderAt(t), POSTER + (INFO[k].delay || 0));
       await p.screenshot({path: S.out(k) + '.jpg', type: 'jpeg', quality: 86});
     }
     await p.close();

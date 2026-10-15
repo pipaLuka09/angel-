@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<!--
+  Las piezas impresas de las escenas del toque, en mm reales:
+    ?p=viejo    un acrílico de reseñas "de los de siempre", solo con QR (10 x 15 cm)
+    ?p=sticker  el sticker NFC de Tap Work que se le pega (30 mm)
+    ?p=forja    el sticker de FORJA que va en cada máquina (50 x 90 mm)
+  render-piezas.js las saca a PNG a 300 dpi.
+-->
+<style>
+@font-face{font-family:A;src:url(../../sitio/fonts/archivo.woff2) format('woff2');font-weight:100 900;font-stretch:62% 125%}
+@font-face{font-family:S;src:url(../../sitio/fonts/serif-italic.woff2) format('woff2');font-weight:500;font-style:italic}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:transparent}
+.p{position:relative;overflow:hidden}
+
+/* el acrílico de siempre: blanco, letra de imprenta, el QR al centro */
+#viejo{width:100mm;height:150mm;background:#fff;color:#1d1d1f;font-family:'DejaVu Serif',serif;text-align:center}
+#viejo .t{position:absolute;left:0;right:0;top:13mm;font-weight:700;font-size:8.4mm;line-height:1.1}
+#viejo .s{position:absolute;left:0;right:0;top:33mm;font-family:'DejaVu Sans',sans-serif;font-size:3.6mm;color:#555}
+#viejo .qr{position:absolute;left:25mm;top:44mm;width:50mm;height:50mm;padding:3mm;border:.6mm solid #1d1d1f;border-radius:3mm}
+#viejo .qr img{width:100%;height:100%;image-rendering:pixelated;display:block}
+#viejo .e{position:absolute;left:0;right:0;top:99mm;font-family:'DejaVu Sans',sans-serif;font-weight:700;font-size:3.8mm;letter-spacing:.3mm}
+#viejo .st{position:absolute;left:0;right:0;top:106mm;font-family:'DejaVu Sans',sans-serif;font-size:6mm;letter-spacing:1.4mm;color:#E8A317}
+
+/* el sticker de Tap Work */
+#sticker{width:30mm;height:30mm;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a2c33,#0b0c10 70%);
+  box-shadow:inset 0 0 0 .5mm rgba(255,255,255,.14);font-family:A;color:#fff;text-align:center}
+#sticker svg{position:absolute;left:50%;top:6.2mm;width:11mm;height:11mm;margin-left:-5.5mm}
+#sticker b{position:absolute;left:0;right:0;top:18.6mm;font-weight:800;font-stretch:80%;font-size:2.7mm;letter-spacing:.35mm}
+#sticker i{position:absolute;left:50%;top:22.6mm;width:5mm;height:.7mm;margin-left:-2.5mm;border-radius:1mm;background:#EC3013}
+
+/* FORJA, una estación del gimnasio */
+#forja{width:50mm;height:90mm;border-radius:4mm;background:#101114;color:#fff;font-family:A;
+  box-shadow:inset 0 0 0 .5mm rgba(255,255,255,.1)}
+#forja .b{position:absolute;left:5mm;top:6mm;font-weight:900;font-stretch:78%;font-size:5.4mm;letter-spacing:.6mm;color:#EC3013}
+#forja .e{position:absolute;left:5mm;top:17mm;font-weight:700;font-stretch:80%;font-size:2.6mm;letter-spacing:.5mm;opacity:.6}
+#forja .n{position:absolute;left:4mm;top:19mm;font-weight:900;font-stretch:72%;font-size:27mm;line-height:1;letter-spacing:-.8mm}
+#forja .x{position:absolute;left:5mm;right:4mm;top:48mm;font-family:S;font-style:italic;font-size:6.2mm;line-height:1}
+#forja .nfc{position:absolute;left:5mm;right:5mm;bottom:6mm;height:20mm;border-radius:3mm;background:#EC3013;display:flex;align-items:center;gap:2.5mm;padding:0 3.5mm}
+#forja .nfc svg{flex:none;width:9mm;height:9mm}
+#forja .nfc span{font-weight:800;font-stretch:80%;font-size:2.9mm;line-height:1.15;letter-spacing:.2mm;text-transform:uppercase}
+</style></head>
+<body>
+<div class="p" id="viejo" hidden>
+  <div class="t">Tu opinión<br>nos importa</div>
+  <div class="s">¿Cómo te atendimos hoy?</div>
+  <div class="qr"><img id="qr" src="qr-viejo.png" alt=""></div>
+  <div class="e">ESCANEA EL CÓDIGO Y CALIFÍCANOS</div>
+  <div class="st">★★★★★</div>
+</div>
+
+<div class="p" id="sticker" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 8.5a5 5 0 0 1 0 7M10.5 6a9 9 0 0 1 0 12M14 3.5a13 13 0 0 1 0 17"/><circle cx="4" cy="12" r="1.4" fill="#fff" stroke="none"/></svg>
+  <b>TOCA AQUÍ</b><i></i>
+</div>
+
+<div class="p" id="forja" hidden>
+  <div class="b">FORJA</div>
+  <div class="e">ESTACIÓN</div>
+  <div class="n">07</div>
+  <div class="x">Press de<br>banca</div>
+  <div class="nfc">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M7 8.5a5 5 0 0 1 0 7M10.5 6a9 9 0 0 1 0 12M14 3.5a13 13 0 0 1 0 17"/><circle cx="4" cy="12" r="1.4" fill="#fff" stroke="none"/></svg>
+    <span>Acerca tu<br>celular</span>
+  </div>
+</div>
+<script>
+const p = new URLSearchParams(location.search).get('p') || 'viejo';
+document.getElementById(p).hidden = false;
+window.__ready = Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode().catch(() => {}))]);
+</script>
+</body></html>
