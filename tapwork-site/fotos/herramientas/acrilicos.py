@@ -60,7 +60,7 @@ def stand(path, pw=540, ph=810, m=18, foot=70, k=1.08, sticker=None):
 
 # Dónde está el círculo "toca aquí" en cada diseño, en mm sobre los 100 x 150 del arte.
 TAP = {'pago': (20, 61, 16.2), 'wifi': (21, 80, 14)}
-# El acrílico reutilizado: el de siempre (solo QR) y el sticker de Tap Work que se le pega.
+# El acrílico reutilizado: el de menú de siempre (solo QR) y el sticker de Tap Work que se le pega.
 STICKER = ('pieza-sticker.png', 80, 128, 30)
 # FORJA: la foto de Unsplash (ver README) recortada a 4:5 y el sticker de la estación pegado
 # en el poste delantero de la máquina, con su inclinación.
@@ -105,6 +105,8 @@ if __name__ == '__main__':
                             sticker=dict(src='pieza-sticker.png', d=sd / 100 * iw))
     # el menú: la foto real del acrílico "Carta Digital"; el ícono NFC está bajo el QR
     info['menu'] = dict(photo='../menu.jpg', ring='255,255,255', tap=[530, 825, 46])
+    # reseñas: la foto real del acrílico de Google; se toca el óvalo con el ícono NFC
+    info['resenas'] = dict(photo='../resenas.jpg', ring='255,209,0', tap=[530, 673, 110])
     info['gym'] = dict(photo='gym-fondo.jpg', ring='236,48,19', phone=.62, tap=gym())
     json.dump(info, open('acrilicos.json', 'w'), indent=1)
     print(json.dumps(info))

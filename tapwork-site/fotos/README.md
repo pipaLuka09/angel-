@@ -18,14 +18,14 @@ generado. Formato 4:5.
   del cliente: gancho, tres escenas con texto y cierre con la foto de estudio,
   el logo y el WhatsApp. `herramientas/video-venta.html` dibuja cada cuadro y
   `herramientas/render-venta.js` lo renderiza.
-- `resenas.mp4`: el mismo formato de venta, pero sin toma real todavía: la
-  foto del acrílico y las pantallas del celular sin textos
-  (`herramientas/pantallas.js` las saca de `../reels/composer.html`).
-- `acrilico.jpg`, `acrilico.mp4` (acrílico reutilizado): un acrílico de reseñas
+- `resenas.mp4`: el toque sobre la foto real del acrílico de Google (abajo):
+  se abre la reseña de un negocio de muestra, cinco estrellas y publicada. Es
+  el mismo video del carrusel del inicio; ya no hay versión con el render 3D.
+- `acrilico.jpg`, `acrilico.mp4` (acrílico reutilizado): un acrílico de menú
   "de los de siempre", solo con QR (`herramientas/piezas.html?p=viejo`), con el
   sticker NFC de Tap Work pegado. En el video primero cae el sticker sobre el
-  acrílico y después viene el toque, que abre una reseña de 5 estrellas.
-- `pago.mp4`, `wifi.mp4`: el toque, 7,5 s en bucle: un celular se acerca al
+  acrílico y después viene el toque, que abre la carta.
+- `pago.mp4`, `wifi.mp4` (y `resenas.mp4`): el toque, 7,5 s en bucle: un celular se acerca al
   círculo de la foto de estudio, salen las ondas NFC y se abre la pantalla (el
   pago con monto de muestra o la conexión a la red "Invitados").
   `herramientas/toque.html` dibuja cada cuadro y `herramientas/render-toque.js`

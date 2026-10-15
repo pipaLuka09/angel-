@@ -50,6 +50,15 @@
    46
   ]
  },
+ "resenas": {
+  "photo": "../resenas.jpg",
+  "ring": "255,209,0",
+  "tap": [
+   530,
+   673,
+   110
+  ]
+ },
  "gym": {
   "photo": "gym-fondo.jpg",
   "ring": "236,48,19",

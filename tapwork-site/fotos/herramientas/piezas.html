@@ -2,7 +2,7 @@
 <html lang="es"><head><meta charset="utf-8">
 <!--
   Las piezas impresas de las escenas del toque, en mm reales:
-    ?p=viejo    un acrílico de reseñas "de los de siempre", solo con QR (10 x 15 cm)
+    ?p=viejo    un acrílico de menú "de los de siempre", solo con QR (10 x 15 cm)
     ?p=sticker  el sticker NFC de Tap Work que se le pega (30 mm)
     ?p=forja    el sticker de FORJA que va en cada máquina (50 x 90 mm)
   render-piezas.js las saca a PNG a 300 dpi.
@@ -43,11 +43,10 @@ html,body{background:transparent}
 </style></head>
 <body>
 <div class="p" id="viejo" hidden>
-  <div class="t">Tu opinión<br>nos importa</div>
-  <div class="s">¿Cómo te atendimos hoy?</div>
+  <div class="t">Nuestra<br>carta</div>
+  <div class="s">Platos, bebidas y promociones del día</div>
   <div class="qr"><img id="qr" src="qr-viejo.png" alt=""></div>
-  <div class="e">ESCANEA EL CÓDIGO Y CALIFÍCANOS</div>
-  <div class="st">★★★★★</div>
+  <div class="e">ESCANEA EL CÓDIGO CON TU CÁMARA</div>
 </div>
 
 <div class="p" id="sticker" hidden>

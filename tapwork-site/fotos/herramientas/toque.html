@@ -4,7 +4,7 @@
   El toque: un celular se acerca al círculo del acrílico, salen las ondas NFC y
   se abre la pantalla (el pago, el Wi-Fi, la carta, la reseña o la máquina de
   FORJA). renderAt(t) dibuja el cuadro exacto del segundo t;
-  ?k=pago|wifi|menu|acrilico|gym elige la escena y ?w=&h= el tamaño del cuadro
+  ?k=pago|wifi|menu|resenas|acrilico|gym elige la escena y ?w=&h= el tamaño del cuadro
   (1080x1350 tienda, 720x1280 carrusel del inicio). La foto de fondo, dónde
   tocar, el color de las ondas, el tamaño del celular y el sticker que se pega
   (acrílico reutilizado) salen de acrilicos.json, que arma acrilicos.py.
@@ -100,7 +100,7 @@ const CHECK = c => `<svg viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-wi
 
 // --- las pantallas de cada acrílico --------------------------------------
 const dishes = L => L.map(([a, b]) => `<div style="padding:15px 0;border-top:1px solid rgba(243,234,223,.12)"><div style="font-weight:800;font-size:17px">${a}</div><div style="font-family:S;font-style:italic;font-size:15px;opacity:.7;margin-top:2px">${b}</div></div>`).join('');
-const APP = {
+const SCREENS = {
   wifi: {
     bg: 'radial-gradient(120% 80% at 30% 20%,#2f4a8a 0%,#101a35 55%,#070b16 100%)',
     ask: `<div class="sheet" id="s1">
@@ -160,18 +160,20 @@ const APP = {
     bar: ['#fff', '#fff'],
     slide: true,
   },
-  acrilico: {
+  resenas: {
     bg: '#fff',
-    ask: `<div class="layer" id="s1" style="background:#fff;color:#1d1d1f;text-align:center;padding-top:120px">
-        <div style="font-family:S;font-style:italic;font-size:30px;line-height:1.1">¿Cómo te<br>atendimos hoy?</div>
-        <div class="muted" style="font-size:14px;font-weight:600;margin-top:10px">Toca las estrellas</div>
-        <div id="stars" style="display:flex;justify-content:center;gap:8px;margin-top:34px"></div>
-        <div style="margin:36px 22px 0;padding:16px;border-radius:16px;background:#F4F4F6;text-align:left;font-size:14px;color:#8a8a93">Cuéntanos algo (opcional)</div>
-        <span class="cta" id="go" style="position:absolute;left:18px;right:18px;bottom:30px;width:auto;background:#1d1d1f;color:#fff">Enviar</span></div>`,
+    ask: `<div class="layer" id="s1" style="background:#fff;color:#1d1d1f;text-align:center;padding-top:96px">
+        <div style="width:64px;height:64px;border-radius:50%;margin:0 auto;background:#3B2A20;color:#F3EADF;display:grid;place-items:center;font-family:S;font-style:italic;font-size:30px">C</div>
+        <div style="font-weight:800;font-size:20px;margin-top:12px">Cafetería · Machala</div>
+        <div class="muted" style="font-size:13px;font-weight:600;margin-top:2px">Reseña en Google Maps</div>
+        <div style="font-family:S;font-style:italic;font-size:24px;margin-top:26px">¿Cómo estuvo tu visita?</div>
+        <div id="stars" style="display:flex;justify-content:center;gap:8px;margin-top:16px"></div>
+        <div style="margin:28px 22px 0;padding:16px;border-radius:16px;background:#F4F4F6;text-align:left;font-size:14px;color:#8a8a93">Cuenta cómo te fue (opcional)</div>
+        <span class="cta" id="go" style="position:absolute;left:18px;right:18px;bottom:30px;width:auto;background:#1d1d1f;color:#fff">Publicar</span></div>`,
     done: `<div class="layer" id="s2" style="background:#fff;color:#1d1d1f;text-align:center;padding-top:170px">
-        <div class="check" style="background:#EC3013">${CHECK('#fff')}</div>
+        <div class="check" style="background:#2BB58A">${CHECK('#fff')}</div>
         <div style="font-weight:900;font-stretch:85%;font-size:30px;margin-top:20px">¡Gracias!</div>
-        <div style="font-family:S;font-style:italic;font-size:20px;margin-top:4px">tu opinión ya llegó</div>
+        <div style="font-family:S;font-style:italic;font-size:20px;margin-top:4px">tu reseña ya se publicó</div>
         <div style="margin-top:22px;font-size:26px;letter-spacing:6px;color:#F2A900">★★★★★</div></div>`,
     button: [0.5, 0.925],
     bar: ['#1d1d1f', '#1d1d1f'],
@@ -203,7 +205,10 @@ const APP = {
     button: [0.5, 0.925],
     bar: ['#fff', '#fff'],
   },
-}[K];
+};
+// el acrílico reutilizado era de menú con QR: con el sticker abre la misma carta
+SCREENS.acrilico = SCREENS.menu;
+const APP = SCREENS[K];
 const app = document.getElementById('app');
 app.style.background = APP.bg;
 app.innerHTML = APP.ask + APP.done;
@@ -315,7 +320,7 @@ window.renderAt = function (T) {
   }
   const chk = s2.querySelector('.check');
   if (chk) chk.style.transform = `scale(${t < 4.3 ? 0 : back(seg(t, 4.35, 4.85))})`;
-  // reseña: las estrellas se encienden una por una antes de enviar
+  // reseña: las estrellas se encienden una por una antes de publicar
   if (STARS) STARS.innerHTML = [0, 1, 2, 3, 4].map(i => star(t > 3.0 + i * .12)).join('');
 };
 window.__ready = document.fonts.ready.then(() => Promise.all([...document.images].filter(i => i.getAttribute('src')).map(i => i.decode().catch(() => {}))));
