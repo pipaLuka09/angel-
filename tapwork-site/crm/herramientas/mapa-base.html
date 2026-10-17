@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<!--
+  Mapa base de Machala para el CRM (crm/index.html).
+  Un div de tamaño fijo con Leaflet + teselas de OpenStreetMap, centro y zoom exactos,
+  para sacar una captura y usarla como imagen de fondo. Así el CRM sabe a qué
+  píxel corresponde cada latitud/longitud (Web Mercator, ver CENTRO y ZOOM abajo).
+  Parámetros opcionales: ?w=3200&h=2600&z=16&lat=-3.2645&lng=-79.951
+-->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>html,body{margin:0;background:#fff}#m{position:absolute;left:0;top:0}</style>
+</head><body>
+<div id="m"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const W = +(q.get('w') || 3200), H = +(q.get('h') || 2600), ZOOM = +(q.get('z') || 16);
+const CENTRO = [+(q.get('lat') || -3.2645), +(q.get('lng') || -79.951)];
+const el = document.getElementById('m');
+el.style.width = W + 'px'; el.style.height = H + 'px';
+const map = L.map(el, {zoomControl: false, attributionControl: false, fadeAnimation: false, zoomSnap: 1})
+  .setView(CENTRO, ZOOM);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, keepBuffer: 0}).addTo(map);
+</script>
+</body></html>
